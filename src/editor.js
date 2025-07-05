@@ -1,8 +1,8 @@
-require.config({ paths: { vs: 'node_modules/monaco-editor/min/vs' } });
-require(['vs/editor/editor.main'], monacoReady);
-let editor;
-function monacoReady() {
-    editor = monaco.editor.create(document.getElementById('codeEditor'), {
+import * as monaco from "monaco-editor";
+import { openFile, updateFile, getCompletions, getSignatureHelp } from "./pyright-manager";
+
+export function setUpMonaco() {
+    const editor = monaco.editor.create(document.getElementById('codeEditor'), {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
         theme: "vs-dark",
@@ -127,5 +127,5 @@ function monacoReady() {
             };
         }
     });
-
+    return editor;
 }

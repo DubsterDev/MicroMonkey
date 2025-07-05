@@ -1,27 +1,27 @@
+import stubs from "./stub-bundle.json";
+
 const pyrightWorker = new Worker("pyright/pyright.worker.js");
 
 pyrightWorker.addEventListener("message", console.log)
 let requestId = 0;
 
-(async function () {
-    const stubs = (await (await fetch("./stub-bundle.json")).json())
-    stubs["pyrightconfig.json"] = {
-        "typeCheckingMode": "strict",
-        "typeshedPath": "/typeshed"
-    }
-    pyrightWorker.postMessage({
-        jsonrpc: '2.0',
-        id: requestId++,
-        method: 'initialize',
-        params: {
-            rootUri: 'file:///', // or whatever you want
-            capabilities: {},
-            initializationOptions: {
-                files: stubs
-            }
+
+stubs["pyrightconfig.json"] = {
+    "typeCheckingMode": "strict",
+    "typeshedPath": "/typeshed"
+}
+pyrightWorker.postMessage({
+    jsonrpc: '2.0',
+    id: requestId++,
+    method: 'initialize',
+    params: {
+        rootUri: 'file:///',
+        capabilities: {},
+        initializationOptions: {
+            files: stubs
         }
-    });
-})();
+    }
+});
 
 const fileVersions = {};
 
@@ -117,3 +117,5 @@ function getSignatureHelp(uri, position = { line: 0, character: 0 }) {
         pyrightWorker.addEventListener("message", messageReceived);
     });
 }
+
+export { openFile, updateFile, getCompletions, getSignatureHelp };

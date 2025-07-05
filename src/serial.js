@@ -2,7 +2,6 @@ let activePort;
 let reader;
 let writer;
 const serialMonitor = document.getElementById("serialMonitor");
-const serialMonitorOutput = document.getElementById("serialMonitorOutput");
 
 async function writeFile(code, filename = "main.py") {
     if (!activePort || !writer) return;
@@ -141,74 +140,78 @@ async function sendDummyData() {
     }
 }
 
-navigator.serial.addEventListener("connect", () => {
-    serialMonitorOutput.innerText += "\n[Board connected]";
-})
+function startSerial(editor) {
+    navigator.serial.addEventListener("connect", () => {
+        serialMonitorOutput.innerText += "\n[Board connected]";
+    })
 
-navigator.serial.addEventListener("disconnect", () => {
-    serialMonitorOutput.innerText += "\n[Board disconnected]";
-    document.getElementById("boardStatus").innerText = "Connect to board";
-});
-
-document.getElementById("findPorts").addEventListener("click", async () => {
-    // request a circuitmess device
-    const port = await navigator.serial
-        .requestPort({
-            filters: [{
-                usbProductId: 29987,
-                usbVendorId: 6790
-            }, {
-                usbProductId: 6e4,
-                usbVendorId: 4292
-            }, {
-                usbProductId: 4097,
-                usbVendorId: 12346
-            }]
-        });
-    document.getElementById("boardStatus").innerText = "Connected";
-    activePort = port;
-    await port.open({
-        baudRate: 115200
+    navigator.serial.addEventListener("disconnect", () => {
+        serialMonitorOutput.innerText += "\n[Board disconnected]";
+        document.getElementById("boardStatus").innerText = "Connect to board";
     });
-    writer = port.writable.getWriter();
 
-    await interruptScript();
+    document.getElementById("findPorts").addEventListener("click", async () => {
+        // request a circuitmess device
+        const port = await navigator.serial
+            .requestPort({
+                filters: [{
+                    usbProductId: 29987,
+                    usbVendorId: 6790
+                }, {
+                    usbProductId: 6e4,
+                    usbVendorId: 4292
+                }, {
+                    usbProductId: 4097,
+                    usbVendorId: 12346
+                }]
+            });
+        document.getElementById("boardStatus").innerText = "Connected";
+        activePort = port;
+        await port.open({
+            baudRate: 115200
+        });
+        writer = port.writable.getWriter();
 
-    const textDecoder = new TextDecoderStream();
-    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-    reader = textDecoder.readable.getReader();
+        await interruptScript();
 
-    serialMonitorOutput.innerText += "\n[Board connected]";
-    
-    sendDummyData();
+        const textDecoder = new TextDecoderStream();
+        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+        reader = textDecoder.readable.getReader();
 
-    while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-            // Allow the serial port to be closed later.
-            reader.releaseLock();
-            break;
+        serialMonitorOutput.innerText += "\n[Board connected]";
+
+        sendDummyData();
+
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) {
+                // Allow the serial port to be closed later.
+                reader.releaseLock();
+                break;
+            }
+
+            serialMonitorOutput.innerText += value;
+            serialMonitor.scrollTo(0, serialMonitor.scrollHeight);
+
+            const event = new CustomEvent("esp32-data", {
+                detail: value
+            });
+            document.dispatchEvent(event);
         }
-
-        serialMonitorOutput.innerText += value;
-        serialMonitor.scrollTo(0, serialMonitor.scrollHeight);
-
-        const event = new CustomEvent("esp32-data", {
-            detail: value
-        });
-        document.dispatchEvent(event);
-    }
-});
-
-document.getElementById("openSerialMonitor").addEventListener("click", () => {
-    const rightPanel = document.getElementById("rightPanel");
-    if (serialMonitor.style.display == "block") {
-        serialMonitor.style.display = "none";
-    } else {
-        serialMonitor.style.display = "block";
-    }
-    editor.layout({
-        width: rightPanel.clientWidth,
-        height: rightPanel.clientHeight - serialMonitor.clientHeight
     });
-})
+
+    document.getElementById("openSerialMonitor").addEventListener("click", () => {
+        const rightPanel = document.getElementById("rightPanel");
+        if (serialMonitor.style.display == "block") {
+            serialMonitor.style.display = "none";
+        } else {
+            serialMonitor.style.display = "block";
+        }
+        editor.layout({
+            width: rightPanel.clientWidth,
+            height: rightPanel.clientHeight - serialMonitor.clientHeight
+        });
+    })
+}
+
+export { writeFile, getFile, getFiles, writeString, startSerial };
