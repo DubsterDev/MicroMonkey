@@ -201,9 +201,14 @@ document.getElementById("findPorts").addEventListener("click", async () => {
 });
 
 document.getElementById("openSerialMonitor").addEventListener("click", () => {
+    const rightPanel = document.getElementById("rightPanel");
     if (serialMonitor.style.display == "block") {
         serialMonitor.style.display = "none";
     } else {
         serialMonitor.style.display = "block";
     }
+    editor.layout({
+        width: rightPanel.clientWidth,
+        height: rightPanel.clientHeight - serialMonitor.clientHeight
+    });
 })
