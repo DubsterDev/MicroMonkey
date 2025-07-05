@@ -124,6 +124,7 @@ function interruptScript() {
 
 function softReboot() {
     if (!activePort || !writer) return;
+    serialMonitorOutput.innerText = "";
     return writer.write(new Uint8Array([0x04]));
 }
 
@@ -140,13 +141,13 @@ async function sendDummyData() {
     }
 }
 
-navigator.serial.addEventListener("connect", (e) => {
-    console.log("connect", e.target);
+navigator.serial.addEventListener("connect", () => {
+    serialMonitorOutput.innerText += "\n[Board connected]";
 })
 
-navigator.serial.addEventListener("disconnect", (e) => {
+navigator.serial.addEventListener("disconnect", () => {
+    serialMonitorOutput.innerText += "\n[Board disconnected]";
     document.getElementById("boardStatus").innerText = "Connect to board";
-    console.log("disconnect", e.target);
 });
 
 document.getElementById("findPorts").addEventListener("click", async () => {
@@ -176,6 +177,8 @@ document.getElementById("findPorts").addEventListener("click", async () => {
     const textDecoder = new TextDecoderStream();
     const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
     reader = textDecoder.readable.getReader();
+
+    serialMonitorOutput.innerText += "\n[Board connected]";
     
     sendDummyData();
 
@@ -188,6 +191,7 @@ document.getElementById("findPorts").addEventListener("click", async () => {
         }
 
         serialMonitorOutput.innerText += value;
+        serialMonitor.scrollTo(0, serialMonitor.scrollHeight);
 
         const event = new CustomEvent("esp32-data", {
             detail: value
