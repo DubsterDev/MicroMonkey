@@ -133,6 +133,13 @@ function wait(ms) {
     });
 }
 
+async function sendDummyData() {
+    for (let i = 0; i < 20; i++) {
+        await wait(100);
+        await writeString("print('hi')");
+    }
+}
+
 navigator.serial.addEventListener("connect", (e) => {
     console.log("connect", e.target);
 })
@@ -164,15 +171,13 @@ document.getElementById("findPorts").addEventListener("click", async () => {
     });
     writer = port.writable.getWriter();
 
-    for (let i = 0; i < 20; i++) {
-        await writeString("print('hi')");
-    }
-
     await interruptScript();
 
     const textDecoder = new TextDecoderStream();
     const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
     reader = textDecoder.readable.getReader();
+    
+    sendDummyData();
 
     while (true) {
         const { value, done } = await reader.read();
