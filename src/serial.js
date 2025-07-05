@@ -1,7 +1,23 @@
+import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
+import '@xterm/xterm/css/xterm.css';
+
 let activePort;
 let reader;
 let writer;
-const serialMonitor = document.getElementById("serialMonitor");
+const terminal = new Terminal({
+    cursorBlink: true,
+    disableStdin: false,
+    fontFamily: "Open Sans",
+    letterSpacing: "0px"
+});
+const fitAddon = new FitAddon();
+terminal.loadAddon(fitAddon);
+terminal.open(document.getElementById("rightPanel"));
+terminal.onData(data => {
+    writeString(data, "");
+}) 
+const serialMonitor = document.querySelector(".terminal");
 
 async function writeFile(code, filename = "main.py") {
     if (!activePort || !writer) return;
@@ -123,7 +139,7 @@ function interruptScript() {
 
 function softReboot() {
     if (!activePort || !writer) return;
-    serialMonitorOutput.innerText = "";
+    terminal.clear();
     return writer.write(new Uint8Array([0x04]));
 }
 
@@ -142,11 +158,11 @@ async function sendDummyData() {
 
 function startSerial(editor) {
     navigator.serial.addEventListener("connect", () => {
-        serialMonitorOutput.innerText += "\n[Board connected]";
+        terminal.writeln("[Board Connected]");
     })
 
     navigator.serial.addEventListener("disconnect", () => {
-        serialMonitorOutput.innerText += "\n[Board disconnected]";
+        terminal.writeln("[Board Disconnected]");
         document.getElementById("boardStatus").innerText = "Connect to board";
     });
 
@@ -178,7 +194,7 @@ function startSerial(editor) {
         const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
         reader = textDecoder.readable.getReader();
 
-        serialMonitorOutput.innerText += "\n[Board connected]";
+        terminal.writeln("[Board Connected]");
 
         sendDummyData();
 
@@ -190,8 +206,7 @@ function startSerial(editor) {
                 break;
             }
 
-            serialMonitorOutput.innerText += value;
-            serialMonitor.scrollTo(0, serialMonitor.scrollHeight);
+            terminal.write(value);
 
             const event = new CustomEvent("esp32-data", {
                 detail: value
