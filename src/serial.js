@@ -20,7 +20,6 @@ const terminal = new Terminal({
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
 terminal.open(serialMonitor);
-terminal.writeln("[Connect to a device to continue]");
 terminal.onData(data => {
     writeString(data, "");
 });
@@ -199,6 +198,8 @@ function startSerial(editor) {
         const textDecoder = new TextDecoderStream();
         const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
         reader = textDecoder.readable.getReader();
+
+        terminal.clear();
 
         terminal.writeln("[Board Connected]");
 
