@@ -48,10 +48,10 @@ main {
     position: relative;
 }
 
-.terminal {
+.serialMonitor {
     background-color: var(--background-color);
     border-top: 1px solid var(--border-color);
-    display: none;
+    /* display: none; */
     flex-shrink: 0;
     position: absolute;
     bottom: 0;
@@ -59,6 +59,10 @@ main {
     width: 100%;
     height: 30%;
     z-index: 99;
+}
+
+.serialMonitor .terminal {
+    height: 100%;
 }
 
 #codeEditor {

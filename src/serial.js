@@ -5,19 +5,25 @@ import '@xterm/xterm/css/xterm.css';
 let activePort;
 let reader;
 let writer;
+const serialMonitor = document.getElementById("serialMonitor");
+const rightPanel = document.getElementById("rightPanel");
+const terminalFontSize = 18;
 const terminal = new Terminal({
     cursorBlink: true,
     disableStdin: false,
+    fontSize: terminalFontSize,
     fontFamily: "Open Sans",
-    letterSpacing: "0px"
+    letterSpacing: "0px",
+    rows: Math.floor((serialMonitor.clientHeight - (terminalFontSize * 2)) / terminalFontSize),
+    cols: Math.floor((serialMonitor.clientWidth) / terminalFontSize)
 });
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
-terminal.open(document.getElementById("rightPanel"));
+terminal.open(serialMonitor);
+terminal.writeln("[Connect to a device to continue]");
 terminal.onData(data => {
     writeString(data, "");
-}) 
-const serialMonitor = document.querySelector(".terminal");
+});
 
 async function writeFile(code, filename = "main.py") {
     if (!activePort || !writer) return;
@@ -216,7 +222,6 @@ function startSerial(editor) {
     });
 
     document.getElementById("openSerialMonitor").addEventListener("click", () => {
-        const rightPanel = document.getElementById("rightPanel");
         if (serialMonitor.style.display == "block") {
             serialMonitor.style.display = "none";
         } else {
@@ -226,6 +231,7 @@ function startSerial(editor) {
             width: rightPanel.clientWidth,
             height: rightPanel.clientHeight - serialMonitor.clientHeight
         });
+        fitAddon.fit();
     })
 }
 
