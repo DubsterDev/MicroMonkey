@@ -2,6 +2,15 @@ import * as monaco from "monaco-editor";
 import { openFile, updateFile, getCompletions, getSignatureHelp } from "./pyright-manager";
 
 export function setUpMonaco() {
+    self.MonacoEnvironment = {
+        getWorker: function (_moduleId, label) {
+            // Customize as needed
+            return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), {
+                type: 'module'
+            });
+        }
+    };
+
     const editor = monaco.editor.create(document.getElementById('codeEditor'), {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
