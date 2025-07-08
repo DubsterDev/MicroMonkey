@@ -97,3 +97,11 @@ main {
     align-items: center;
     gap: 5px;
 }
+
+.folder {
+    padding-left: 20px;
+}
+
+.file {
+    padding-left: 20px;
+}

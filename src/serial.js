@@ -109,7 +109,24 @@ function getFiles() {
         await rawMode(true);
         await writeString(`import os`);
         await writeString(`print("${readingString}")`)
-        await writeString(`print(os.listdir())`)
+        
+        const readingScript = `import os
+def get_contents_of_dir(dir_name="/"):
+    files = os.ilistdir(dir_name)
+    result = {}
+    for file in files:
+        if (file[1] == 0x4000):
+            result[file[0]] = get_contents_of_dir(dir_name + "/" + file[0])
+        else:
+            result[file[0]] = file[0]
+    return result
+print(get_contents_of_dir())`.split("\n");
+
+        for (let line of readingScript) {
+            await wait(100);
+            await writeString(line);
+        }
+
         await writeString(`print("${doneReadingString}")`)
         await runRawCode();
         await rawMode(false);
@@ -161,7 +178,7 @@ async function sendDummyData() {
     }
 }
 
-function startSerial(editor) {
+function startSerial(editor, upandrunningCallback=() => {}) {
     navigator.serial.addEventListener("connect", () => {
         terminal.writeln("[Board Connected]");
     })
@@ -203,7 +220,7 @@ function startSerial(editor) {
 
         terminal.writeln("[Board Connected]");
 
-        sendDummyData();
+        upandrunningCallback();
 
         while (true) {
             const { value, done } = await reader.read();
