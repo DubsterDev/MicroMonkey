@@ -37,6 +37,8 @@ main {
     height: 100%;
     background-color: var(--background-color);
     border-right: 1px solid var(--border-color);
+    overflow: auto;
+    padding: 12px;
 }
 
 .rightPanel {
@@ -98,10 +100,60 @@ main {
     gap: 5px;
 }
 
-.folder {
-    padding-left: 20px;
+.leftSidebar .file, .folder-container {
+    margin-left: 20px;
+    vertical-align: middle;
 }
 
-.file {
-    padding-left: 20px;
+.leftSidebar .folder-container {
+    border-left: 2px solid transparent;
+}
+
+.leftSidebar .folder-container:not(.collapsed) {
+    border-left: 2px solid var(--border-color);
+}
+
+.leftSidebar .folder-container.collapsed .item {
+    display: none;
+}
+
+.leftSidebar .folder-name, .leftSidebar .file {
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.leftSidebar .folder-name:hover, .leftSidebar .file:hover {
+    background-color: #78787825;
+}
+
+.leftSidebar .folder-name::before, .leftSidebar .file::before {
+    font-family: 'Material Symbols Outlined';
+    vertical-align: middle;
+    font-size: 20px;
+    margin-right: 6px;
+}
+
+
+.leftSidebar .file::before {
+    content: "code";
+}
+
+.leftSidebar .folder-container .folder-name::before {
+    content: "keyboard_arrow_down";
+}
+
+.leftSidebar .folder-container.collapsed .folder-name::before {
+    content: "keyboard_arrow_right";
+}
+
+.tabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.tabs .tab {
+    border-right: 1px solid var(--border-color);
+    padding: 0px 12px;
 }

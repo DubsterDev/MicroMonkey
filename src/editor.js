@@ -4,7 +4,6 @@ import { openFile, updateFile, getCompletions, getSignatureHelp } from "./pyrigh
 export function setUpMonaco() {
     self.MonacoEnvironment = {
         getWorker: function (_moduleId, label) {
-            // Customize as needed
             return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), {
                 type: 'module'
             });
@@ -19,9 +18,9 @@ export function setUpMonaco() {
     });
 
     const model = monaco.editor.createModel(
-        'hello="a greeting"\n',
+        '# Open a file using the file explorer to get started\n# If there\'s nothing in it, connect to a board first.',
         'python',
-        monaco.Uri.parse('file://hi.py')
+        monaco.Uri.parse('file://.default_files/micromonkey/hi.py')
     );
 
     editor.setModel(model);
@@ -137,4 +136,8 @@ export function setUpMonaco() {
         }
     });
     return editor;
+}
+
+export function getCurrentFileContent(editor) {
+
 }
