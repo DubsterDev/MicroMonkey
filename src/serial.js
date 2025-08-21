@@ -252,7 +252,7 @@ function startSerial(editor, upandrunningCallback=() => {}) {
         }
         editor.layout({
             width: rightPanel.clientWidth,
-            height: rightPanel.clientHeight - serialMonitor.clientHeight
+            height: rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight
         });
         fitAddon.fit();
     })
