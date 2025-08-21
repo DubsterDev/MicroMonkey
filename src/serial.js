@@ -79,6 +79,9 @@ function getFile(filename) {
         }
         document.addEventListener("esp32-data", dataReceived);
         await interruptScript();
+        await interruptScript();
+        await interruptScript();
+        await wait(100);
         await rawMode(true);
         await writeString(`file = open("${filename.replaceAll("\"", "\\\"")}", "r")`);
         await writeString(`print("${readingString}")`)
@@ -111,6 +114,9 @@ function getFiles() {
         }
         document.addEventListener("esp32-data", dataReceived);
         await interruptScript();
+        await interruptScript();
+        await interruptScript();
+        await wait(100);
         await rawMode(true);
         await writeString(`import os`);
         await writeString(`print("${readingString}")`)

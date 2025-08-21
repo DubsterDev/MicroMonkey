@@ -6,7 +6,9 @@ import { initializeOpenFilesManager, saveActiveFile } from "./openFilesManager";
 const editor = setUpMonaco();
 initializeOpenFilesManager(editor);
 
-startSerial(editor, async () => newFolderStructure(await getFiles()));
+startSerial(editor, async () => {
+    newFolderStructure(await getFiles());
+});
 
 document.addEventListener("keydown", (ev) => {
     if (ev.ctrlKey && ev.key.toLowerCase() === "s") {
