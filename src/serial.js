@@ -26,6 +26,11 @@ terminal.onData(data => {
 
 async function writeFile(code, filename = "main.py") {
     if (!activePort || !writer) return;
+
+    if (filename.startsWith("/")) {
+        filename = filename.replace("/", "");
+    }
+
     await interruptScript();
     await rawMode(true);
 
@@ -45,7 +50,7 @@ async function writeFile(code, filename = "main.py") {
     await writeString(`file = open("${filename.replaceAll("\"", "\\\"")}", "w")`);
     for (let i = 0; i < code.length; i += 125) {
         const snippet = code.slice(i, i + 125);
-        await writeString(`file.write("${snippet.replaceAll("\"", "\\\"").replaceAll("\\", "\\\\")}")`);
+        await writeString(`file.write("${snippet.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n")}")`);
     }
     await writeString(`file.close()`);
     await runRawCode();

@@ -1,3 +1,5 @@
+import { openTab } from "./openFilesManager";
+
 export function newFolderStructure(folderStructure) {
     document.querySelector(`[data-file-explorer-path="/"]`).innerText = "";
     recursivelyAddItems(folderStructure);
@@ -42,6 +44,9 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
             p.innerText = key;
             p.classList.add("file");
             p.classList.add("item");
+            p.addEventListener("click", () => {
+                openTab(`${currentDir}${key}`);
+            })
             parentElement.appendChild(p);
         }
     })

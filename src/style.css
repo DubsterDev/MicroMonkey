@@ -1,6 +1,7 @@
 :root {
     --border-color: #313131;
     --background-color: #181818;
+    --background-color-variant: #222121;
     --lighter-text-color: #d4d4d4;
     --text-color: #fafafa;
 }
@@ -151,9 +152,14 @@ main {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    height: 50px;
 }
 
 .tabs .tab {
     border-right: 1px solid var(--border-color);
     padding: 0px 12px;
+}
+
+.tabs .tab.active {
+    background-color: var(--background-color-variant);
 }

@@ -1,6 +1,8 @@
 import * as monaco from "monaco-editor";
 import { openFile, updateFile, getCompletions, getSignatureHelp } from "./pyright-manager";
+import { fileChanged } from "./openFilesManager";
 
+let editor;
 export function setUpMonaco() {
     self.MonacoEnvironment = {
         getWorker: function (_moduleId, label) {
@@ -10,45 +12,12 @@ export function setUpMonaco() {
         }
     };
 
-    const editor = monaco.editor.create(document.getElementById('codeEditor'), {
+    editor = monaco.editor.create(document.getElementById('codeEditor'), {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
         theme: "vs-dark",
         automaticLayout: true
     });
-
-    const model = monaco.editor.createModel(
-        '# Open a file using the file explorer to get started\n# If there\'s nothing in it, connect to a board first.',
-        'python',
-        monaco.Uri.parse('file://.default_files/micromonkey/hi.py')
-    );
-
-    editor.setModel(model);
-
-    openFile(model.uri.toString(), model.getValue());
-
-    model.onDidChangeContent((e) => {
-        const changes = e.changes.map((change) => {
-            const startPos = model.getPositionAt(change.rangeOffset);
-            const endPos = model.getPositionAt(change.rangeOffset + change.rangeLength);
-
-            return {
-                range: {
-                    start: {
-                        line: startPos.lineNumber - 1,
-                        character: startPos.column - 1,
-                    },
-                    end: {
-                        line: endPos.lineNumber - 1,
-                        character: endPos.column - 1,
-                    },
-                },
-                text: change.text,
-            };
-        });
-        updateFile(model.uri.toString(), changes);
-    })
-
 
     monaco.languages.registerCompletionItemProvider('python', {
         provideCompletionItems: async (model, position) => {
@@ -136,6 +105,43 @@ export function setUpMonaco() {
         }
     });
     return editor;
+}
+
+export function createModel(content, uri) {
+    const model = monaco.editor.createModel(
+        content,
+        'python',
+        monaco.Uri.parse(uri)
+    );
+    return model;
+}
+
+export function changeModel(model) {
+    editor.setModel(model);
+
+    openFile(model.uri.toString(), model.getValue());
+
+    model.onDidChangeContent((e) => {
+        const changes = e.changes.map((change) => {
+            const startPos = model.getPositionAt(change.rangeOffset);
+            const endPos = model.getPositionAt(change.rangeOffset + change.rangeLength);
+
+            return {
+                range: {
+                    start: {
+                        line: startPos.lineNumber - 1,
+                        character: startPos.column - 1,
+                    },
+                    end: {
+                        line: endPos.lineNumber - 1,
+                        character: endPos.column - 1,
+                    },
+                },
+                text: change.text,
+            };
+        });
+        updateFile(model.uri.toString(), changes);
+    })
 }
 
 export function getCurrentFileContent(editor) {
