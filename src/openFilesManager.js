@@ -1,16 +1,15 @@
 import { changeModel, createModel } from "./editor";
 import { getFile, writeFile } from "./serial";
 
-const tabs = [
-    {
+const tabs = {
+    "/.default_files/micromonkey/hi.py": {
         "title": "Welcome to MicroMonkey",
         "type": "monaco",
-        "path": "/.default_files/micromonkey/hi.py",
         "model": createModel("# Open a file using the file explorer to get started\n# If there\'s nothing in it, connect to a board first.", 'file://.default_files/micromonkey/hi.py'),
         "active": true,
         "saved": true
     }
-];
+};
 
 export function initializeOpenFilesManager() {
     renderTabs();
@@ -18,43 +17,37 @@ export function initializeOpenFilesManager() {
 
 export async function openTab(path, title="", type="") {
     // Check if this tab is opened already, while deactivating the currently active tab
-    let foundExistingTab = false;
-    tabs.forEach(tab => {
-        if (tab.path === path) {
-            foundExistingTab = true;
-            tab.active = true;
-        } else if (tab.active) {
+    Object.keys(tabs).forEach(path => {
+        const tab = tabs[path];
+        if (tab.active) {
             tab.active = false;
         }
     });
-
-    if (!foundExistingTab) {
+    if (path in tabs) {
+        tabs[path].active = true;
+    } else {
         const content = await getFile(path);
         const model = createModel(content, "file:/" + path);
-        tabs.push({
+        tabs[path] = {
             "title": title === "" ? path.split("/").at(-1) : title,
             "type": type === "" ? "monaco" : type,
-            "path": path,
             "model": model,
             "active": true,
             "saved": true
-        });
+        };
     }
 
     renderTabs();
 }
 
 export function fileChanged(path) {
-    tabs.forEach(tab => {
-        if (tab.path === path) {
-            tab.saved = false;
-        }
-    });
+    tabs[path].saved = false;
     renderTabs();
 }
 
 export function saveActiveFile() {
-    tabs.forEach(async tab => {
+    Object.keys(tabs).forEach(async path => {
+        const tab = tabs[path];
         if (tab.active) {
             await writeFile(tab.model.getValue(), tab.path)
             tab.saved = true;
@@ -67,9 +60,11 @@ function renderTabs(activateActiveTab=true) {
     const tabsContainer = document.getElementById("tabs");
     tabsContainer.innerText = "";
 
-    tabs.forEach((tab, index) => {
+    const tabPaths = Object.keys(tabs);
+    tabPaths.forEach(path => {
+        const tab = tabs[path];
         const tabContainer = document.createElement("div");
-        tabContainer.dataset.path = tab.path;
+        tabContainer.dataset.path = path;
         tabContainer.classList.add("tab");
 
         if (tab.active) {
@@ -85,14 +80,18 @@ function renderTabs(activateActiveTab=true) {
         closeBtn.innerText = "close";
         tabContainer.appendChild(closeBtn);
 
-        closeBtn.addEventListener("click", () => {
+        closeBtn.addEventListener("click", (ev) => {
             tab.model.dispose();
-            tabs.splice(index, 1);
+            delete tabs[path];
+            const tabKeys = Object.keys(tabs);
+            if (tab.active && tabKeys.length > 0) tabs[tabKeys[tabKeys.length - 1]].active = true;
             renderTabs();
+            ev.stopPropagation();
         });
 
         tabContainer.addEventListener("click", () => {
-            tabs.forEach(aTab => {
+            Object.keys(tabs).forEach(aTabPath => {
+                const aTab = tabs[aTabPath];
                 if (aTab.active) {
                     aTab.active = false;
                 }
