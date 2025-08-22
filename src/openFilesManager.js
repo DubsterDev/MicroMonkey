@@ -67,7 +67,7 @@ function renderTabs(activateActiveTab=true) {
     const tabsContainer = document.getElementById("tabs");
     tabsContainer.innerText = "";
 
-    tabs.forEach(tab => {
+    tabs.forEach((tab, index) => {
         const tabContainer = document.createElement("div");
         tabContainer.dataset.path = tab.path;
         tabContainer.classList.add("tab");
@@ -79,6 +79,17 @@ function renderTabs(activateActiveTab=true) {
         const tabTitle = document.createElement("p");
         tabTitle.innerText = tab.title + (tab.saved ? "" : " (unsaved)");
         tabContainer.appendChild(tabTitle);
+
+        const closeBtn = document.createElement("button");
+        closeBtn.classList.add("material-symbols-outlined");
+        closeBtn.innerText = "close";
+        tabContainer.appendChild(closeBtn);
+
+        closeBtn.addEventListener("click", () => {
+            tab.model.dispose();
+            tabs.splice(index, 1);
+            renderTabs();
+        });
 
         tabContainer.addEventListener("click", () => {
             tabs.forEach(aTab => {

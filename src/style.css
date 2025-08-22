@@ -153,13 +153,40 @@ main {
     flex-direction: row;
     justify-content: flex-start;
     height: 50px;
+    background-color: var(--background-color);
 }
 
 .tabs .tab {
     border-right: 1px solid var(--border-color);
     padding: 0px 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
 }
 
 .tabs .tab.active {
     background-color: var(--background-color-variant);
+}
+
+.tabs .tab button {
+    opacity: 0;
+    transition: 0.2s;
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    margin-left: 10px;
+    padding: 5px;
+    border-radius: 6px;
+    color: #787878cb;
+}
+
+.tabs .tab.active button, .tabs .tab:hover button {
+    opacity: 1;
+}
+
+.tabs .tab button:hover {
+    background-color: #78787825;
+    color: var(--text-color);
 }
