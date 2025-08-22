@@ -5,7 +5,7 @@ const tabs = {
     "/.default_files/micromonkey/hi.py": {
         "title": "Welcome to MicroMonkey",
         "type": "monaco",
-        "model": createModel("# Open a file using the file explorer to get started\n# If there\'s nothing in it, connect to a board first.", 'file://.default_files/micromonkey/hi.py'),
+        "model": createModel("# Open a file using the file explorer to get started\n# If there\'s nothing in it, connect to a board first.", 'file://micromonkey/.default_files/micromonkey/hi.py'),
         "active": true,
         "saved": true
     }
@@ -27,7 +27,7 @@ export async function openTab(path, title="", type="") {
         tabs[path].active = true;
     } else {
         const content = await getFile(path);
-        const model = createModel(content, "file:/" + path);
+        const model = createModel(content, "file://micromonkey" + path);
         tabs[path] = {
             "title": title === "" ? path.split("/").at(-1) : title,
             "type": type === "" ? "monaco" : type,
@@ -41,6 +41,7 @@ export async function openTab(path, title="", type="") {
 }
 
 export function fileChanged(path) {
+    if (!tabs[path].saved) return;
     tabs[path].saved = false;
     renderTabs();
 }
@@ -49,11 +50,11 @@ export function saveActiveFile() {
     Object.keys(tabs).forEach(async path => {
         const tab = tabs[path];
         if (tab.active) {
-            await writeFile(tab.model.getValue(), tab.path)
+            await writeFile(tab.model.getValue(), path)
             tab.saved = true;
+            renderTabs();
         }
     });
-    renderTabs();
 }
 
 function renderTabs(activateActiveTab=true) {

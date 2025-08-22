@@ -117,9 +117,13 @@ export function createModel(content, uri) {
 }
 
 export function changeModel(model) {
+    const modelUriString = model.uri.toString();
+    const modelPath = modelUriString.replace("file://micromonkey", "");
     editor.setModel(model);
 
-    openFile(model.uri.toString(), model.getValue());
+    console.log(modelPath);
+
+    openFile(modelUriString, model.getValue());
 
     model.onDidChangeContent((e) => {
         const changes = e.changes.map((change) => {
@@ -140,7 +144,8 @@ export function changeModel(model) {
                 text: change.text,
             };
         });
-        updateFile(model.uri.toString(), changes);
+        fileChanged(modelPath);
+        updateFile(modelUriString, changes);
     })
 }
 

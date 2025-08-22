@@ -35,17 +35,17 @@ async function writeFile(code, filename = "main.py") {
     await rawMode(true);
 
     // make directories if needed
-    if (filename.includes("/")) {
-        let directories = filename.split("/");
-        directories.pop();
-        await writeString(`import os`);
+    // if (filename.includes("/")) {
+    //     let directories = filename.split("/");
+    //     directories.pop();
+    //     await writeString(`import os`);
 
-        let pathSoFar = "";
-        for (let i = 0; i < directories.length; i++) {
-            pathSoFar += (i > 0 ? "/" : "") + directories[i];
-            await writeString(`os.mkdir("${pathSoFar}")`);
-        }
-    }
+    //     let pathSoFar = "";
+    //     for (let i = 0; i < directories.length; i++) {
+    //         pathSoFar += (i > 0 ? "/" : "") + directories[i];
+    //         await writeString(`os.mkdir("${pathSoFar}")`);
+    //     }
+    // }
 
     await writeString(`file = open("${filename.replaceAll("\"", "\\\"")}", "w")`);
     for (let i = 0; i < code.length; i += 125) {
@@ -149,6 +149,7 @@ print(get_contents_of_dir())`.split("\n");
 
 function writeString(string, newlineString = "\r\n") {
     if (!activePort || !writer) return;
+    console.log(string)
 
     const textEncoder = new TextEncoder();
     const encoded = textEncoder.encode(string + newlineString);
