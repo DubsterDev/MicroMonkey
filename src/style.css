@@ -190,3 +190,10 @@ main {
     background-color: #78787825;
     color: var(--text-color);
 }
+
+.rightClickMenu {
+    display: none;
+    position: fixed;
+    background-color: var(--background-color-variant);
+    padding: 10px;
+}
