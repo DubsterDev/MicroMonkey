@@ -197,3 +197,13 @@ main {
     background-color: var(--background-color-variant);
     padding: 10px;
 }
+
+@media screen and (prefers-color-scheme: light) {
+    :root {
+        --border-color: #b6b4b4;
+        --background-color: #ebebeb;
+        --background-color-variant: #dddcdc;
+        --lighter-text-color: #212121;
+        --text-color: #3d3d3d;
+    }
+}

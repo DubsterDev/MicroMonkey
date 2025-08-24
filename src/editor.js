@@ -15,9 +15,15 @@ export function setUpMonaco() {
     editor = monaco.editor.create(document.getElementById('codeEditor'), {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
-        theme: "vs-dark",
+        theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark",
         automaticLayout: true
     });
+
+    if ('matchMedia' in window) {
+        matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
+            monaco.editor.setTheme(event.matches ? "vs-light" : "vs-dark");
+        });
+    }
 
     monaco.languages.registerCompletionItemProvider('python', {
         provideCompletionItems: async (model, position) => {
