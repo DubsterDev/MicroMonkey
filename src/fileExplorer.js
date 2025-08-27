@@ -27,7 +27,6 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
         if (typeof object === "object") {
             const folderDiv = document.createElement("div");
             folderDiv.classList.add("folder-container");
-            folderDiv.classList.add("collapsed");
             folderDiv.classList.add("item");
 
             const folderName = document.createElement("p");
