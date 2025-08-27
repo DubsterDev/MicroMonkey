@@ -1,3 +1,4 @@
+import { getInput } from "./commandPalette";
 import { newFolderStructure } from "./fileExplorer";
 import { getFiles, renameFile } from "./serial";
 
@@ -10,7 +11,7 @@ export function setupUiManager() {
             const currentDir = ev.target.parentElement.dataset.fileExplorerPath;
             console.log(currentDir);
             menuOptions.push(["Rename", () => {
-
+                launchRename(currentDir);
             }]);
         } else if (ev.target.classList.contains("file") || ev.target.parentElement?.classList.contains("file")) {
             const currentDir = ev.target.parentElement.dataset.fileExplorerPath || ev.target.parentElement.parentElement.dataset.fileExplorerPath;
@@ -41,43 +42,23 @@ export function setupUiManager() {
 
     document.addEventListener("click", () => {
         menu.style.display = "none";
-        // const renameInput = document.querySelector(".renameInput");
-        // if (renameInput && renameInput.previousElementSibling) renameInput.previousElementSibling.style.display = "initial";
-        // if (renameInput) renameInput.outerHTML = "";
     });
 }
 
-function launchRename(directory="", fileName="") {
+async function launchRename(directory="", fileName="") {
+    if (fileName === "") {
+        if (directory.endsWith("/")) directory = directory.slice(0, directory.length - 1);
+        const directories = directory.split("/");
+        fileName = directories.pop();
+        directory = directories.join("/");
+    }
     if (!directory?.endsWith("/")) directory = (directory || "")  + '/';
-    const element = document.querySelector(`[data-full-path="${directory || ""}${fileName || ""}"]`)
     
-    const title = element.querySelector("span");
-    title.style.display = "none";
-    
-    const renameInput = document.createElement("input");
-    renameInput.classList.add("renameInput");
-    renameInput.value = fileName;
-    element.appendChild(renameInput);
-    renameInput.focus();
-    renameInput.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-    });
+    const newName = await getInput("Enter a new name", fileName);
 
-    renameInput.addEventListener("keydown", async (ev) => {
-        if (ev.code.toLowerCase() === "enter") {
-            title.style.display = "initial";
-            renameInput.outerHTML = "";
+    const oldPath = `${directory}${fileName}`;
+    const newPath = `${directory}${newName}`;
 
-            const newName = renameInput.value;
-            const oldPath = `${directory}${fileName}`;
-            const newPath = `${directory}${newName}`;
-
-            title.innerText = `${newName} (pending)`;
-            element.dataset.fullPath = newPath;
-            element.dataset.fileName = newName;
-
-            await renameFile(oldPath, newPath);
-            newFolderStructure(await getFiles());
-        }
-    })
+    await renameFile(oldPath, newPath);
+    newFolderStructure(await getFiles());
 }
