@@ -145,7 +145,19 @@ print(get_contents_of_dir())`.split("\n");
     })
 }
 
-
+async function renameFile(oldFilePath, newFilePath) {
+    if (!activePort || !writer) return;
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+    await wait(100);
+    await rawMode(true);
+    await writeString(`import os`);
+    await writeString(`os.rename("${oldFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "${newFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+    await runRawCode();
+    await rawMode(false);
+    await interruptScript();
+}
 
 function writeString(string, newlineString = "\r\n") {
     if (!activePort || !writer) return;
@@ -265,4 +277,4 @@ function startSerial(editor, upandrunningCallback=() => {}) {
     })
 }
 
-export { writeFile, getFile, getFiles, writeString, startSerial };
+export { writeFile, renameFile, getFile, getFiles, writeString, startSerial };

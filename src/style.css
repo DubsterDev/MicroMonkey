@@ -206,4 +206,8 @@ main {
         --lighter-text-color: #212121;
         --text-color: #3d3d3d;
     }
+
+    html, body, main {
+        color-scheme: light;
+    }
 }

@@ -41,7 +41,13 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
             recursivelyAddItems(object, `${currentDir}${key}/`);
         } else {
             const p = document.createElement("p");
-            p.innerText = key;
+
+            const span = document.createElement("span");
+            span.innerText = key;
+            p.appendChild(span);
+
+            p.dataset.fullPath = `${currentDir}${key}`;
+            p.dataset.fileName = key;
             p.classList.add("file");
             p.classList.add("item");
             p.addEventListener("click", () => {
