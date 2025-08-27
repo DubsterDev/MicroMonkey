@@ -14,3 +14,4 @@ MicroMonkey is a web-based IDE for managing code on MicroPython devices.
  - New folder
  - Better documentation
  - When renaming/delete files/folders close/change tab locations
+ - Fix deleting directories only works with empty directories
