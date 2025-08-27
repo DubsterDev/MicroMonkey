@@ -173,6 +173,20 @@ async function removeFile(filePath) {
     await interruptScript();
 }
 
+async function removeDirectory(filePath) {
+    if (!activePort || !writer) return;
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+    await wait(100);
+    await rawMode(true);
+    await writeString(`import os`);
+    await writeString(`os.rmdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+    await runRawCode();
+    await rawMode(false);
+    await interruptScript();
+}
+
 function writeString(string, newlineString = "\r\n") {
     if (!activePort || !writer) return;
     console.log(string)
@@ -291,4 +305,4 @@ function startSerial(editor, upandrunningCallback=() => {}) {
     })
 }
 
-export { writeFile, renameFile, removeFile, getFile, getFiles, writeString, startSerial };
+export { writeFile, renameFile, removeFile, removeDirectory, getFile, getFiles, writeString, startSerial };

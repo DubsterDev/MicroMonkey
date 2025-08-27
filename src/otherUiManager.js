@@ -1,6 +1,6 @@
 import { getInput } from "./commandPalette";
 import { newFolderStructure } from "./fileExplorer";
-import { getFiles, removeFile, renameFile } from "./serial";
+import { getFiles, removeDirectory, removeFile, renameFile } from "./serial";
 
 const menu = document.getElementById("contextMenu");
 export function setupUiManager() {
@@ -9,9 +9,12 @@ export function setupUiManager() {
         const menuOptions = [];
         if (ev.target.classList.contains("folder-name")) {
             const currentDir = ev.target.parentElement.dataset.fileExplorerPath;
-            console.log(currentDir);
             menuOptions.push(["Rename", () => {
                 launchRename(currentDir);
+            }]);
+            menuOptions.push(["Delete", async () => {
+                await removeDirectory(`${currentDir}`);
+                newFolderStructure(await getFiles());
             }]);
         } else if (ev.target.classList.contains("file") || ev.target.parentElement?.classList.contains("file")) {
             const currentDir = ev.target.parentElement.dataset.fileExplorerPath || ev.target.parentElement.parentElement.dataset.fileExplorerPath;
