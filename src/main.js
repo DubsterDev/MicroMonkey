@@ -4,6 +4,7 @@ import { getFiles, startSerial } from "./serial";
 import { newFolderStructure } from "./fileExplorer";
 import { initializeOpenFilesManager, saveActiveFile } from "./openFilesManager";
 import { setupUiManager } from "./otherUiManager";
+import { setupCommandPalette } from "./commandPalette";
 const editor = setUpMonaco();
 initializeOpenFilesManager(editor);
 
@@ -20,3 +21,4 @@ document.addEventListener("keydown", (ev) => {
 });
 
 setupUiManager();
+setupCommandPalette();
