@@ -24,7 +24,7 @@ terminal.onData(data => {
     writeString(data, "");
 });
 
-async function writeFile(code, filename = "main.py") {
+export async function writeFile(code, filename = "main.py") {
     if (!activePort || !writer) return;
 
     if (filename.startsWith("/")) {
@@ -59,7 +59,7 @@ async function writeFile(code, filename = "main.py") {
     await softReboot();
 }
 
-function getFile(filename) {
+export function getFile(filename) {
     if (!activePort || !writer) return;
     return new Promise(async (resolve) => {
 
@@ -94,7 +94,7 @@ function getFile(filename) {
     })
 }
 
-function getFiles() {
+export function getFiles() {
     if (!activePort || !writer) return;
     return new Promise(async (resolve) => {
 
@@ -145,7 +145,7 @@ print(get_contents_of_dir())`.split("\n");
     })
 }
 
-async function renameFile(oldFilePath, newFilePath) {
+export async function renameFile(oldFilePath, newFilePath) {
     if (!activePort || !writer) return;
     await interruptScript();
     await interruptScript();
@@ -159,7 +159,7 @@ async function renameFile(oldFilePath, newFilePath) {
     await interruptScript();
 }
 
-async function removeFile(filePath) {
+export async function removeFile(filePath) {
     if (!activePort || !writer) return;
     await interruptScript();
     await interruptScript();
@@ -173,7 +173,7 @@ async function removeFile(filePath) {
     await interruptScript();
 }
 
-async function removeDirectory(filePath) {
+export async function removeDirectory(filePath) {
     if (!activePort || !writer) return;
     await interruptScript();
     await interruptScript();
@@ -187,7 +187,7 @@ async function removeDirectory(filePath) {
     await interruptScript();
 }
 
-function writeString(string, newlineString = "\r\n") {
+export function writeString(string, newlineString = "\r\n") {
     if (!activePort || !writer) return;
     console.log(string)
 
@@ -230,7 +230,7 @@ async function sendDummyData() {
     }
 }
 
-function startSerial(editor, upandrunningCallback=() => {}) {
+export function startSerial(editor, upandrunningCallback=() => {}) {
     navigator.serial.addEventListener("connect", () => {
         terminal.writeln("[Board Connected]");
     })
@@ -304,5 +304,3 @@ function startSerial(editor, upandrunningCallback=() => {}) {
         fitAddon.fit();
     })
 }
-
-export { writeFile, renameFile, removeFile, removeDirectory, getFile, getFiles, writeString, startSerial };
