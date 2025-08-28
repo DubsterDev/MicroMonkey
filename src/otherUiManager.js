@@ -16,10 +16,10 @@ export function setupUiManager() {
                 await removeDirectory(`${currentDir}`);
                 newFolderStructure(await getFiles());
             }]);
-        } else if (ev.target.classList.contains("file") || ev.target.parentElement?.classList.contains("file")) {
-            const currentDir = ev.target.parentElement.dataset.fileExplorerPath || ev.target.parentElement.parentElement.dataset.fileExplorerPath;
-            const fileName = ev.target.classList.contains("file") ? ev.target.dataset.fileName : ev.target.parentElement.dataset.fileName;
-            console.log(currentDir, fileName);
+        } else if (ev.target.classList.contains("file")) {
+            const currentDir = ev.target.parentElement.dataset.fileExplorerPath;
+            const fileName = ev.target.dataset.fileName;
+            
             menuOptions.push(["Rename", () => {
                 launchRename(currentDir, fileName);
             }]);
