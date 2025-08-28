@@ -1,9 +1,17 @@
+// Import dependencies
 import * as monaco from "monaco-editor";
 import { openFile, updateFile, getCompletions, getSignatureHelp } from "./pyright-manager";
 import { fileChanged } from "./openFilesManager";
 
+// Create editor variable so we can access it later
 let editor;
+
+/**
+ * Sets up the monaco editor instance. Must be called before any other functions here.
+ * @returns {*} Instance of monaco
+ */
 export function setUpMonaco() {
+    // Define MonacoEnviroment so it gets the service worker from the right spot
     self.MonacoEnvironment = {
         getWorker: function (_moduleId, label) {
             return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), {
@@ -12,6 +20,7 @@ export function setUpMonaco() {
         }
     };
 
+    // Create an editor instance
     editor = monaco.editor.create(document.getElementById('codeEditor'), {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
@@ -19,14 +28,17 @@ export function setUpMonaco() {
         automaticLayout: true
     });
 
+    // Dynamically change the theme of the editor based on the system theme
     if ('matchMedia' in window) {
         matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
             monaco.editor.setTheme(event.matches ? "vs-light" : "vs-dark");
         });
     }
 
+    // Register python completion provider
     monaco.languages.registerCompletionItemProvider('python', {
         provideCompletionItems: async (model, position) => {
+            // Array mapping from what the Language Server returns and what Monaco expects
             const lspToMonacoKind = {
                 1: monaco.languages.CompletionItemKind.Text,
                 2: monaco.languages.CompletionItemKind.Method,
@@ -54,18 +66,19 @@ export function setUpMonaco() {
                 24: monaco.languages.CompletionItemKind.Operator,
                 25: monaco.languages.CompletionItemKind.TypeParameter,
             };
-            console.log(position)
 
+            // Get completions from pyright
             const completions = await getCompletions(model.uri.toString(), {
                 line: position.lineNumber - 1,
                 character: position.column - 1
             });
 
+            // Make sure result is an array
             const items = Array.isArray(completions)
                 ? completions
                 : completions.items;
-            console.log(items)
 
+            // Map suggestions to a monaco style array
             const suggestions = items.map((item) => ({
                 label: item.label,
                 kind: lspToMonacoKind[item.kind] ?? monaco.languages.CompletionItemKind.Text,
@@ -74,23 +87,28 @@ export function setUpMonaco() {
                 documentation: item.documentation,
                 sortText: item.sortText,
             }));
-            console.log(suggestions)
+
             return { suggestions };
         }
     });
 
+    // Register a python signature help provider
     monaco.languages.registerSignatureHelpProvider('python', {
         signatureHelpTriggerCharacters: ['(', ','],
         provideSignatureHelp: async function (model, position) {
+            // Convert the URI to a string
             const uri = model.uri.toString();
 
+            // Get signature help from pyright
             const result = await getSignatureHelp(uri, {
                 line: position.lineNumber - 1,
                 character: position.column - 1,
             });
 
+            // If there are no results, return no results
             if (!result || !result.signatures?.length) return { value: { signatures: [], activeSignature: 0, activeParameter: 0 }, dispose: () => { } };
 
+            // Convert signatures from LSP style to monaco style
             const signatures = result.signatures.map((sig) => ({
                 label: sig.label,
                 documentation: sig.documentation,
@@ -100,6 +118,7 @@ export function setUpMonaco() {
                 })) ?? [],
             }));
 
+            // Return signatures to Monaco
             return {
                 value: {
                     signatures,
@@ -110,28 +129,49 @@ export function setUpMonaco() {
             };
         }
     });
+
+    // Return an editor instance in case it is needed elsewhere
     return editor;
 }
 
+/**
+ * Get a model for a file
+ * @param {string} content Contents of the file
+ * @param {string} uri URI for the model. Should start with file://micromonkey/
+ * @returns The monaco model
+ */
 export function createModel(content, uri) {
+    // Create the model
     const model = monaco.editor.createModel(
         content,
         'python',
         monaco.Uri.parse(uri)
     );
+
+    // Return the model
     return model;
 }
 
+/**
+ * Switch what model is displaying in the editor
+ * @param {*} model The model to switch to. You can get one of these with {@link createModel}
+ */
 export function changeModel(model) {
+    // Convert the URI to a string
     const modelUriString = model.uri.toString();
+
+    // Convert the model URI to an actual path on the board
     const modelPath = modelUriString.replace("file://micromonkey", "");
+
+    // Set the model
     editor.setModel(model);
 
-    console.log(modelPath);
-
+    // Let pyright know we're using a different file
     openFile(modelUriString, model.getValue());
 
+    // Add a listener for when the user types in the code editor
     model.onDidChangeContent((e) => {
+        // Get the changes to the file
         const changes = e.changes.map((change) => {
             const startPos = model.getPositionAt(change.rangeOffset);
             const endPos = model.getPositionAt(change.rangeOffset + change.rangeLength);
@@ -150,11 +190,11 @@ export function changeModel(model) {
                 text: change.text,
             };
         });
+
+        // Let file manager know that the file has changed
         fileChanged(modelPath);
+
+        // Tell pyright the file has changed
         updateFile(modelUriString, changes);
     })
-}
-
-export function getCurrentFileContent(editor) {
-
 }
