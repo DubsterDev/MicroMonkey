@@ -355,6 +355,51 @@ export async function removeDirectory(filePath) {
 }
 
 /**
+ * Recursively delete a directory and all it's contents off of the board
+ * @param {string} filePath The path to the directory to remove
+ */
+export async function removeDirectoryRecursively(filePath) {
+    // Exit early if we are not connected to a board
+    if (!activePort || !writer) return;
+
+    // Interrupt any running scripts
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+
+    // Wait a bit for any running scripts to terminate
+    await wait(100);
+
+    // Enter raw mode on the board
+    await rawMode(true);
+
+    // Define the script to delete the contents of the directory
+    const deleteScript = `import os
+def recursively_delete_dir(dir_name="/"):
+    if (not dir_name.endswith("/")):
+        dir_name = dir_name + "/"
+    files = os.ilistdir(dir_name)
+    for file in files:
+        if (file[1] == 0x4000):
+            recursively_delete_dir(dir_name + "/" + file[0] + "/")
+        else:
+            os.remove(dir_name + file[0])
+    os.rmdir(dir_name)
+recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`
+
+    // Loop through and run the script
+    for (let line of deleteScript) {
+        await wait(100);
+        await writeString(line);
+    }
+
+    // Run the code, exit raw mode, and interrupt any running scripts
+    await runRawCode();
+    await rawMode(false);
+    await interruptScript();
+}
+
+/**
  * Writes text to the board
  * @param {string} string The line to write to the board
  * @param {string} newlineString The characters used to terminate the line. If you don't want to advance to the next line, pass an empty string.
