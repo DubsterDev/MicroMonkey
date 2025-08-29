@@ -253,6 +253,71 @@ print(get_contents_of_dir())`.split("\n");
     })
 }
 
+/**
+ * Create a new file on the board. The parent directory must already exist.
+ * @param {string} filePath The path to the file to create
+ */
+export async function createFile(filePath) {
+    // Exit early if we are not connected to a board
+    if (!activePort || !writer) return;
+
+    // Interrupt any running scripts
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+
+    // Wait a bit for any running scripts to terminate
+    await wait(100);
+
+    // Enter raw mode on the board
+    await rawMode(true);
+
+    // Import the OS library
+    await writeString(`import os`);
+
+    // Open the file
+    await writeString(`f = open("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+
+    // Close the file
+    await writeString(`f.close()`);
+
+    // Run the code, exit raw mode, and interrupt any running scripts
+    await runRawCode();
+    await rawMode(false);
+    await interruptScript();
+}
+
+/**
+ * Create a new directory on the board. The parent directory must already exist.
+ * @param {string} filePath The path to the directory to create
+ */
+export async function createDirectory(filePath) {
+    // Exit early if we are not connected to a board
+    if (!activePort || !writer) return;
+
+    // Interrupt any running scripts
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+
+    // Wait a bit for any running scripts to terminate
+    await wait(100);
+
+    // Enter raw mode on the board
+    await rawMode(true);
+
+    // Import the OS library
+    await writeString(`import os`);
+
+    // Use os.mkdir to create the folder
+    await writeString(`os.mkdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+
+    // Run the code, exit raw mode, and interrupt any running scripts
+    await runRawCode();
+    await rawMode(false);
+    await interruptScript();
+}
+
 
 /**
  * Rename a file that is on the board
