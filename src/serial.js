@@ -385,7 +385,7 @@ def recursively_delete_dir(dir_name="/"):
         else:
             os.remove(dir_name + file[0])
     os.rmdir(dir_name)
-recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`
+recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`.split("\n")
 
     // Loop through and run the script
     for (let line of deleteScript) {
