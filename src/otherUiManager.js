@@ -124,6 +124,9 @@ async function launchRename(directory="", fileName="") {
     // Get a new name for the file or folder from the command palette
     const newName = await getInput("Enter a new name", fileName);
 
+    // If no input was received, don't rename the file
+    if (newName === undefined || newName.trim() === "") return;
+
     // Construct the old path and new path
     const oldPath = `${directory}${fileName}`;
     const newPath = `${directory}${newName}`;
