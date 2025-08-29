@@ -4,8 +4,8 @@ import { setUpMonaco } from "./editor";
 // Facilitates starting the serial connection with the board
 import { getFiles, startSerial } from "./serial";
 
-// For when we get the files from the board
-import { newFolderStructure } from "./fileExplorer";
+// For when we get the files from the board and to alllow creating new files
+import { addNewFileEventListeners, newFolderStructure } from "./fileExplorer";
 
 // For managing the open tabs
 import { initializeOpenFilesManager, saveActiveFile } from "./openFilesManager";
@@ -41,3 +41,6 @@ document.addEventListener("keydown", (ev) => {
 // Setup the context menu and command palette
 setupUiManager();
 setupCommandPalette();
+
+// Add event listeners for creating new files and folders
+addNewFileEventListeners();

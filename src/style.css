@@ -42,6 +42,42 @@ main {
     padding: 12px;
 }
 
+.leftSidebar .fileExplorerHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.newActions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+}
+
+.newActions button {
+    opacity: 0;
+    transition: 0.2s;
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    margin-left: 10px;
+    padding: 5px;
+    border-radius: 6px;
+    color: var(--text-color);
+}
+
+.fileExplorerHeader:hover .newActions button, .folder-name:hover .newActions button {
+    opacity: 0.6;
+}
+
+.newActions button:hover {
+    background-color: #78787825;
+    opacity: 1 !important;
+}
+
 .rightPanel {
     display: flex;
     flex-direction: column;

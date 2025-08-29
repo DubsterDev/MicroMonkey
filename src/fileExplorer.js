@@ -1,5 +1,7 @@
 // Import the openTab function to allow clicking on tabs
+import { getInput } from "./commandPalette";
 import { openTab } from "./openFilesManager";
+import { createDirectory, createFile, getFiles } from "./serial";
 
 /**
  * Re-renders the file explorer with a new folder structure.
@@ -21,6 +23,53 @@ export function newFolderStructure(folderStructure) {
     // Start adding items
     recursivelyAddItems(folderStructure);
 }
+
+/**
+ * Adds new file and folder event listeners.
+ */
+export function addNewFileEventListeners() {
+    document.getElementById("newFileRoot").addEventListener("click", () => newFile("/"));
+    document.getElementById("newFolderRoot").addEventListener("click", () => newFolder("/"));
+}
+
+/**
+ * Launches the command palette with a request for a new file's name
+ * and then creates the file if a name is provided.
+ */
+async function newFile(base="/") {
+    if (!base.endsWith("/")) base = base + "/";
+    // Get input from the command palette for a name
+    const fileName = await getInput("Enter a name for the file");
+
+    // If escaped or hit enter with no content, don't create the file
+    if (fileName === undefined || fileName.trim() === "") return;
+
+    // Use serial.js to create the file
+    await createFile(`${base}${fileName}`);
+
+    // Reload the file explorer
+    newFolderStructure(await getFiles());
+}
+
+/**
+ * Launches the command palette with a request for a new folder's name
+ * and then creates the folder if a name is provided.
+ */
+async function newFolder(base="/") {
+    if (!base.endsWith("/")) base = base + "/";
+    // Get input from the command palette for a name
+    const folderName = await getInput("Enter a name for the folder");
+
+    // If escaped or hit enter with no content, don't create the folder
+    if (folderName === undefined || folderName.trim() === "") return;
+
+    // Use serial.js to create the folder
+    await createDirectory(`${base}${folderName}`);
+
+    // Reload the file explorer
+    newFolderStructure(await getFiles());
+}
+
 
 /**
  * Adds items to the file explorer recursively.
