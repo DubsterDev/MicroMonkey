@@ -276,7 +276,7 @@ export async function createFile(filePath) {
     await writeString(`import os`);
 
     // Open the file
-    await writeString(`f = open("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+    await writeString(`f = open("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "w")`);
 
     // Close the file
     await writeString(`f.close()`);
