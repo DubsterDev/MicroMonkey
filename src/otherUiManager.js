@@ -5,7 +5,7 @@ import { getInput } from "./commandPalette";
 import { newFolderStructure } from "./fileExplorer";
 
 // Helper functions for interacting with the board
-import { getFiles, removeDirectory, removeFile, renameFile } from "./serial";
+import { getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
 
 // Get the context menu element
 const menu = document.getElementById("contextMenu");
@@ -35,7 +35,7 @@ export function setupUiManager() {
             // Add a delete action
             menuOptions.push(["Delete", async () => {
                 // Tell the device to delete the file
-                await removeDirectory(`${currentDir}`);
+                await removeDirectoryRecursively(`${currentDir}`);
                 // And refresh the file explorer
                 newFolderStructure(await getFiles());
             }]);
