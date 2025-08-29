@@ -1,6 +1,3 @@
-// Load the stylesheet. This will probably be moved to index.html
-import "./style.css";
-
 // Import the function to start the editor
 import { setUpMonaco } from "./editor";
 
