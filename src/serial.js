@@ -561,21 +561,8 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
 
     // Add an event listener for when the user clicks the find ports button
     document.getElementById("findPorts").addEventListener("click", async () => {
-        // Request a CircuitMess device. This will change in the future
-        // TODO: Change filters
-        const port = await navigator.serial
-            .requestPort({
-                filters: [{
-                    usbProductId: 29987,
-                    usbVendorId: 6790
-                }, {
-                    usbProductId: 6e4,
-                    usbVendorId: 4292
-                }, {
-                    usbProductId: 4097,
-                    usbVendorId: 12346
-                }]
-            });
+        // Request a device
+        const port = await navigator.serial.requestPort();
         
         // Change the board status to Connected
         document.getElementById("boardStatus").innerText = "Connected";
