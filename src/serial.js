@@ -20,7 +20,7 @@ const terminal = new Terminal({
     fontSize: terminalFontSize,
     fontFamily: "Open Sans",
     letterSpacing: "0px",
-    rows: Math.floor((serialMonitor.clientHeight - (terminalFontSize * 2)) / terminalFontSize),
+    rows: Math.floor((serialMonitor.clientHeight - (terminalFontSize * 2)) / (terminalFontSize + 2)),
     cols: Math.floor((serialMonitor.clientWidth) / terminalFontSize)
 });
 
