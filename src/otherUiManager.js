@@ -22,10 +22,10 @@ export function setupUiManager() {
         // An array of menu options, in format [Name, Click-Listener]
         const menuOptions = [];
 
-        if (ev.target.classList.contains("folder-name")) {
+        if (ev.target.classList.contains("folder-name") || ev.target.parentElement.classList.contains("folder-name")) {
             // If it's a folder that's clicked
             // Get the directory's path
-            const currentDir = ev.target.parentElement.dataset.fileExplorerPath;
+            const currentDir = ev.target.classList.contains("folder-name") ? ev.target.parentElement.dataset.fileExplorerPath : ev.target.parentElement.parentElement.dataset.fileExplorerPath;
 
             // Add a rename function that launches a rename
             menuOptions.push(["Rename", () => {
