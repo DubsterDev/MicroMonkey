@@ -324,7 +324,7 @@ export async function removeFile(filePath) {
 }
 
 /**
- * Delete a directory off of the board
+ * Delete a empty directory off of the board
  * @param {string} filePath The path to the directory to remove
  */
 export async function removeDirectory(filePath) {
