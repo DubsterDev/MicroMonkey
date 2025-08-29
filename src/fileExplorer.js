@@ -111,8 +111,57 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
             // Create a paragraph tag to hold the name of the folder
             const folderName = document.createElement("p");
 
-            // Put the name in the <p>
-            folderName.innerText = key;
+            // Create a span to hold the folder's name
+            const folderNameSpan = document.createElement("span");
+
+            // Put the name in the <span>
+            folderNameSpan.innerText = key;
+
+            // Add the span to the paragraph tag
+            folderName.appendChild(folderNameSpan);
+
+            // Create a div to hold the actions for the create file buttons
+            const actionsDiv = document.createElement("div");
+            actionsDiv.classList.add("newActions");
+
+            // Create the new file button
+            const newFileButton = document.createElement("button");
+
+            // Add the material symbols class
+            newFileButton.classList.add("material-symbols-outlined");
+
+            // Set the name of the icon
+            newFileButton.innerText = "note_add";
+
+            // Add an event listener to create a new file
+            newFileButton.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                newFile(`${currentDir}${key}/`);
+            });
+
+            // Append the new file button to the holder div
+            actionsDiv.appendChild(newFileButton);
+
+            // Create the new folder button
+            const newFolderButton = document.createElement("button");
+
+            // Add the material symbols class
+            newFolderButton.classList.add("material-symbols-outlined");
+
+            // Set the name of the icon
+            newFolderButton.innerText = "create_new_folder";
+
+            // Add an event listener to create a new folder
+            newFolderButton.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                newFolder(`${currentDir}${key}/`);
+            });
+
+            // Append the new folder button to the holder div
+            actionsDiv.appendChild(newFolderButton);
+
+            // Add the actions div to the folder name holder
+            folderName.appendChild(actionsDiv);
 
             // Add the folder-name class
             folderName.classList.add("folder-name");

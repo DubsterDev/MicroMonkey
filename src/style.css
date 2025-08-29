@@ -171,6 +171,16 @@ main {
     margin-right: 6px;
 }
 
+.leftSidebar .folder-name {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.leftSidebar .folder-name span {
+    margin-right: auto;
+}
 
 .leftSidebar .file::before {
     content: "code";
