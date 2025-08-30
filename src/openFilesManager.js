@@ -5,15 +5,11 @@ import { changeModel, createModel } from "./editor";
 import { getFile, writeFile } from "./serial";
 
 // A object containing the open tabs
-const tabs = {
-    "/.default_files/micromonkey/hi.py": {
-        "title": "Welcome to MicroMonkey",
-        "type": "monaco",
-        "model": createModel("# Open a file using the file explorer to get started\n# If there\'s nothing in it, connect to a board first.", 'file://micromonkey/.default_files/micromonkey/hi.py'),
-        "active": true,
-        "saved": true
-    }
-};
+const tabs = {};
+
+// References to monaco and custom editor in the DOM
+const codeEditorElement = document.getElementById("codeEditor");
+const customEditorElement = document.getElementById("customEditor");
 
 /**
  * Renders the tabs for the first time.
@@ -26,9 +22,10 @@ export function initializeOpenFilesManager() {
  * Opens or focuses a tab
  * @param {string} path The path of the file on the board
  * @param {string} title A name to be shown on the tab. If no name is provided, the last segment of the path is used
- * @param {string} type The type of editor to be shown. Currently the only option is `monaco`
+ * @param {string} type The type of editor to be shown. Either `monaco` (meaning content is fetched from board and displayed in a Monaco editor) or `custom` (must provide render function)
+ * @param {Function|null} renderFunction If the passed type is `custom`, this parameter must have a function that receives a root element where you can append new elements to. It will be called whenever the tab is clicked
  */
-export async function openTab(path, title="", type="monaco") {
+export async function openTab(path, title="", type="monaco", renderFunction=null) {
     // Check if this tab is opened already, while deactivating the currently active tab
     Object.keys(tabs).forEach(path => {
         const tab = tabs[path];
@@ -40,17 +37,22 @@ export async function openTab(path, title="", type="monaco") {
         // If the tab is already opened, activate it
         tabs[path].active = true;
     } else {
-        // Get the file's content from the board
-        const content = await getFile(path);
+        // If the type is monaco, grab the contents from the board and create a model for it
+        let model;
+        if (type === "monaco") {
+            // Get the file's content from the board
+            const content = await getFile(path);
 
-        // Create a monaco model for the file
-        const model = createModel(content, "file://micromonkey" + path);
+            // Create a monaco model for the file
+            model = createModel(content, "file://micromonkey" + path);
+        }
 
         // Add the tab to the list of tabs
         tabs[path] = {
             "title": title === "" ? path.split("/").at(-1) : title,
             "type": type,
             "model": model,
+            "renderFunction": renderFunction,
             "active": true,
             "saved": true
         };
@@ -81,8 +83,8 @@ export function saveActiveFile() {
     Object.keys(tabs).forEach(async path => {
         // Get the tab object
         const tab = tabs[path];
-        if (tab.active) {
-            // If this is an active tab, write the file to the board
+        if (tab.active && tab.type === "monaco") {
+            // If this is an active tab, and it is a file, write the file to the board
             await writeFile(tab.model.getValue(), path)
 
             // Mark it as saved
@@ -95,8 +97,8 @@ export function saveActiveFile() {
 }
 
 /**
- * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco
- * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco
+ * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco or calls the render function
+ * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco or show call the custom render function
  */
 function renderTabs(activateActiveTab=true) {
     // Get and clear the tabs container
@@ -143,8 +145,8 @@ function renderTabs(activateActiveTab=true) {
         tabContainer.appendChild(closeBtn);
 
         closeBtn.addEventListener("click", (ev) => {
-            // On click, dispose of the model
-            tab.model.dispose();
+            // On click, dispose of the model, if it is monaco
+            if (tab.type === "monaco") tab.model.dispose();
 
             // Delete the tab from the list of tabs
             delete tabs[path];
@@ -181,9 +183,17 @@ function renderTabs(activateActiveTab=true) {
         // Add the tab to the tab container
         tabsContainer.appendChild(tabContainer);
 
-        // If activateActiveTab is set to true, and this tab is active, change the model
-        if (activateActiveTab && tab.active) {
+        // If activateActiveTab is set to true, and this tab is active,
+        // change the model or switch to custom editor mode
+        if (activateActiveTab && tab.active && tab.type === "monaco") {
+            codeEditorElement.style.display = "block";
+            customEditorElement.style.display = "none";
             changeModel(tab.model);
+        } else if (activateActiveTab && tab.active && tab.type === "custom") {
+            codeEditorElement.style.display = "none";
+            customEditorElement.style.display = "block";
+            customEditorElement.innerText = "";
+            tab.renderFunction(customEditorElement);
         }
     })
 }
