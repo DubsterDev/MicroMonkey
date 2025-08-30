@@ -117,7 +117,7 @@ main {
 .bottomBar {
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: space-between;
     align-items: center;
     gap: 20px;
     width: 100%;
@@ -130,11 +130,19 @@ main {
     color: var(--lighter-text-color);
 }
 
+.bottomBar .left, .bottomBar .right {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    gap: 20px;
+}
+
 .bottomBar i {
     font-size: 18px;
 }
 
-.bottomBar div {
+.bottomBar .item {
     display: flex;
     flex-direction: row;
     justify-content: left;

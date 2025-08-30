@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MicroMonkey</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close,code,create_new_folder,developer_board,keyboard_arrow_down,keyboard_arrow_right,note_add,terminal" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close,code,create_new_folder,developer_board,keyboard_arrow_down,keyboard_arrow_right,note_add,settings,terminal" />
     <link rel="stylesheet" href="/src/style.css">
 </head>
 <body>
@@ -30,13 +30,21 @@
             </div>
         </div>
         <div class="bottomBar">
-            <div id="findPorts">
-                <i class="material-symbols-outlined">developer_board</i>
-                <span id="boardStatus">Connect to board</span>
+            <div class="left">
+                <div id="findPorts" class="item">
+                    <i class="material-symbols-outlined">developer_board</i>
+                    <span id="boardStatus">Connect to board</span>
+                </div>
+                <div id="openSerialMonitor" class="item">
+                    <i class="material-symbols-outlined">terminal</i>
+                    <span>Serial Monitor</span>
+                </div>
             </div>
-            <div id="openSerialMonitor">
-                <i class="material-symbols-outlined">terminal</i>
-                <span id="boardStatus">Serial Monitor</span>
+            <div class="right">
+                <div id="openSettings" class="item">
+                    <i class="material-symbols-outlined">settings</i>
+                    <span>Settings</span>
+                </div>
             </div>
         </div>
         <div class="rightClickMenu" id="contextMenu">
