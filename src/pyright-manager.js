@@ -43,6 +43,20 @@ function openFile(uri, content) {
     pyrightWorker.postMessage(didOpen);
 }
 
+function closeFile(uri) {
+    const didClose = {
+        jsonrpc: '2.0',
+        method: 'textDocument/didClose',
+        params: {
+            textDocument: {
+                uri: uri
+            },
+        },
+    };
+
+    pyrightWorker.postMessage(didClose);
+}
+
 function updateFile(uri, changes) {
     const didChange = {
         jsonrpc: '2.0',
@@ -118,4 +132,4 @@ function getSignatureHelp(uri, position = { line: 0, character: 0 }) {
     });
 }
 
-export { openFile, updateFile, getCompletions, getSignatureHelp };
+export { openFile, closeFile, updateFile, getCompletions, getSignatureHelp };
