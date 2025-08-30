@@ -94,7 +94,7 @@ export function showCommandPalette(placeholder="", defaultValue="", useCommands=
  * or undefined if the user pressed the escape key.
  * @param {string} placeholder A placeholder for the command palette input
  * @param {string} defaultValue The default value for the command palette input
- * @returns {void}
+ * @returns {Promise<string|undefined>} The user inputted string, or undefined if ESCAPE was pressed.
  */
 export function getInput(placeholder, defaultValue) {
     return new Promise((resolve) => {
