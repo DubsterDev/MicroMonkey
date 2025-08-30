@@ -7,26 +7,7 @@ const commandPaletteInput = document.getElementById("commandPaletteInput");
 const commandPaletteSuggestions = document.getElementById("commandPaletteSuggestions");
 
 // Create a default list of commands
-const commands = [
-    {
-        "id": "alert",
-        "name": "Say hi",
-        "callback": () => alert("HI!")
-    },
-    {
-        "id": "deleteit",
-        "name": "Delete something",
-        "callback": async () => {
-            const input = await getInput("What would you like to delete?");
-            removeCommand(input)
-        }
-    },
-    {
-        "id": "addit",
-        "name": "Add say hi",
-        "callback": () => addCommand("alert2", "Say hi (added)", () => alert("Howdy"))
-    }
-];
+const commands = [];
 
 // Define some variables for using on input requested
 let usingCommands = commands;
@@ -184,7 +165,10 @@ function displaySuggestions(searchTerm="") {
         suggestion.innerText = name;
 
         // Add a callback
-        suggestion.addEventListener("click", callback);
+        suggestion.addEventListener("click", () => {
+            commandPalette.style.display = "none";
+            callback();
+        });
 
         // Add it to the suggestions box
         commandPaletteSuggestions.appendChild(suggestion);
