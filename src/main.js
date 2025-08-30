@@ -15,12 +15,16 @@ import { renderWelcomeScreen, setupUiManager } from "./otherUiManager";
 
 // Handles CTRL+SHIFT+P and running commands
 import { setupCommandPalette } from "./commandPalette";
+import { setupSettings } from "./settings";
 
 // Insert the editor into the DOM
 const editor = setUpMonaco();
 
 // Start open files manager
 initializeOpenFilesManager(editor);
+
+// Setup settings
+setupSettings();
 
 // Create a Welcome to MicroMonkey tab
 openTab("/.default_files/micromonkey/welcome.mm", "Welcome to MicroMonkey", "custom", renderWelcomeScreen);
