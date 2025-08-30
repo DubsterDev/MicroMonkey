@@ -15,7 +15,7 @@ pyrightWorker.postMessage({
     id: requestId++,
     method: 'initialize',
     params: {
-        rootUri: 'file:///',
+        rootUri: 'file://micromonkey',
         capabilities: {},
         initializationOptions: {
             files: stubs
