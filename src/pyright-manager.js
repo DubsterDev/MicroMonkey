@@ -25,8 +25,10 @@ pyrightWorker.postMessage({
 
 const fileVersions = {};
 
+let currentlyOpenUri = "";
 function openFile(uri, content) {
     fileVersions[uri] = 1;
+    if (currentlyOpenUri !== "") closeFile(currentlyOpenUri);
     const didOpen = {
         jsonrpc: '2.0',
         method: 'textDocument/didOpen',
@@ -41,6 +43,8 @@ function openFile(uri, content) {
     };
 
     pyrightWorker.postMessage(didOpen);
+
+    currentlyOpenUri = uri;
 }
 
 function closeFile(uri) {
