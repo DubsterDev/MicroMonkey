@@ -16,5 +16,4 @@ MicroMonkey is a web-based IDE for managing code on MicroPython devices.
  - Close all tabs/saved tabs option in tab bar
  - Better welcome screen
  - Stubs that actually work
- - Fix overflowing terminal
  - Can't copy from terminal
