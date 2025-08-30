@@ -11,10 +11,13 @@ MicroMonkey is a web-based IDE for managing code on MicroPython devices.
  - Delete files/folders
 
 ## To-do
- - Better documentation (completed 7/8)
- - When renaming/delete files/folders close/change tab locations
- - Close all tabs/saved tabs option in tab bar
- - Better welcome screen
- - Fix pyright
-    - Changes appear to be passed incorrectly
- - Make tab bar scrollable
+ - **Best Practices**
+   - Better documentation (completed 7/8 files, only pyright-manager.js is left)
+   - Tests
+ - **Tab Bar**
+   - When renaming/delete files/folders close/change tab locations
+   - Close all tabs/saved tabs option in tab bar
+   - Make tab bar scrollable
+ - **Editor**
+   - Fix pyright
+       - Changes appear to be passed incorrectly, garbling file contents for pyright to autocomplete
