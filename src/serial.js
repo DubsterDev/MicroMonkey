@@ -24,6 +24,15 @@ const terminal = new Terminal({
     cols: Math.floor((serialMonitor.clientWidth) / terminalFontSize)
 });
 
+terminal.attachCustomKeyEventHandler(async (event) => {
+    if (event.type === "keydown" && event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "c" && terminal.hasSelection()) {
+        event.preventDefault();
+        event.stopPropagation();
+        navigator.clipboard.writeText(terminal.getSelection());
+        return false;
+    }
+})
+
 // Fit the terminal
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
