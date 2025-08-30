@@ -20,3 +20,28 @@ export function addParagraph(content, root) {
     element.innerText = content;
     root.appendChild(element);
 }
+
+/**
+ * Create and append a checkbox to an element
+ * @param {string} content The content of the new checkbox's label
+ * @param {Element} root The element to append to
+ * @param {boolean} checked The checkbox initial state
+ * @param {Function|undefined} callback A callback for when the checkbox value changes. Called with one parameter: boolean value of checked state
+ */
+export function addCheckbox(content, root, checked=false, callback) {
+    const label = document.createElement("label");
+    
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = checked;
+    if (callback !== undefined) checkbox.addEventListener("change", () => {
+        callback(checkbox.checked);
+    });
+    label.appendChild(checkbox);
+
+    const span = document.createElement("span");
+    span.innerText = content;
+    label.appendChild(span);
+
+    root.appendChild(label);
+}
