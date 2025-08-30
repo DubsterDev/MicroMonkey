@@ -538,16 +538,85 @@ function wait(ms) {
     });
 }
 
+let readyCallback;
+
+/**
+ * Finish connecting to a board after getting a reference to the port.
+ * @param {*} port The serial port to read data from
+ */
+async function connectToBoard(port) {
+    // Change the board status to Connected
+    document.getElementById("boardStatus").innerText = "Connected";
+
+    // Store the received port in a variable that is accessible by other functions
+    activePort = port;
+
+    // Open the connection to the port
+    await port.open({
+        baudRate: 115200
+    });
+
+    // Open a writer object
+    writer = port.writable.getWriter();
+
+    // Start getting decoded text from the board
+    const textDecoder = new TextDecoderStream();
+    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+    reader = textDecoder.readable.getReader();
+
+    // Clear the terminal display and show that the board has been connected
+    terminal.clear();
+    terminal.writeln("[Connecting to board...]");
+
+    // Wait for board to finish booting in case it was just turned on
+    await wait(200);
+
+    // Interrupt any running scripts
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+
+    // Wait for scripts to finish
+    await wait(100);
+
+    // Call the up and running callback
+    readyCallback();
+
+    // Infinitely loop to read output from the board
+    while (true) {
+        // Get the output from the reader
+        const { value, done } = await reader.read();
+
+        // If done reading, stop looping
+        if (done) {
+            // Allow the serial port to be closed later.
+            reader.releaseLock();
+            break;
+        }
+
+        // Show the output in the REPL
+        terminal.write(value);
+
+        // Dispatch an event that anything else can listen to
+        const event = new CustomEvent("esp32-data", {
+            detail: value
+        });
+        document.dispatchEvent(event);
+    }
+}
+
 /**
  * Add event listeners for starting a serial connection
  * @param {*} editor A reference to the monaco editor
  * @param {Function} upandrunningCallback A callback that is called when successfully connected to a board
  */
 export function startSerial(editor, upandrunningCallback=() => {}) {
+    readyCallback = upandrunningCallback;
     // Add an event listener for when a board is connected
-    navigator.serial.addEventListener("connect", () => {
+    navigator.serial.addEventListener("connect", (ev) => {
         // Write the text "[Board Connected]" to the terminal
         terminal.writeln("[Board Connected]");
+        connectToBoard(ev.target);
     });
 
     // Add an event listener for when the board is disconnected
@@ -564,56 +633,8 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
         // Request a device
         const port = await navigator.serial.requestPort();
         
-        // Change the board status to Connected
-        document.getElementById("boardStatus").innerText = "Connected";
-
-        // Store the received port in a variable that is accessible by other functions
-        activePort = port;
-
-        // Open the connection to the port
-        await port.open({
-            baudRate: 115200
-        });
-
-        // Open a writer object
-        writer = port.writable.getWriter();
-
-        // Interrupt any running scripts
-        await interruptScript();
-
-        // Start getting decoded text from the board
-        const textDecoder = new TextDecoderStream();
-        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-        reader = textDecoder.readable.getReader();
-
-        // Clear the terminal display and show that the board has been connected
-        terminal.clear();
-        terminal.writeln("[Board Connected]");
-
-        // Call the up and running callback
-        upandrunningCallback();
-
-        // Infinitely loop to read output from the board
-        while (true) {
-            // Get the output from the reader
-            const { value, done } = await reader.read();
-
-            // If done reading, stop looping
-            if (done) {
-                // Allow the serial port to be closed later.
-                reader.releaseLock();
-                break;
-            }
-
-            // Show the output in the REPL
-            terminal.write(value);
-
-            // Dispatch an event that anything else can listen to
-            const event = new CustomEvent("esp32-data", {
-                detail: value
-            });
-            document.dispatchEvent(event);
-        }
+        // Finish connecting to the board
+        connectToBoard(port);
     });
 
     // Toggle the serial monitor's visiblity with the Serial Monitor button
