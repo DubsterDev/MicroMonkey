@@ -1,5 +1,6 @@
 // Used when renaming files, gets input using the command palette
 import { getInput } from "./commandPalette";
+import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
 import { newFolderStructure } from "./fileExplorer";
@@ -134,4 +135,18 @@ async function launchRename(directory="", fileName="") {
     // Tell the device to rename the file and refresh the file explorer
     await renameFile(oldPath, newPath);
     newFolderStructure(await getFiles());
+}
+
+// Other random functions that didn't have a better spot
+
+/**
+ * Renders the welcome screen on a custom tab
+ * @param {Element} rootElement The element to append the welcome screen to
+ */
+export async function renderWelcomeScreen(rootElement) {
+    // Header
+    addHeading("Welcome to MicroMonkey!", "h2", rootElement);
+
+    // Define some welcome text
+    addParagraph("Connect your device with a USB cable, and then you can use the Connect to Board button on the bottom left.", rootElement);
 }

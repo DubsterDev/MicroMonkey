@@ -8,10 +8,10 @@ import { getFiles, startSerial } from "./serial";
 import { addNewFileEventListeners, newFolderStructure } from "./fileExplorer";
 
 // For managing the open tabs
-import { initializeOpenFilesManager, saveActiveFile } from "./openFilesManager";
+import { initializeOpenFilesManager, openTab, saveActiveFile } from "./openFilesManager";
 
 // Mainly just for the context menu
-import { setupUiManager } from "./otherUiManager";
+import { renderWelcomeScreen, setupUiManager } from "./otherUiManager";
 
 // Handles CTRL+SHIFT+P and running commands
 import { setupCommandPalette } from "./commandPalette";
@@ -21,6 +21,9 @@ const editor = setUpMonaco();
 
 // Start open files manager
 initializeOpenFilesManager(editor);
+
+// Create a Welcome to MicroMonkey tab
+openTab("/.default_files/micromonkey/welcome.mm", "Welcome to MicroMonkey", "custom", renderWelcomeScreen);
 
 // Begin listening for clicks on the Connect to board button
 // and manage communication with it
