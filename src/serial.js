@@ -2,6 +2,7 @@
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import '@xterm/xterm/css/xterm.css';
+import { getSetting } from "./settings";
 
 // Create some variables to be defined later
 let activePort;
@@ -88,8 +89,8 @@ export async function writeFile(code, filename = "main.py") {
     // Interrupt any scripts
     await interruptScript();
 
-    // Reboot the board
-    await softReboot();
+    // Reboot the board if that setting is checked
+    if (getSetting("reboot-on-save", true)) await softReboot();
 }
 
 /**
