@@ -36,14 +36,15 @@ export function setSetting(key, value) {
 /**
  * Retrieve a setting
  * @param {string} key The key to retrieve
+ * @param {*} defaultValue The value to return if the setting wasn't defined
  * @returns {*} The value of the setting
  */
-export function getSetting(key) {
+export function getSetting(key, defaultValue) {
     // Parse the settings object
     const settings = JSON.parse(localStorage.getItem("micromonkey-settings") || "{}");
 
     // Return the value
-    return settings[key];
+    return settings[key] ?? defaultValue;
 }
 
 /**
@@ -54,5 +55,5 @@ function renderSettings(root) {
     addHeading("Settings", "h2", root);
 
     addHeading("Auto-reboot device", "h3", root);
-    addCheckbox("Reboots the device when the file is saved", root, getSetting("reboot-on-save"), (bool) => setSetting("reboot-on-save", bool));
+    addCheckbox("Reboots the device when the file is saved", root, getSetting("reboot-on-save", true), (bool) => setSetting("reboot-on-save", bool));
 }
