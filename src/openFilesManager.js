@@ -148,6 +148,9 @@ function renderTabs(activateActiveTab=true) {
             // On click, dispose of the model, if it is monaco
             if (tab.type === "monaco") tab.model.dispose();
 
+            // Or, if it's a custom editor, remove content from the custom editor
+            else if (tab.type === "custom") customEditorElement.innerText = "";
+
             // Delete the tab from the list of tabs
             delete tabs[path];
 
