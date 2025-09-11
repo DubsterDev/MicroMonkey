@@ -28,7 +28,7 @@ main {
 .mostContent {
     display: flex;
     flex-direction: row;
-    height: 100%;
+    height: calc(100% - 36px);
     width: 100%;
     flex-grow: 1;
 }
