@@ -2,7 +2,6 @@ import stubs from "./stub-bundle.json";
 
 const pyrightWorker = new Worker("pyright/pyright.worker.js");
 
-pyrightWorker.addEventListener("message", console.log)
 let requestId = 0;
 
 
