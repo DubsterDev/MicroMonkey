@@ -9,6 +9,9 @@ let activePort;
 let reader;
 let writer;
 
+// A list of callbacks that are called when output is received from the serial device
+const serialCallbacks = [];
+
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");
 const rightPanel = document.getElementById("rightPanel");
@@ -111,9 +114,9 @@ export function getFile(filename) {
         let fileData = "";
 
         // This function is called whenever data is sent from the board
-        function dataReceived(event) {
+        function dataReceived(text, _) {
             // Add the output to file data
-            fileData += event.detail;
+            fileData += text;
 
             if (fileData.includes(`${readingString}\r\n`)) {
                 // If the readingString was just outputted, get rid of
@@ -125,7 +128,7 @@ export function getFile(filename) {
                 fileData = fileData.split(`\r\n${doneReadingString}`)[0];
 
                 // Delete the event listener for new data
-                document.removeEventListener("esp32-data", dataReceived);
+                removeSerialCallback(dataReceived);
 
                 // Resolve the promise with the file data
                 resolve(fileData);
@@ -133,7 +136,7 @@ export function getFile(filename) {
         }
 
         // Register for data from the board
-        document.addEventListener("esp32-data", dataReceived);
+        addSerialCallback(dataReceived);
 
         // Interrupt the script a few times to make sure there's nothing running
         await interruptScript();
@@ -189,9 +192,9 @@ export function getFiles() {
         let fileData = "";
 
         // A function to be called when we get data from the board
-        function dataReceived(event) {
+        function dataReceived(text, _) {
             // Add the data to the fileData variable
-            fileData += event.detail;
+            fileData += text;
 
             if (fileData.includes(`${readingString}\r\n`)) {
                 // If we started reading, get rid of all the data before,
@@ -203,7 +206,7 @@ export function getFiles() {
                 fileData = fileData.split(`\r\n${doneReadingString}`)[0];
 
                 // Remove the event listener for new data
-                document.removeEventListener("esp32-data", dataReceived);
+                removeSerialCallback(dataReceived);
 
                 // Parse the object and resolve with it
                 resolve(JSON.parse(fileData.replaceAll("'", "\"")));
@@ -211,7 +214,7 @@ export function getFiles() {
         }
 
         // Register an event listener for data outputted from the board
-        document.addEventListener("esp32-data", dataReceived);
+        addSerialCallback(dataReceived);
 
         // Interrupt any scripts that are running
         await interruptScript();
@@ -502,6 +505,216 @@ function rawMode(enable = true) {
 }
 
 /**
+ * Run and retrieve the result of running code in the raw-paste REPL.
+ * @todo Fix issue where result is stored in the exceptions variable and exceptions are not returned
+ * @param {string} code The code to run
+ * @returns {Promise<Object>} The result. Format `{"result": "", "exceptions": ""}`.
+ */
+export function runCode(code) {
+    return new Promise(async (resolve) => {
+        // Create a new text decoder to use later
+        const textDecoder = new TextDecoder();
+
+        // Get a byte array of the code string
+        const codeBytes = new TextEncoder().encode(code);
+
+        // Enable raw mode and wait a little bit
+        rawMode(true);
+        await wait(100);
+
+        // Flags to determine where we are
+        // in the process of communicating with the board
+        let enteredRawPasteModeSuccessfully = false;
+        let gotWindowSize = false;
+        let needsToStop = false;
+        let doneWriting = false;
+        let executing = false;
+        let printingExceptions = false;
+
+        // How many bytes we can write
+        let windowSize = 0;
+        let remainingWindowSize = 0;
+
+        // A "mailbox" of sorts, to store bytes that were not acted upon,
+        // these are pushed before the new bytes in the data callback
+        let unreadBytes = new Uint8Array();
+
+        // The amount of bytes already pushed to the board
+        let bytesWritten = 0;
+
+        // The content of the execution and exceptions
+        let executionResult = "";
+        let exceptions = "";
+        
+        // A serial callback called with new data
+        function dataCallback(_, orgBytes) {
+            // Add the unread bytes before the received bytes
+            // Create a new array of the length of bytes
+            let amtOfUnreadBytes = unreadBytes.length;
+            let bytes = new Uint8Array(amtOfUnreadBytes + orgBytes.length);
+
+            // Loop through and add the unread bytes first
+            for (let i = 0; i < amtOfUnreadBytes; i++) {
+                bytes[i] = unreadBytes[i];
+            }
+
+            // Clear the unread bytes array
+            unreadBytes = new Uint8Array();
+
+            // Loop through the received bytes,
+            // adding them after the unread bytes
+            for (let i = 0; i < orgBytes.length; i++) {
+                bytes[amtOfUnreadBytes + i] = orgBytes[i];
+            }
+
+            // An number that stores the amount of bytes we've read
+            let alreadyReadBytes = 0;
+
+            // If we haven't entered raw paste mode, and there are two bytes to read...
+            if (!enteredRawPasteModeSuccessfully && bytes.length >= alreadyReadBytes + 2) {
+                if (bytes[alreadyReadBytes + 0] === 0x52 && bytes[alreadyReadBytes + 1] === 0x01) {
+                    // We successfully entered raw paste mode! Store it in a flag
+                    enteredRawPasteModeSuccessfully = true;
+                } else if (bytes[0] === 0x52 && bytes[1] === 0x00) {
+                    // The board understood the command,
+                    // but it doesn't support raw paste mode
+                    alert("Sorry, your board is not compatible with MicroMonkey.");
+                    removeSerialCallback(dataCallback);
+                } else if (bytes[0] === 0x72 && bytes[1] === 0x61) {
+                    // The board doesn't even know what raw paste mode is
+                    alert("Sorry, your board is not compatible with MicroMonkey.");
+                    removeSerialCallback(dataCallback);
+                }
+
+                // Increment the read bytes counter
+                alreadyReadBytes += 2;
+            }
+
+            if (!gotWindowSize && bytes.length >= alreadyReadBytes + 2) {
+                // If we just received the window size, get it
+                windowSize = (bytes[alreadyReadBytes + 1] << 8) | bytes[alreadyReadBytes + 0];
+
+                // Set the remaining window size and a flag
+                remainingWindowSize = windowSize;
+                gotWindowSize = true;
+
+                // Increment the read bytes count and start writing data!
+                alreadyReadBytes += 2;
+                writeWhenReady();
+            }
+
+            // If there is a byte waiting to be read
+            if (bytes.length >= alreadyReadBytes + 1) {
+                const byte = bytes[alreadyReadBytes + 0];
+                if (byte === 0x01) {
+                    // If the board says to increment the window size
+                    // increment it!
+                    remainingWindowSize += windowSize;
+                    alreadyReadBytes++;
+                } else if (byte === 0x04 && !doneWriting) {
+                    // This means the board wants to stop receiving data
+                    needsToStop = true;
+                    alreadyReadBytes++;
+                } else if (byte === 0x04 && doneWriting) {
+                    // The board should be printing output now
+                    // NOTE: This appears to happen too early,
+                    // but when I tried changing it to happen
+                    // on the second one, it didn't receive enough of these.
+                    // Right now, the output of the code is stored in the
+                    // exceptions variable, which is not right.
+                    doneWriting = false;
+                    executing = true;
+                }
+            }
+
+            if (executing || printingExceptions) {
+                // If we could be receiving data from the board, loop through it
+                for (let i = alreadyReadBytes; i < bytes.length; i++) {
+                    const byte = bytes[i];
+
+                    if (byte === 0x04 && executing) {
+                        // Switch from executing status to exception status
+                        executing = false;
+                        printingExceptions = true;
+                    } else if (byte === 0x04 && printingExceptions) {
+                        // Stop reading now that the board should be completely
+                        // done outputting data
+
+                        // Remove this callback
+                        removeSerialCallback(dataCallback);
+
+                        // Exit raw mode
+                        rawMode(false);
+
+                        // Resolve the result
+                        resolve({"result": executionResult, "exceptions": exceptions});
+                    } else if (executing) {
+                        // If it's not a special byte, and we are currently
+                        // receiving execution results, add to the execution variable
+                        executionResult += textDecoder.decode(new Uint8Array([byte]));
+                        alreadyReadBytes++;
+                    } else if (printingExceptions) {
+                        // If printing exceptions, add the exception to the
+                        // exceptions variable
+                        exceptions += textDecoder.decode(new Uint8Array([byte]));
+                        alreadyReadBytes++;
+                    }
+                }
+            }
+
+            if (alreadyReadBytes < bytes.length) {
+                // If there are bytes that aren't read, add them to the unreadBytes variable
+                unreadBytes = new Uint8Array(bytes.length - alreadyReadBytes);
+                for (let i = alreadyReadBytes; i < bytes.length; i++) {
+                    unreadBytes[i - alreadyReadBytes] = bytes[i];
+                }
+            }
+        }
+
+        function writeWhenReady() {
+            // Begin writing bytes. Continues until all bytes are written,
+            // or the board says it wants to stop.
+            while (bytesWritten < codeBytes.length) {
+                // If the board wants to stop, stop.
+                if (needsToStop) break;
+
+                // If the board hasn't said it's ready for more bytes, skip writing.
+                if (remainingWindowSize === 0) continue;
+                
+                // Calculate the amount of bytes we are going to write to the board right now
+                const amountToWrite = Math.min(codeBytes.length - bytesWritten, remainingWindowSize);
+                
+                // Slice the bytes from the bytes array
+                const bytes = codeBytes.slice(bytesWritten, bytesWritten + amountToWrite);
+
+                // Increment the bytes written counter
+                bytesWritten += amountToWrite;
+
+                // Write the bytes
+                writer.write(bytes);
+
+                // Simple console.log statement for debugging
+                console.log(`Wrote ${amountToWrite}/${codeBytes.length} bytes.`);
+
+                // Decrement the remaining window size
+                remainingWindowSize -= amountToWrite;
+            }
+
+            // Now that we're done writing, let the board know
+            writer.write(new Uint8Array([0x04]));
+            doneWriting = true;
+        }
+
+        // Add the dataCallback for serial events
+        addSerialCallback(dataCallback);
+
+        // Enter raw-paste mode
+        writer.write(new Uint8Array([0x05, 0x41, 0x01]));
+    })
+    
+}
+
+/**
  * Execute CTRL+D on the board to execute raw code.
  */
 function runRawCode() {
@@ -548,6 +761,57 @@ function wait(ms) {
     });
 }
 
+/**
+ * Add a callback that will be called when new serial data is received
+ * @param {Function} callback The callback. Called with two parameters: text, bytes
+ */
+export function addSerialCallback(callback) {
+    serialCallbacks.push(callback);
+}
+
+/**
+ * Remove a callback that is called when new serial data is received
+ * @param {Function} callback The callback to be removed
+ */
+export function removeSerialCallback(callback) {
+    serialCallbacks.splice(serialCallbacks.indexOf(callback), 1)
+}
+
+/**
+ * Infinitely loops and gets output from the connected board,
+ * and calls serial callbacks
+ */
+async function startReadingOutput() {
+    // Create a textDecoder
+    const textDecoder = new TextDecoder();
+
+    // Infinitely loop to read output from the board
+    while (true) {
+        // Get the output from the reader
+        const { value, done } = await reader.read();
+
+        // If done reading, stop looping
+        if (done) {
+            // Allow the serial port to be closed later.
+            reader.releaseLock();
+            break;
+        }
+
+        // Convert to UTF-8
+        const text = textDecoder.decode(value);
+
+        // Show the output in the REPL
+        terminal.write(value);
+
+        console.log(text, value)
+
+        // Call the registered callbacks with the text and butes just received
+        serialCallbacks.forEach(callback => {
+            callback(text, value);
+        })
+    }
+}
+
 let readyCallback;
 
 /**
@@ -570,9 +834,7 @@ async function connectToBoard(port) {
     writer = port.writable.getWriter();
 
     // Start getting decoded text from the board
-    const textDecoder = new TextDecoderStream();
-    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-    reader = textDecoder.readable.getReader();
+    reader = port.readable.getReader();
 
     // Clear the terminal display and show that the board has been connected
     terminal.clear();
@@ -592,27 +854,8 @@ async function connectToBoard(port) {
     // Call the up and running callback
     readyCallback();
 
-    // Infinitely loop to read output from the board
-    while (true) {
-        // Get the output from the reader
-        const { value, done } = await reader.read();
-
-        // If done reading, stop looping
-        if (done) {
-            // Allow the serial port to be closed later.
-            reader.releaseLock();
-            break;
-        }
-
-        // Show the output in the REPL
-        terminal.write(value);
-
-        // Dispatch an event that anything else can listen to
-        const event = new CustomEvent("esp32-data", {
-            detail: value
-        });
-        document.dispatchEvent(event);
-    }
+    // Start reading output from the board to show in the terminal
+    startReadingOutput();
 }
 
 /**
