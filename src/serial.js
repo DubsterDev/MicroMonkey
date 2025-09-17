@@ -506,7 +506,7 @@ function rawMode(enable = true) {
 
 /**
  * Run and retrieve the result of running code in the raw-paste REPL.
- * @todo Fix issue where result is stored in the exceptions variable and exceptions are not returned
+ * @todo Outputs duplicates sometimes
  * @param {string} code The code to run
  * @returns {Promise<Object>} The result. Format `{"result": "", "exceptions": ""}`.
  */
@@ -528,6 +528,7 @@ export function runCode(code) {
         let gotWindowSize = false;
         let needsToStop = false;
         let doneWriting = false;
+        let preparingToExecute = false;
         let executing = false;
         let printingExceptions = false;
 
@@ -567,7 +568,7 @@ export function runCode(code) {
                 bytes[amtOfUnreadBytes + i] = orgBytes[i];
             }
 
-            // An number that stores the amount of bytes we've read
+            // A number that stores the amount of bytes we've read
             let alreadyReadBytes = 0;
 
             // If we haven't entered raw paste mode, and there are two bytes to read...
@@ -603,62 +604,63 @@ export function runCode(code) {
                 writeWhenReady();
             }
 
-            // If there is a byte waiting to be read
-            if (bytes.length >= alreadyReadBytes + 1) {
-                const byte = bytes[alreadyReadBytes + 0];
+            // If we could be receiving data from the board, loop through it
+            for (let i = alreadyReadBytes; i < bytes.length; i++) {
+                const byte = bytes[i];
+
+                console.log("dcloop", byte);
+
                 if (byte === 0x01) {
+                    console.log("Incrementing")
                     // If the board says to increment the window size
                     // increment it!
                     remainingWindowSize += windowSize;
                     alreadyReadBytes++;
+                } else if (byte === 0x04 && doneWriting) {
+                    console.log("Preparing to execute...")
+                    // The board should be about to execute our code now
+                    doneWriting = false;
+                    preparingToExecute = true;
+                } else if (byte === 0x04 && preparingToExecute) {
+                    console.log("Executing...")
+                    // The board should be printing output now
+                    preparingToExecute = false;
+                    executing = true;
+                } else if (byte === 0x04 && executing) {
+                    console.log("Exceptioning...")
+                    // Switch from executing status to exception status
+                    executing = false;
+                    printingExceptions = true;
+                } else if (byte === 0x04 && printingExceptions) {
+                    console.log("Resolving...")
+                    // Stop reading now that the board should be completely
+                    // done outputting data
+
+                    // Remove this callback
+                    removeSerialCallback(dataCallback);
+
+                    // Exit raw mode
+                    rawMode(false);
+
+                    // Resolve the result
+                    resolve({"result": executionResult, "exceptions": exceptions});
                 } else if (byte === 0x04 && !doneWriting) {
+                    console.log("Stopping...")
                     // This means the board wants to stop receiving data
                     needsToStop = true;
                     alreadyReadBytes++;
-                } else if (byte === 0x04 && doneWriting) {
-                    // The board should be printing output now
-                    // NOTE: This appears to happen too early,
-                    // but when I tried changing it to happen
-                    // on the second one, it didn't receive enough of these.
-                    // Right now, the output of the code is stored in the
-                    // exceptions variable, which is not right.
-                    doneWriting = false;
-                    executing = true;
-                }
-            }
-
-            if (executing || printingExceptions) {
-                // If we could be receiving data from the board, loop through it
-                for (let i = alreadyReadBytes; i < bytes.length; i++) {
-                    const byte = bytes[i];
-
-                    if (byte === 0x04 && executing) {
-                        // Switch from executing status to exception status
-                        executing = false;
-                        printingExceptions = true;
-                    } else if (byte === 0x04 && printingExceptions) {
-                        // Stop reading now that the board should be completely
-                        // done outputting data
-
-                        // Remove this callback
-                        removeSerialCallback(dataCallback);
-
-                        // Exit raw mode
-                        rawMode(false);
-
-                        // Resolve the result
-                        resolve({"result": executionResult, "exceptions": exceptions});
-                    } else if (executing) {
-                        // If it's not a special byte, and we are currently
-                        // receiving execution results, add to the execution variable
-                        executionResult += textDecoder.decode(new Uint8Array([byte]));
-                        alreadyReadBytes++;
-                    } else if (printingExceptions) {
-                        // If printing exceptions, add the exception to the
-                        // exceptions variable
-                        exceptions += textDecoder.decode(new Uint8Array([byte]));
-                        alreadyReadBytes++;
-                    }
+                } else if (executing) {
+                    // If it's not a special byte, and we are currently
+                    // receiving execution results, add to the execution variable
+                    // TODO: It appears to get duplicate letters here
+                    executionResult += textDecoder.decode(new Uint8Array([byte]));
+                    alreadyReadBytes++;
+                } else if (printingExceptions) {
+                    // If printing exceptions, add the exception to the
+                    // exceptions variable
+                    // TODO: It appears to get duplicate letters here
+                    exceptions += textDecoder.decode(new Uint8Array([byte]));
+                    alreadyReadBytes++;
                 }
             }
 
@@ -671,7 +673,7 @@ export function runCode(code) {
             }
         }
 
-        function writeWhenReady() {
+        async function writeWhenReady() {
             // Begin writing bytes. Continues until all bytes are written,
             // or the board says it wants to stop.
             while (bytesWritten < codeBytes.length) {
@@ -679,7 +681,7 @@ export function runCode(code) {
                 if (needsToStop) break;
 
                 // If the board hasn't said it's ready for more bytes, skip writing.
-                if (remainingWindowSize === 0) continue;
+                if (remainingWindowSize === 0) await wait(25);
                 
                 // Calculate the amount of bytes we are going to write to the board right now
                 const amountToWrite = Math.min(codeBytes.length - bytesWritten, remainingWindowSize);
