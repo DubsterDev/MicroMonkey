@@ -68,26 +68,21 @@ export async function writeFile(code, filename = "main.py") {
     await interruptScript();
     await interruptScript();
 
-    // Start raw mode on the board
-    await rawMode(true);
-
-    // Open the file
-    await writeString(`file = open("${filename.replaceAll("\"", "\\\"")}", "w")`);
+    // Create code snippet that opens the file
+    let fileWriteCode = `file = open("${filename.replaceAll("\"", "\\\"")}", "w")`;
 
     // Write the file onto the board in chunks
     for (let i = 0; i < code.length; i += 125) {
         const snippet = code.slice(i, i + 125);
-        await writeString(`file.write("${snippet.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+        fileWriteCode += `\nfile.write("${snippet.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`;
     }
 
     // Close the file
-    await writeString(`file.close()`);
+    fileWriteCode += `\nfile.close()`;
 
     // Execute the code
-    await runRawCode();
-
-    // Disable raw mode
-    await rawMode(false);
+    const {result, exceptions} = await runCode(fileWriteCode)
+    console.log("Wrote file with results", result, "Exceptions", exceptions);
 
     // Interrupt any scripts
     await interruptScript();
@@ -101,78 +96,28 @@ export async function writeFile(code, filename = "main.py") {
  * @param {string} filename The path to the file that you want to read
  * @returns {Promise<string>} The contents of the file, or null
  */
-export function getFile(filename) {
+export async function getFile(filename) {
     // Exit early if we are not connected to a board
     if (!activePort || !writer) return;
 
-    return new Promise(async (resolve) => {
-        // A string to print before the data and after the data has been printed
-        const readingString = "[File Reader Reading]";
-        const doneReadingString = "[File Reader Reading Done]";
+    // Interrupt the script a few times to make sure there's nothing running
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
 
-        // To store the file data, as it is retrieved in chunks
-        let fileData = "";
+    // Wait a little bit for the interrupted script to terminate
+    await wait(100);
 
-        // This function is called whenever data is sent from the board
-        function dataReceived(text, _) {
-            // Add the output to file data
-            fileData += text;
+    // Get the contents of the file
+    const {result, exceptions} = await runCode(`
+file = open("${filename.replaceAll("\"", "\\\"")}", "r")
+print(file.read())
+file.close()`);
+    // Interrupt the script
+    await interruptScript();
 
-            if (fileData.includes(`${readingString}\r\n`)) {
-                // If the readingString was just outputted, get rid of
-                // everything before and including, it
-                fileData = fileData.split(`${readingString}\r\n`)[1];
-            } else if (fileData.includes(`\r\n${doneReadingString}`)) {
-                // If the doneReadingString was just outputted, get rid of
-                // anything after, and including, it
-                fileData = fileData.split(`\r\n${doneReadingString}`)[0];
-
-                // Delete the event listener for new data
-                removeSerialCallback(dataReceived);
-
-                // Resolve the promise with the file data
-                resolve(fileData);
-            }
-        }
-
-        // Register for data from the board
-        addSerialCallback(dataReceived);
-
-        // Interrupt the script a few times to make sure there's nothing running
-        await interruptScript();
-        await interruptScript();
-        await interruptScript();
-
-        // Wait a little bit for the interrupted script to terminate
-        await wait(100);
-
-        // Enter raw mode
-        await rawMode(true);
-
-        // Open the file on the board
-        await writeString(`file = open("${filename.replaceAll("\"", "\\\"")}", "r")`);
-
-        // Print the reading string
-        await writeString(`print("${readingString}")`)
-
-        // Print the contents of the file
-        await writeString(`print(file.read())`)
-
-        // Print the done reading string
-        await writeString(`print("${doneReadingString}")`)
-
-        // Close the file
-        await writeString(`file.close()`)
-        
-        // Run the code
-        await runRawCode();
-
-        // Exit raw mode
-        await rawMode(false);
-
-        // Interrupt the script
-        await interruptScript();
-    })
+    console.log(exceptions)
+    return result;
 }
 
 /**
@@ -621,16 +566,19 @@ export function runCode(code) {
                     // The board should be about to execute our code now
                     doneWriting = false;
                     preparingToExecute = true;
+                    alreadyReadBytes++;
                 } else if (byte === 0x04 && preparingToExecute) {
                     console.log("Executing...")
                     // The board should be printing output now
                     preparingToExecute = false;
                     executing = true;
+                    alreadyReadBytes++;
                 } else if (byte === 0x04 && executing) {
                     console.log("Exceptioning...")
                     // Switch from executing status to exception status
                     executing = false;
                     printingExceptions = true;
+                    alreadyReadBytes++;
                 } else if (byte === 0x04 && printingExceptions) {
                     console.log("Resolving...")
                     // Stop reading now that the board should be completely
@@ -644,6 +592,7 @@ export function runCode(code) {
 
                     // Resolve the result
                     resolve({"result": executionResult, "exceptions": exceptions});
+                    alreadyReadBytes++;
                 } else if (byte === 0x04 && !doneWriting) {
                     console.log("Stopping...")
                     // This means the board wants to stop receiving data
@@ -696,7 +645,7 @@ export function runCode(code) {
                 writer.write(bytes);
 
                 // Simple console.log statement for debugging
-                console.log(`Wrote ${amountToWrite}/${codeBytes.length} bytes.`);
+                console.log(`Wrote ${amountToWrite}/${codeBytes.length} bytes, with a window size of ${remainingWindowSize}.`);
 
                 // Decrement the remaining window size
                 remainingWindowSize -= amountToWrite;
