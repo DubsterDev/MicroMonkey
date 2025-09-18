@@ -221,20 +221,9 @@ export async function renameFile(oldFilePath, newFilePath) {
     // Wait a bit for any running scripts to finish
     await wait(100);
 
-    // Enter raw mode on the board
-    await rawMode(true);
-
-    // Import the OS library
-    await writeString(`import os`);
-
-    // Rename the file using os.rename
-    await writeString(`os.rename("${oldFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "${newFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
-
-    // Run the code
-    await runRawCode();
-
-    // Exit raw mode
-    await rawMode(false);
+    // Rename the file on the board
+    await runCode(`import os
+os.rename("${oldFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "${newFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
 
     // And interrupt any scripts
     await interruptScript();
