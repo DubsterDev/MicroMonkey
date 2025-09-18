@@ -155,7 +155,5 @@ export async function renderWelcomeScreen(rootElement) {
 
     // Define some welcome text
     addParagraph("Connect your device with a USB cable, and then you can use the Connect to Board button on the bottom left.", rootElement);
-    addParagraph("This is a beta release, and there are many things yet to be done.", rootElement);
-    addParagraph("It is mostly stable, so you should be able to download and put files on your device.", rootElement);
-    addParagraph("Thanks for using MicroMonkey!", rootElement);
+    addParagraph("If the device does not load, try pressing the 'EN' button on the board or refreshing the page.", rootElement);
 }
