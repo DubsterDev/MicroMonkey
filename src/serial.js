@@ -81,8 +81,7 @@ export async function writeFile(code, filename = "main.py") {
     fileWriteCode += `\nfile.close()`;
 
     // Execute the code
-    const {result, exceptions} = await runCode(fileWriteCode)
-    console.log("Wrote file with results", result, "Exceptions", exceptions);
+    await runCode(fileWriteCode)
 
     // Interrupt any scripts
     await interruptScript();
@@ -109,14 +108,13 @@ export async function getFile(filename) {
     await wait(100);
 
     // Get the contents of the file
-    const {result, exceptions} = await runCode(`
+    const {result} = await runCode(`
 file = open("${filename.replaceAll("\"", "\\\"")}", "r")
 print(file.read())
 file.close()`);
     // Interrupt the script
     await interruptScript();
 
-    console.log(exceptions)
     return result;
 }
 
@@ -451,7 +449,6 @@ function rawMode(enable = true) {
 
 /**
  * Run and retrieve the result of running code in the raw-paste REPL.
- * @todo Outputs duplicates sometimes
  * @param {string} code The code to run
  * @returns {Promise<Object>} The result. Format `{"result": "", "exceptions": ""}`.
  */
@@ -473,7 +470,6 @@ export function runCode(code) {
         let gotWindowSize = false;
         let needsToStop = false;
         let doneWriting = false;
-        let preparingToExecute = false;
         let executing = false;
         let printingExceptions = false;
 
@@ -553,34 +549,22 @@ export function runCode(code) {
             for (let i = alreadyReadBytes; i < bytes.length; i++) {
                 const byte = bytes[i];
 
-                console.log("dcloop", byte);
-
                 if (byte === 0x01) {
-                    console.log("Incrementing")
                     // If the board says to increment the window size
                     // increment it!
                     remainingWindowSize += windowSize;
                     alreadyReadBytes++;
                 } else if (byte === 0x04 && doneWriting) {
-                    console.log("Preparing to execute...")
-                    // The board should be about to execute our code now
-                    doneWriting = false;
-                    preparingToExecute = true;
-                    alreadyReadBytes++;
-                } else if (byte === 0x04 && preparingToExecute) {
-                    console.log("Executing...")
                     // The board should be printing output now
-                    preparingToExecute = false;
+                    doneWriting = false;
                     executing = true;
                     alreadyReadBytes++;
                 } else if (byte === 0x04 && executing) {
-                    console.log("Exceptioning...")
                     // Switch from executing status to exception status
                     executing = false;
                     printingExceptions = true;
                     alreadyReadBytes++;
                 } else if (byte === 0x04 && printingExceptions) {
-                    console.log("Resolving...")
                     // Stop reading now that the board should be completely
                     // done outputting data
 
@@ -590,24 +574,21 @@ export function runCode(code) {
                     // Exit raw mode
                     rawMode(false);
 
-                    // Resolve the result
-                    resolve({"result": executionResult, "exceptions": exceptions});
+                    // Resolve the result, removing the last \r\n
+                    resolve({"result": executionResult.replace(/\r\n$/, ""), "exceptions": exceptions.replace(/\r\n$/, "")});
                     alreadyReadBytes++;
                 } else if (byte === 0x04 && !doneWriting) {
-                    console.log("Stopping...")
                     // This means the board wants to stop receiving data
                     needsToStop = true;
                     alreadyReadBytes++;
                 } else if (executing) {
                     // If it's not a special byte, and we are currently
                     // receiving execution results, add to the execution variable
-                    // TODO: It appears to get duplicate letters here
                     executionResult += textDecoder.decode(new Uint8Array([byte]));
                     alreadyReadBytes++;
                 } else if (printingExceptions) {
                     // If printing exceptions, add the exception to the
                     // exceptions variable
-                    // TODO: It appears to get duplicate letters here
                     exceptions += textDecoder.decode(new Uint8Array([byte]));
                     alreadyReadBytes++;
                 }
@@ -643,9 +624,6 @@ export function runCode(code) {
 
                 // Write the bytes
                 writer.write(bytes);
-
-                // Simple console.log statement for debugging
-                console.log(`Wrote ${amountToWrite}/${codeBytes.length} bytes, with a window size of ${remainingWindowSize}.`);
 
                 // Decrement the remaining window size
                 remainingWindowSize -= amountToWrite;
@@ -753,8 +731,6 @@ async function startReadingOutput() {
 
         // Show the output in the REPL
         terminal.write(value);
-
-        console.log(text, value)
 
         // Call the registered callbacks with the text and butes just received
         serialCallbacks.forEach(callback => {
