@@ -97,6 +97,34 @@ export function saveActiveFile() {
 }
 
 /**
+ * Remove a tab from the tab strip if it's open
+ * @param {string} path The file path
+ */
+export function closeTab(path) {
+    // Get the tab object
+    const tab = tabs[path];
+
+    // Return if the tab isn't open
+    if (tab === undefined || tab === null) return;
+
+    // Dispose of the model, if it is monaco
+    if (tab.type === "monaco") tab.model.dispose();
+
+    // Or, if it's a custom editor, remove content from the custom editor
+    else if (tab.type === "custom") customEditorElement.innerText = "";
+
+    // Delete the tab from the list of tabs
+    delete tabs[path];
+
+    // If this was an active tab, activate the last tab if possible
+    const tabKeys = Object.keys(tabs);
+    if (tab.active && tabKeys.length > 0) tabs[tabKeys[tabKeys.length - 1]].active = true;
+
+    // Render the tabs
+    renderTabs();
+}
+
+/**
  * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco or calls the render function
  * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco or show call the custom render function
  */
@@ -145,21 +173,10 @@ function renderTabs(activateActiveTab=true) {
         tabContainer.appendChild(closeBtn);
 
         closeBtn.addEventListener("click", (ev) => {
-            // On click, dispose of the model, if it is monaco
-            if (tab.type === "monaco") tab.model.dispose();
+            // Close the tab
+            closeTab(path);
 
-            // Or, if it's a custom editor, remove content from the custom editor
-            else if (tab.type === "custom") customEditorElement.innerText = "";
-
-            // Delete the tab from the list of tabs
-            delete tabs[path];
-
-            // If this was an active tab, activate the last tab if possible
-            const tabKeys = Object.keys(tabs);
-            if (tab.active && tabKeys.length > 0) tabs[tabKeys[tabKeys.length - 1]].active = true;
-
-            // Render the tabs and prevent the tab container's click event from being triggered
-            renderTabs();
+            // Prevent the tab container's click event from being triggered
             ev.stopPropagation();
         });
 

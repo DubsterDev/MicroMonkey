@@ -4,6 +4,7 @@ import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
 import { newFolderStructure } from "./fileExplorer";
+import { closeTab } from "./openFilesManager";
 
 // Helper functions for interacting with the board
 import { getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
@@ -57,6 +58,7 @@ export function setupUiManager() {
             menuOptions.push(["Delete", async () => {
                 // Tell the device to delete the file
                 await removeFile(`${currentDir}${fileName}`);
+                closeTab(`${currentDir}${fileName}`);
 
                 // Refresh the file explorer
                 newFolderStructure(await getFiles());
