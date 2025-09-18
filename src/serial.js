@@ -245,20 +245,11 @@ export async function removeFile(filePath) {
     // Wait a little bit for the script to terminate
     await wait(100);
 
-    // Enter raw mode
-    await rawMode(true);
+    // Delete the file from the board
+    await runCode(`import os
+os.remove("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`)
 
-    // Import the OS library
-    await writeString(`import os`);
-
-    // Use os.remove to delete the file
-    await writeString(`os.remove("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
-
-    // Run the code
-    await runRawCode();
-
-    // Exit raw mode and interrupt the script
-    await rawMode(false);
+    // Interrupt the script
     await interruptScript();
 }
 
