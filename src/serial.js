@@ -3,6 +3,7 @@ import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import '@xterm/xterm/css/xterm.css';
 import { getSetting } from "./settings";
+import { newFolderStructure } from "./fileExplorer";
 
 // Create some variables to be defined later
 let activePort;
@@ -676,6 +677,17 @@ async function connectToBoard(port) {
     startReadingOutput();
 }
 
+function portDisconnected() {
+    // Write the text "[Board Disconnected]" to the terminal
+    terminal.writeln("[Board Disconnected]");
+
+    // Change the board status button to say a board needs to be connected
+    document.getElementById("boardStatus").innerText = "Connect to board";
+
+    // Clears the file explorer
+    newFolderStructure({});
+}
+
 /**
  * Add event listeners for starting a serial connection
  * @param {*} editor A reference to the monaco editor
@@ -691,21 +703,32 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
     });
 
     // Add an event listener for when the board is disconnected
-    navigator.serial.addEventListener("disconnect", () => {
-        // Write the text "[Board Disconnected]" to the terminal
-        terminal.writeln("[Board Disconnected]");
-
-        // Change the board status button to say a board needs to be connected
-        document.getElementById("boardStatus").innerText = "Connect to board";
-    });
+    navigator.serial.addEventListener("disconnect", portDisconnected);
 
     // Add an event listener for when the user clicks the find ports button
     document.getElementById("findPorts").addEventListener("click", async () => {
-        // Request a device
-        const port = await navigator.serial.requestPort();
-        
-        // Finish connecting to the board
-        connectToBoard(port);
+        if (activePort && activePort.readable !== null && activePort.writable !== null) {
+            console.log(activePort)
+            // Cancels and releases the lock of the reader stream
+            await reader.cancel();
+            reader.releaseLock();
+
+            // Closes and releases the lock of the writer stream
+            await writer.close();
+            writer.releaseLock();
+
+            // Closes the Serial Port
+            await activePort.close();
+
+            // Call the callback
+            portDisconnected();
+        } else {
+            // Request a device
+            const port = await navigator.serial.requestPort();
+            
+            // Finish connecting to the board
+            connectToBoard(port);
+        }
     });
 
     // Toggle the serial monitor's visiblity with the Serial Monitor button
