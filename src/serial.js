@@ -677,6 +677,9 @@ async function connectToBoard(port) {
     startReadingOutput();
 }
 
+/**
+ * Cleans up after a port has been disconnected.
+ */
 function portDisconnected() {
     // Write the text "[Board Disconnected]" to the terminal
     terminal.writeln("[Board Disconnected]");
