@@ -122,62 +122,20 @@ file.close()`);
  * Retrieve a recursive object of files and folders on the connected board
  * @returns {Promise<object>} A promise that resolves to a JSON object, or null
  */
-export function getFiles() {
+export async function getFiles() {
     // Exit early if not connected
     if (!activePort || !writer) return;
 
-    return new Promise(async (resolve) => {
-        // Define the reading and done reading strings
-        const readingString = "[Grabbing List of Files]";
-        const doneReadingString = "[Grabbing List of Files Done]";
+    // Interrupt any scripts that are running
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
 
-        // Define a variable to hold the data from the board
-        let fileData = "";
+    // Wait a bit to allow any scripts to terminate
+    await wait(100);
 
-        // A function to be called when we get data from the board
-        function dataReceived(text, _) {
-            // Add the data to the fileData variable
-            fileData += text;
-
-            if (fileData.includes(`${readingString}\r\n`)) {
-                // If we started reading, get rid of all the data before,
-                // and including, the reading string
-                fileData = fileData.split(`${readingString}\r\n`)[1];
-            } else if (fileData.includes(`\r\n${doneReadingString}`)) {
-                // If we stopped reading, get rid of all the data before,
-                // and including, the done reading string
-                fileData = fileData.split(`\r\n${doneReadingString}`)[0];
-
-                // Remove the event listener for new data
-                removeSerialCallback(dataReceived);
-
-                // Parse the object and resolve with it
-                resolve(JSON.parse(fileData.replaceAll("'", "\"")));
-            }
-        }
-
-        // Register an event listener for data outputted from the board
-        addSerialCallback(dataReceived);
-
-        // Interrupt any scripts that are running
-        await interruptScript();
-        await interruptScript();
-        await interruptScript();
-
-        // Wait a bit to allow any scripts to terminate
-        await wait(100);
-
-        // Enter raw mode on the board
-        await rawMode(true);
-
-        // Import OS library
-        await writeString(`import os`);
-
-        // Print the reading string
-        await writeString(`print("${readingString}")`)
-        
-        // Define the script to read the contents of the board
-        const readingScript = `import os
+    // Read the folders from the board
+    const {result} = await runCode(`import os
 def get_contents_of_dir(dir_name="/"):
     files = os.ilistdir(dir_name)
     result = {}
@@ -187,26 +145,13 @@ def get_contents_of_dir(dir_name="/"):
         else:
             result[file[0]] = file[0]
     return result
-print(get_contents_of_dir())`.split("\n");
+print(get_contents_of_dir())`);
 
-        // Loop through and run the script
-        for (let line of readingScript) {
-            await wait(100);
-            await writeString(line);
-        }
+    // Interrupt the script one last time
+    await interruptScript();
 
-        // Print the done reading string
-        await writeString(`print("${doneReadingString}")`)
+    return JSON.parse(result.replaceAll("'", "\""));
 
-        // Run the code
-        await runRawCode();
-
-        // Exit raw mode
-        await rawMode(false);
-
-        // Interrupt the script one last time
-        await interruptScript();
-    })
 }
 
 /**
