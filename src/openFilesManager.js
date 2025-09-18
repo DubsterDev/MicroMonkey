@@ -125,6 +125,18 @@ export function closeTab(path) {
 }
 
 /**
+ * Remove all tabs that are in a directory from the tab strip
+ * @param {string} path The file path to remove everything under, should end with a /
+ */
+export function closeTabsInDirectory(path) {
+    // Loop through all the tabs
+    Object.keys(tabs).forEach(tabPath => {
+        // And close a tab if the path starts with the provided path
+        if (tabPath.startsWith(path)) closeTab(tabPath);
+    });
+}
+
+/**
  * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco or calls the render function
  * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco or show call the custom render function
  */
