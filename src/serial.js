@@ -293,11 +293,8 @@ export async function removeDirectoryRecursively(filePath) {
     // Wait a bit for any running scripts to terminate
     await wait(100);
 
-    // Enter raw mode on the board
-    await rawMode(true);
-
-    // Define the script to delete the contents of the directory
-    const deleteScript = `import os
+    // Run the script to delete the contents of the directory
+    await runCode(`import os
 def recursively_delete_dir(dir_name="/"):
     if (not dir_name.endswith("/")):
         dir_name = dir_name + "/"
@@ -308,17 +305,9 @@ def recursively_delete_dir(dir_name="/"):
         else:
             os.remove(dir_name + file[0])
     os.rmdir(dir_name)
-recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`.split("\n")
+recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
 
-    // Loop through and run the script
-    for (let line of deleteScript) {
-        await wait(100);
-        await writeString(line);
-    }
-
-    // Run the code, exit raw mode, and interrupt any running scripts
-    await runRawCode();
-    await rawMode(false);
+    // Interrupt any running scripts
     await interruptScript();
 }
 
