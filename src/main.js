@@ -51,3 +51,6 @@ setupCommandPalette();
 
 // Add event listeners for creating new files and folders
 addNewFileEventListeners();
+
+// Add a event listener for the reload file explorer button
+document.getElementById("reloadFileExplorer").addEventListener("click", async () => newFolderStructure(await getFiles()));
