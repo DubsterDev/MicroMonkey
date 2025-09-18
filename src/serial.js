@@ -170,7 +170,7 @@ export async function createFile(filePath) {
     // Wait a bit for any running scripts to terminate
     await wait(100);
 
-    // Enter raw mode on the board
+    // Run code to create a new file on the board
     await runCode(`import os
 f = open("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "w")
 f.close()`)
