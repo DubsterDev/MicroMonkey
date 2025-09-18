@@ -269,18 +269,11 @@ export async function removeDirectory(filePath) {
     // Wait a bit for any running scripts to terminate
     await wait(100);
 
-    // Enter raw mode on the board
-    await rawMode(true);
+    // Delete a folder off the board
+    await runCode(`import os
+os.rmdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
 
-    // Import the OS library
-    await writeString(`import os`);
-
-    // Use os.rmdir to delete the folder
-    await writeString(`os.rmdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
-
-    // Run the code, exit raw mode, and interrupt any running scripts
-    await runRawCode();
-    await rawMode(false);
+    // Interrupt any running scripts
     await interruptScript();
 }
 
