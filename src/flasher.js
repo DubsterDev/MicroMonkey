@@ -1,6 +1,7 @@
 import { Transport, ESPLoader } from "esptool-js";
 import { openTab } from "./openFilesManager";
 import { addHeading, addMessageBox, addParagraph } from "./customEditorHelperFunctions";
+import { addCommand } from "./commandPalette";
 
 const espLoaderTerminal = {
   clean() {
@@ -15,12 +16,15 @@ const espLoaderTerminal = {
 }
 
 export function addFlasherEventListeners() {
-    document.getElementById("flashMicroPython").addEventListener("click", () => {
-        openTab("/.default_files/micromonkey/flasher.mm", "MicroPython Flasher", "custom", renderFlasherPage);
-    })
+    document.getElementById("flashMicroPython").addEventListener("click", openFlasher)
+    addCommand("openMicroPythonFlasher", "Flash MicroPython", openFlasher);
+}
+
+function openFlasher() {
+    openTab("/.default_files/micromonkey/flasher.mm", "MicroPython Flasher", "custom", renderFlasherPage);
 }
 
 function renderFlasherPage(root) {
     addHeading("MicroPython Flasher", "h2", root);
-    addMessageBox("warning", "This flasher only supports Espressif boards, such as the ESP32 or ESP8266, right now.", root);
+    addMessageBox("warning", "Currently this flasher only supports Espressif boards, such as the ESP32 or ESP8266.", root);
 }
