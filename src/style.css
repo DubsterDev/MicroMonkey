@@ -4,6 +4,9 @@
     --background-color-variant: #222121;
     --lighter-text-color: #d4d4d4;
     --text-color: #fafafa;
+    --success-color: #2e7030;
+    --warning-color: #c07504;
+    --error-color: #bd0000;
 }
 
 *:not(#codeEditor *):not(.material-symbols-outlined) {
@@ -278,6 +281,29 @@ main {
     border-radius: 6px;
 }
 
+.messagebox {
+    margin-right: 12px;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.messagebox span {
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.messagebox.success {
+    background-color: var(--success-color);
+}
+
+.messagebox.warning {
+    background-color: var(--warning-color);
+}
+
+.messagebox.error {
+    background-color: var(--error-color);
+}
+
 @media screen and (prefers-color-scheme: light) {
     :root {
         --border-color: #b6b4b4;
@@ -285,6 +311,9 @@ main {
         --background-color-variant: #dddcdc;
         --lighter-text-color: #212121;
         --text-color: #3d3d3d;
+        --success-color: #4caf50;
+        --warning-color: #f0af4e;
+        --error-color: #ff4d4d;
     }
 
     html, body, main {

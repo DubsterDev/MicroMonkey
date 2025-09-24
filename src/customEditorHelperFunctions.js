@@ -22,6 +22,29 @@ export function addParagraph(content, root) {
 }
 
 /**
+ * Create and append a success, warning, or error message to an element
+ * @param {string} level success, warning, or error
+ * @param {string} content The content
+ * @param {Element} root The element to append to
+ */
+export function addMessageBox(level, content, root) {
+    const element = document.createElement("p");
+    element.classList.add("messagebox");
+    element.classList.add(level);
+
+    const icon = document.createElement("span");
+    icon.classList.add("material-symbols-outlined");
+    icon.innerText = level.replaceAll("success", "check_circle");
+    element.appendChild(icon);
+
+    const text = document.createElement("span");
+    text.innerText = content;
+    element.appendChild(text);
+
+    root.appendChild(element);
+}
+
+/**
  * Create and append a checkbox to an element
  * @param {string} content The content of the new checkbox's label
  * @param {Element} root The element to append to
