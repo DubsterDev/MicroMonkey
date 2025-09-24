@@ -13,6 +13,9 @@ import { initializeOpenFilesManager, openTab, saveActiveFile } from "./openFiles
 // Mainly just for the context menu
 import { renderWelcomeScreen, setupUiManager } from "./otherUiManager";
 
+// For starting the flasher
+import { addFlasherEventListeners } from "./flasher";
+
 // Handles CTRL+SHIFT+P and running commands
 import { setupCommandPalette } from "./commandPalette";
 import { setupSettings } from "./settings";
@@ -51,6 +54,9 @@ setupCommandPalette();
 
 // Add event listeners for creating new files and folders
 addNewFileEventListeners();
+
+// Add event listeners for the flasher
+addFlasherEventListeners();
 
 // Add a event listener for the reload file explorer button
 document.getElementById("reloadFileExplorer").addEventListener("click", async () => newFolderStructure(await getFiles()));
