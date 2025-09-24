@@ -599,6 +599,20 @@ export function removeSerialCallback(callback) {
 }
 
 /**
+ * Removes the reader and writer from the serial port,
+ * allowing the port to be closed or used by another process
+ */
+export async function disconnectSerialPortListeners() {
+    // Cancels and releases the lock of the reader stream
+    await reader.cancel();
+    reader.releaseLock();
+
+    // Closes and releases the lock of the writer stream
+    await writer.close();
+    writer.releaseLock();
+}
+
+/**
  * Infinitely loops and gets output from the connected board,
  * and calls serial callbacks
  */
@@ -711,14 +725,8 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
     // Add an event listener for when the user clicks the find ports button
     document.getElementById("findPorts").addEventListener("click", async () => {
         if (activePort && activePort.readable !== null && activePort.writable !== null) {
-            console.log(activePort)
-            // Cancels and releases the lock of the reader stream
-            await reader.cancel();
-            reader.releaseLock();
-
-            // Closes and releases the lock of the writer stream
-            await writer.close();
-            writer.releaseLock();
+            // Disconnect listeners from the Serial Port
+            await disconnectSerialPortListeners();
 
             // Closes the Serial Port
             await activePort.close();
