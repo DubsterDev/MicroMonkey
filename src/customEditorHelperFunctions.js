@@ -77,7 +77,7 @@ export function addCheckbox(content, root, checked=false, callback) {
  */
 export function addButton(content, root, callback) {
     const button = document.createElement("button");
-    if (callback !== undefined) button.addEventListener("change", () => {
+    if (callback !== undefined) button.addEventListener("click", () => {
         callback();
     });
 
