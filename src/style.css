@@ -285,6 +285,7 @@ main {
     margin-right: 12px;
     padding: 12px;
     border-radius: 12px;
+    color: var(--text-color);
 }
 
 .messagebox span {
@@ -309,8 +310,8 @@ main {
         --border-color: #b6b4b4;
         --background-color: #ebebeb;
         --background-color-variant: #dddcdc;
-        --lighter-text-color: #212121;
-        --text-color: #3d3d3d;
+        --text-color: #212121;
+        --lighter-text-color: #3d3d3d;
         --success-color: #4caf50;
         --warning-color: #f0af4e;
         --error-color: #ff4d4d;
