@@ -68,3 +68,20 @@ export function addCheckbox(content, root, checked=false, callback) {
 
     root.appendChild(label);
 }
+
+/**
+ * Create and append a button to an element
+ * @param {string} content The content of the new button
+ * @param {Element} root The element to append to
+ * @param {Function|undefined} callback A callback for when the button is clicked
+ */
+export function addButton(content, root, callback) {
+    const button = document.createElement("button");
+    if (callback !== undefined) button.addEventListener("change", () => {
+        callback();
+    });
+
+    button.innerText = content;
+
+    root.appendChild(button);
+}
