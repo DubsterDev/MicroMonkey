@@ -137,6 +137,20 @@ export function closeTabsInDirectory(path) {
 }
 
 /**
+ * Request the render function be called again, only works if the tab is active and it is a custom tab
+ * @param {string} path The file path of the custom editor that wants to be rendered
+ */
+export function requestReRender(path) {
+    const tab = tabs[path];
+    if (tab === null || tab === undefined) return;
+
+    if (tab.active && tab.type === "custom") {
+        customEditorElement.innerText = "";
+        tab.renderFunction(customEditorElement);
+    }
+}
+
+/**
  * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco or calls the render function
  * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco or show call the custom render function
  */
