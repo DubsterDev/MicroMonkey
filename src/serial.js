@@ -599,6 +599,14 @@ export function removeSerialCallback(callback) {
 }
 
 /**
+ * Returns the serial port that is connected
+ * @returns {*} The connected serial port, or null if one is not connected
+ */
+export function getPort() {
+    return activePort;
+}
+
+/**
  * Removes the reader and writer from the serial port,
  * allowing the port to be closed or used by another process
  */
