@@ -17,6 +17,9 @@ const espLoaderTerminal = {
 }
 
 const myFilePath = "/.default_files/micromonkey/flasher.mm";
+const fileInput = document.createElement("input");
+fileInput.type = "file";
+fileInput.onchange = () => requestReRender(myFilePath);
 
 export function addFlasherEventListeners() {
     document.getElementById("flashMicroPython").addEventListener("click", openFlasher)
@@ -55,6 +58,8 @@ function renderFlasherPage(root) {
     addHeading("MicroPython Flasher", "h2", root);
     if (flashingStage === "not_started") {
         addMessageBox("warning", "Currently this flasher only supports Espressif boards, such as the ESP32 or ESP8266.", root);
+        addParagraph(fileInput.files.length > 0 ? "Firmware selected" : "You must upload the firmware to flash.", root);
+        addButton(fileInput.files.length > 0 ? "Change" : "Upload", root, () => fileInput.click())
         addParagraph("Connect to a board with the button on the bottom left, then press continue.", root);
         addParagraph("Press and hold the EN button on your board while pressing the continue button.", root);
         addButton("Continue", root, beginFlash);
