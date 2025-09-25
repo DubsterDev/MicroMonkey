@@ -22,4 +22,4 @@ MicroMonkey is a web-based IDE for managing code on MicroPython devices.
    - Fix pyright
        - Not autocompleting imports and sometimes nothing at all
   - **Miscellaneous**
-    - Built-in MicroPython flasher
+    - Make built-in MicroPython flasher more user friendly
