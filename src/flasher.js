@@ -2,7 +2,7 @@ import { Transport, ESPLoader } from "esptool-js";
 import { openTab, requestReRender } from "./openFilesManager";
 import { addButton, addHeading, addMessageBox, addParagraph } from "./customEditorHelperFunctions";
 import { addCommand } from "./commandPalette";
-import { disconnectSerialPort, disconnectSerialPortListeners, getPort } from "./serial";
+import { connectToBoard, disconnectSerialPort, disconnectSerialPortListeners, getPort } from "./serial";
 import SparkMD5 from "spark-md5";
 
 const espLoaderTerminal = {
@@ -71,6 +71,9 @@ async function flashOS() {
 
     await esploader.writeFlash(flashOptions);
     await esploader.after();
+
+    flashingStage = "done";
+    requestReRender(myFilePath);
 }
 
 function loadOSIntoString() {
@@ -101,5 +104,10 @@ function renderFlasherPage(root) {
         addParagraph("Getting ready to flash MicroPython...", root);
     } else if (flashingStage === "flashing") {
         addParagraph("Flashing MicroPython...", root);
+    } else if (flashingStage === "done") {
+        addParagraph("Done flashing.", root);
+        addParagraph("Reboot your device by pressing the EN button.", root);
+        addParagraph("Then, refresh MicroMonkey and reconnect.", root);
+        addButton("Refresh MicroMonkey", root, () => location.reload());
     }
 }
