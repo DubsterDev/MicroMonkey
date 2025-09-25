@@ -18,6 +18,10 @@ const espLoaderTerminal = {
 }
 
 const myFilePath = "/.default_files/micromonkey/flasher.mm";
+
+let flashingTotal = 0;
+let flashingAmountDone = 0;
+
 const fileInput = document.createElement("input");
 fileInput.type = "file";
 fileInput.onchange = () => requestReRender(myFilePath);
@@ -64,7 +68,9 @@ async function flashOS() {
         eraseAll: false,
         compress: true,
         reportProgress: (fileIndex, written, total) => {
-            console.log(`Wrote ${written}/${total}`)
+            flashingTotal = total;
+            flashingAmountDone = written;
+            requestReRender(myFilePath);
         },
         calculateMD5Hash: (image) => SparkMD5.hashBinary(image),
     }
@@ -104,6 +110,11 @@ function renderFlasherPage(root) {
         addParagraph("Getting ready to flash MicroPython...", root);
     } else if (flashingStage === "flashing") {
         addParagraph("Flashing MicroPython...", root);
+
+        const percentHolder = document.createElement("progress");
+        percentHolder.max = flashingTotal;
+        percentHolder.value = flashingAmountDone;
+        root.appendChild(percentHolder);
     } else if (flashingStage === "done") {
         addParagraph("Done flashing.", root);
         addParagraph("Reboot your device by pressing the EN button.", root);
