@@ -27,7 +27,7 @@ fileInput.type = "file";
 fileInput.onchange = () => requestReRender(myFilePath);
 
 export function addFlasherEventListeners() {
-    document.getElementById("flashMicroPython").addEventListener("click", openFlasher)
+    // document.getElementById("flashMicroPython").addEventListener("click", openFlasher)
     addCommand("openMicroPythonFlasher", "Flash MicroPython", openFlasher);
 }
 
