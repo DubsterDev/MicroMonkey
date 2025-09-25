@@ -53,6 +53,7 @@ async function beginFlash() {
 
 async function flashOS() {
     flashingStage = "flashing";
+    requestReRender(myFilePath);
     await esploader.eraseFlash();
     const osString = await loadOSIntoString();
 
@@ -94,9 +95,11 @@ function renderFlasherPage(root) {
         addParagraph(fileInput.files.length > 0 ? "Firmware selected" : "You must upload the firmware to flash.", root);
         addButton(fileInput.files.length > 0 ? "Change" : "Upload", root, () => fileInput.click())
         addParagraph("Connect to a board with the button on the bottom left, then press continue.", root);
-        addParagraph("Press and hold the EN button on your board while pressing the continue button.", root);
+        addParagraph("Press and hold the Boot button on your board while pressing the continue button.", root);
         addButton("Continue", root, beginFlash);
     } else if (flashingStage === "getting_ready") {
         addParagraph("Getting ready to flash MicroPython...", root);
+    } else if (flashingStage === "flashing") {
+        addParagraph("Flashing MicroPython...", root);
     }
 }
