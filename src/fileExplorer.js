@@ -3,6 +3,10 @@ import { getInput } from "./commandPalette";
 import { openTab } from "./openFilesManager";
 import { createDirectory, createFile, getFiles } from "./serial";
 
+// A object containing which folders are collapsed,
+// used when rerendering the file explorer
+let fileExplorerCollapsedState = {};
+
 /**
  * Re-renders the file explorer with a new folder structure.
  * Folder structure is in this format:
@@ -108,6 +112,10 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
             folderDiv.classList.add("folder-container");
             folderDiv.classList.add("item");
 
+            // Retrieves the collapsed state, and, if it is collapsed, collapse it
+            const isCollapsed = fileExplorerCollapsedState[currentDir + key] ?? true;
+            if (isCollapsed) folderDiv.classList.add("collapsed");
+
             // Create a paragraph tag to hold the name of the folder
             const folderName = document.createElement("p");
 
@@ -167,7 +175,16 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
             folderName.classList.add("folder-name");
 
             // When it's clicked, toggle the collapsed state of the folder's content
-            folderName.addEventListener("click", () => folderDiv.classList.toggle("collapsed"));
+            folderName.addEventListener("click", () => {
+                // Retrieves the saved value of whether this is collapsed
+                const isCollapsed = fileExplorerCollapsedState[currentDir + key] ?? true;
+
+                // Stores the new collapsed state in the directory
+                fileExplorerCollapsedState[currentDir + key] = !isCollapsed;
+
+                // Toggles the collapsed state on the folder
+                folderDiv.classList.toggle("collapsed");
+            });
 
             // Append the folder name to the main folder container
             folderDiv.appendChild(folderName);
