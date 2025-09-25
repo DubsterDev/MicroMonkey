@@ -671,7 +671,7 @@ let readyCallback;
  * Finish connecting to a board after getting a reference to the port.
  * @param {*} port The serial port to read data from
  */
-async function connectToBoard(port) {
+export async function connectToBoard(port) {
     // Change the board status to Connected
     document.getElementById("boardStatus").innerText = "Connected";
 
