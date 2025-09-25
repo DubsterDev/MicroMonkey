@@ -3,6 +3,7 @@ import { openTab, requestReRender } from "./openFilesManager";
 import { addButton, addHeading, addMessageBox, addParagraph } from "./customEditorHelperFunctions";
 import { addCommand } from "./commandPalette";
 import { disconnectSerialPort, disconnectSerialPortListeners, getPort } from "./serial";
+import SparkMD5 from "spark-md5";
 
 const espLoaderTerminal = {
   clean() {
@@ -47,7 +48,39 @@ async function beginFlash() {
     };
     esploader = new ESPLoader(flashOptions);
     chip = await esploader.main();
+    flashOS();
+}
 
+async function flashOS() {
+    flashingStage = "flashing";
+    await esploader.eraseFlash();
+    const osString = await loadOSIntoString();
+
+    const fileArray = [{ data: osString, address: parseInt("0x1000") }];
+    const flashOptions = {
+        fileArray: fileArray,
+        flashSize: "keep",
+        eraseAll: false,
+        compress: true,
+        reportProgress: (fileIndex, written, total) => {
+            console.log(`Wrote ${written}/${total}`)
+        },
+        calculateMD5Hash: (image) => SparkMD5.hashBinary(image),
+    }
+
+    await esploader.writeFlash(flashOptions);
+    await esploader.after();
+}
+
+function loadOSIntoString() {
+    return new Promise((resolve) => {
+        const micropythonReader = new FileReader();
+        micropythonReader.onload = (ev) => {
+            resolve(ev.target.result);
+        }
+
+        micropythonReader.readAsBinaryString(fileInput.files[0]);
+    })
 }
 
 function openFlasher() {
