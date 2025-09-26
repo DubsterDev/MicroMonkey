@@ -5,26 +5,40 @@ const pyrightWorker = new Worker("pyright/pyright.worker.js");
 pyrightWorker.addEventListener("message", (event) => {
     const data = event.data;
     if (data.method === "textDocument/publishDiagnostics") {
-        updateDiagnostics(data.params.diagnostics, data.params.uri);
+        updateDiagnostics(data.params.diagnostics, data.params.uri.replaceAll("/" + encodeURIComponent("<default workspace root>") + "/", "micromonkey/"));
+    } else if (data.method === "window/logMessage") {
+        console.log("pyright message", data.params.message);
     }
 })
 
 let requestId = 0;
 
-
-stubs["pyrightconfig.json"] = {
-    "typeCheckingMode": "strict",
-    "typeshedPath": "/typeshed"
-}
 pyrightWorker.postMessage({
     jsonrpc: '2.0',
     id: requestId++,
     method: 'initialize',
     params: {
-        rootUri: 'file://micromonkey',
-        capabilities: {},
+        rootUri: 'file:///',
+        capabilities: {
+            general: {
+                trace: "verbose"
+            }
+        },
         initializationOptions: {
-            files: stubs
+            files: {
+                ...stubs,
+                "/src/pyrightconfig.json": JSON.stringify({
+                    "pythonVersion": "3.12",
+                    "pythonPlatform": "Linux",
+                    "typeCheckingMode": "basic",
+                    "typeshedPath": "/typeshed/",
+                    "reportMissingModuleSource": false,
+                    // "reportUnusedFunction": false,
+                    // "reportWildcardImportFromLibrary": false,
+                    // "reportMissingImports": false,
+                    "verboseOutput": true
+                })
+            }
         }
     }
 });
@@ -33,6 +47,7 @@ const fileVersions = {};
 
 let currentlyOpenUri = "";
 function openFile(uri, content) {
+    uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     fileVersions[uri] = 1;
     if (currentlyOpenUri !== "") closeFile(currentlyOpenUri);
     const didOpen = {
@@ -54,6 +69,7 @@ function openFile(uri, content) {
 }
 
 function closeFile(uri) {
+    uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const didClose = {
         jsonrpc: '2.0',
         method: 'textDocument/didClose',
@@ -68,6 +84,7 @@ function closeFile(uri) {
 }
 
 function updateFile(uri, changes) {
+    uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const didChange = {
         jsonrpc: '2.0',
         method: 'textDocument/didChange',
@@ -84,6 +101,7 @@ function updateFile(uri, changes) {
 }
 
 function getCompletions(uri, position = { line: 0, character: 0 }) {
+    uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const usedRequestId = requestId;
     const message = {
         jsonrpc: '2.0',
@@ -112,6 +130,7 @@ function getCompletions(uri, position = { line: 0, character: 0 }) {
 }
 
 function getSignatureHelp(uri, position = { line: 0, character: 0 }) {
+    uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const usedRequestId = requestId;
     const message = {
         jsonrpc: '2.0',
