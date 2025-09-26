@@ -177,24 +177,6 @@ export function changeModel(model) {
     // Add a listener for when the user types in the code editor
     model.onDidChangeContent((e) => {
         // Get the changes to the file
-        // const changes = e.changes.map((change) => {
-        //     const startPos = model.getPositionAt(change.rangeOffset);
-        //     const endPos = model.getPositionAt(change.rangeOffset + change.rangeLength);
-
-        //     return {
-        //         range: {
-        //             start: {
-        //                 line: startPos.lineNumber - 1,
-        //                 character: startPos.column - 1,
-        //             },
-        //             end: {
-        //                 line: endPos.lineNumber - 1,
-        //                 character: endPos.column - 1,
-        //             },
-        //         },
-        //         text: change.text,
-        //     };
-        // });
         const changes = [{
             text: model.getValue()
         }];
