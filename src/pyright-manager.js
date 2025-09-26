@@ -1,6 +1,13 @@
+import { updateDiagnostics } from "./editor";
 import stubs from "./stub-bundle.json";
 
 const pyrightWorker = new Worker("pyright/pyright.worker.js");
+pyrightWorker.addEventListener("message", (event) => {
+    const data = event.data;
+    if (data.method === "textDocument/publishDiagnostics") {
+        updateDiagnostics(data.params.diagnostics, data.params.uri);
+    }
+})
 
 let requestId = 0;
 

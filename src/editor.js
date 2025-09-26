@@ -201,3 +201,43 @@ export function changeModel(model) {
         updateFile(modelUriString, changes);
     })
 }
+
+/**
+ * Updates the syntax highlighting markers displayed in the editor.
+ * @param {Array} diagnostics An array of Language Server Protocol style diagnostics
+ * @param {string} uri The URI the diagnostics are for
+ */
+export function updateDiagnostics(diagnostics, uri) {
+    // An array of monaco marker types to convert LSP to Monaco
+    const monacoMarkerType = [
+        undefined,
+        monaco.MarkerSeverity.Error,
+        monaco.MarkerSeverity.Warning,
+        monaco.MarkerSeverity.Info,
+        monaco.MarkerSeverity.Hint
+    ];
+
+    // An array containing the diagnostics for Monaco
+    const newDiagnostics = [];
+
+    // Loop through the array of diagnostics
+    diagnostics.forEach(diagnostic => {
+        // Create a Monaco style diagnostic
+        const newDiagnostic = {
+            endColumn: diagnostic.range.end.character + 1,
+            endLineNumber: diagnostic.range.end.line + 1,
+            message: diagnostic.message,
+            source: diagnostic.source,
+            severity: monacoMarkerType[diagnostic.severity],
+            startColumn: diagnostic.range.start.character + 1,
+            startLineNumber: diagnostic.range.start.line + 1,
+            code: diagnostic.code
+        };
+
+        // Push the new diagnostic to the array
+        newDiagnostics.push(newDiagnostic);
+    });
+
+    // Update Monaco with the new diagnostics
+    monaco.editor.setModelMarkers(monaco.editor.getModel(uri), "pyright", newDiagnostics);
+}
