@@ -161,4 +161,36 @@ function getSignatureHelp(uri, position = { line: 0, character: 0 }) {
     });
 }
 
-export { openFile, closeFile, updateFile, getCompletions, getSignatureHelp };
+function getHover(uri, position = { line: 0, character: 0 }) {
+    uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
+    const usedRequestId = requestId;
+    const message = {
+        jsonrpc: '2.0',
+        id: usedRequestId,
+        method: 'textDocument/hover',
+        params: {
+            textDocument: { uri: uri },
+            position: position,
+            context: {
+                triggerKind: 1
+            }
+        }
+    };
+    requestId++;
+
+    pyrightWorker.postMessage(message);
+
+    return new Promise((resolve) => {
+        function messageReceived(event) {
+            const data = event.data;
+            if (data.id === usedRequestId) {
+                resolve(data.result);
+                pyrightWorker.removeEventListener("message", messageReceived);
+            }
+        }
+
+        pyrightWorker.addEventListener("message", messageReceived);
+    });
+}
+
+export { openFile, closeFile, updateFile, getCompletions, getSignatureHelp, getHover };

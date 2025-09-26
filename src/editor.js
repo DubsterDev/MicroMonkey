@@ -1,6 +1,6 @@
 // Import dependencies
 import * as monaco from "monaco-editor";
-import { openFile, updateFile, getCompletions, getSignatureHelp } from "./pyright-manager";
+import { openFile, updateFile, getCompletions, getSignatureHelp, getHover } from "./pyright-manager";
 import { fileChanged } from "./openFilesManager";
 import { getSetting } from "./settings";
 
@@ -130,6 +130,32 @@ export function setUpMonaco() {
             };
         }
     });
+
+    // Register a hover provider
+    monaco.languages.registerHoverProvider('python', {
+        provideHover: async function (model, position, token) {
+            const hoverResult = await getHover(model.uri.toString(), {
+                line: position.lineNumber - 1,
+                character: position.column - 1,
+            });
+            console.log(hoverResult);
+            return {
+                contents: [
+                    {
+                        value: hoverResult.contents.value,
+                        supportHtml: false,
+                        isTrusted: false
+                    }
+                ],
+                range: {
+                    endColumn: hoverResult.range.end.character + 1,
+                    endLineNumber: hoverResult.range.end.line + 1,
+                    startColumn: hoverResult.range.start.character + 1,
+                    startLineNumber: hoverResult.range.start.line + 1
+                }
+            };
+        }
+    })
 
     // Return an editor instance in case it is needed elsewhere
     return editor;
