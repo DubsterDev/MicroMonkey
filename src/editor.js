@@ -230,8 +230,8 @@ export function updateDiagnostics(diagnostics, uri) {
 
     // Loop through the array of diagnostics
     diagnostics.forEach(diagnostic => {
-        // Skip it if it is a missing module source
-        if (diagnostic.code === "reportMissingModuleSource") return;
+        // Skip it if it is a missing module source or unknown module
+        if (diagnostic.code === "reportMissingModuleSource" || diagnostic.code === "reportMissingImports") return;
         // Create a Monaco style diagnostic
         const newDiagnostic = {
             endColumn: diagnostic.range.end.character + 1,
