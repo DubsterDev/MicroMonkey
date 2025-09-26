@@ -134,11 +134,13 @@ export function setUpMonaco() {
     // Register a hover provider
     monaco.languages.registerHoverProvider('python', {
         provideHover: async function (model, position, token) {
+            // Get the result of hovering
             const hoverResult = await getHover(model.uri.toString(), {
                 line: position.lineNumber - 1,
                 character: position.column - 1,
             });
-            console.log(hoverResult);
+            
+            // Return the result to Monaco
             return {
                 contents: [
                     {
