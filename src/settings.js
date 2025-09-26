@@ -56,4 +56,7 @@ function renderSettings(root) {
 
     addHeading("Auto-reboot device", "h3", root);
     addCheckbox("Reboots the device when the file is saved", root, getSetting("reboot-on-save", true), (bool) => setSetting("reboot-on-save", bool));
+
+    addHeading("Syntax Checking [BETA]", "h3", root);
+    addCheckbox("Show syntax errors and other things like missing imports. Off by default while in beta.", root, getSetting("syntax-checking", false), (bool) => setSetting("syntax-checking", bool));
 }

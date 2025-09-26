@@ -2,6 +2,7 @@
 import * as monaco from "monaco-editor";
 import { openFile, updateFile, getCompletions, getSignatureHelp } from "./pyright-manager";
 import { fileChanged } from "./openFilesManager";
+import { getSetting } from "./settings";
 
 // Create editor variable so we can access it later
 let editor;
@@ -166,6 +167,10 @@ export function changeModel(model) {
     // Set the model
     editor.setModel(model);
 
+    // Remove any diagnostics that are applied to this editor
+    // if syntax checking is disabled
+    if (!getSetting("syntax-checking", false)) monaco.editor.setModelMarkers(model, "pyright", []);
+
     // Let pyright know we're using a different file
     openFile(modelUriString, model.getValue());
 
@@ -208,6 +213,9 @@ export function changeModel(model) {
  * @param {string} uri The URI the diagnostics are for
  */
 export function updateDiagnostics(diagnostics, uri) {
+    // Don't show diagnostics if they're disabled
+    if (!getSetting("syntax-checking", false)) return;
+
     // An array of monaco marker types to convert LSP to Monaco
     const monacoMarkerType = [
         undefined,
