@@ -169,7 +169,7 @@ export function changeModel(model) {
 
     // Remove any diagnostics that are applied to this editor
     // if syntax checking is disabled
-    if (!getSetting("syntax-checking", false)) monaco.editor.setModelMarkers(model, "pyright", []);
+    if (!getSetting("syntax-checking")) monaco.editor.setModelMarkers(model, "pyright", []);
 
     // Let pyright know we're using a different file
     openFile(modelUriString, model.getValue());
@@ -214,7 +214,7 @@ export function changeModel(model) {
  */
 export function updateDiagnostics(diagnostics, uri) {
     // Don't show diagnostics if they're disabled
-    if (!getSetting("syntax-checking", false)) return;
+    if (!getSetting("syntax-checking")) return;
 
     // An array of monaco marker types to convert LSP to Monaco
     const monacoMarkerType = [

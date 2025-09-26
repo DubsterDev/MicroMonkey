@@ -88,7 +88,7 @@ export async function writeFile(code, filename = "main.py") {
     await interruptScript();
 
     // Reboot the board if that setting is checked
-    if (getSetting("reboot-on-save", true)) await softReboot();
+    if (getSetting("reboot-on-save")) await softReboot();
 }
 
 /**

@@ -2,6 +2,12 @@ import { addCommand } from "./commandPalette";
 import { addCheckbox, addHeading } from "./customEditorHelperFunctions";
 import { openTab } from "./openFilesManager";
 
+// A list of default settings, used if no value is set
+const defaults = {
+    "syntax-checking": false,
+    "reboot-on-save": true
+};
+
 /**
  * Adds a event listener and a command to the command palette for opening settings.
  */
@@ -36,7 +42,7 @@ export function setSetting(key, value) {
 /**
  * Retrieve a setting
  * @param {string} key The key to retrieve
- * @param {*} defaultValue The value to return if the setting wasn't defined
+ * @param {*} defaultValue The value to return if the setting wasn't defined and there is no default set already
  * @returns {*} The value of the setting
  */
 export function getSetting(key, defaultValue) {
@@ -44,7 +50,7 @@ export function getSetting(key, defaultValue) {
     const settings = JSON.parse(localStorage.getItem("micromonkey-settings") || "{}");
 
     // Return the value
-    return settings[key] ?? defaultValue;
+    return settings[key] ?? (defaults[key] ?? defaultValue);
 }
 
 /**
@@ -55,8 +61,8 @@ function renderSettings(root) {
     addHeading("Settings", "h2", root);
 
     addHeading("Auto-reboot device", "h3", root);
-    addCheckbox("Reboots the device when the file is saved", root, getSetting("reboot-on-save", true), (bool) => setSetting("reboot-on-save", bool));
+    addCheckbox("Reboots the device when the file is saved", root, getSetting("reboot-on-save"), (bool) => setSetting("reboot-on-save", bool));
 
     addHeading("Syntax Checking [BETA]", "h3", root);
-    addCheckbox("Show syntax errors and other things like missing imports. Off by default while in beta.", root, getSetting("syntax-checking", false), (bool) => setSetting("syntax-checking", bool));
+    addCheckbox("Show syntax errors and other things like missing imports. Off by default while in beta.", root, getSetting("syntax-checking"), (bool) => setSetting("syntax-checking", bool));
 }
