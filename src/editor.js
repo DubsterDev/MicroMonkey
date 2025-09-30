@@ -1,6 +1,6 @@
 // Import dependencies
 import * as monaco from "monaco-editor";
-import { openFile, updateFile, getCompletions, getSignatureHelp, getHover } from "./pyrightManager";
+import { initializePyright, openFile, updateFile, getCompletions, getSignatureHelp, getHover } from "./pyrightManager";
 import { fileChanged } from "./openFilesManager";
 import { getSetting } from "./settings";
 
@@ -12,6 +12,9 @@ let editor;
  * @returns {*} Instance of monaco
  */
 export function setUpMonaco() {
+    // Start pyright
+    initializePyright();
+    
     // Define MonacoEnviroment so it gets the service worker from the right spot
     self.MonacoEnvironment = {
         getWorker: function (_moduleId, label) {

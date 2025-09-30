@@ -1,50 +1,52 @@
 import { updateDiagnostics } from "./editor";
 import stubs from "./stub-bundle.json";
 
-const pyrightWorker = new Worker("pyright/pyright.worker.js");
-pyrightWorker.addEventListener("message", (event) => {
-    const data = event.data;
-    if (data.method === "textDocument/publishDiagnostics") {
-        updateDiagnostics(data.params.diagnostics, data.params.uri.replaceAll("/" + encodeURIComponent("<default workspace root>") + "/", "micromonkey/"));
-    } else if (data.method === "window/logMessage") {
-        console.log("pyright message", data.params.message);
-    }
-})
-
-window.addEventListener("beforeunload", () => {
-    pyrightWorker.terminate();
-})
-
+let pyrightWorker;
+let currentlyOpenUri = "";
 let requestId = 0;
-
-pyrightWorker.postMessage({
-    jsonrpc: '2.0',
-    id: requestId++,
-    method: 'initialize',
-    params: {
-        rootUri: 'file:///',
-        capabilities: {
-            general: {
-                trace: "verbose"
-            }
-        },
-        initializationOptions: {
-            files: {
-                ...stubs,
-                "/src/pyrightconfig.json": JSON.stringify({
-                    "typeCheckingMode": "basic",
-                    "typeshedPath": "/typeshed/",
-                    "reportMissingModuleSource": false,
-                    "verboseOutput": true
-                })
-            }
-        }
-    }
-});
-
 const fileVersions = {};
 
-let currentlyOpenUri = "";
+export function initializePyright() {
+    pyrightWorker = new Worker("pyright/pyright.worker.js");
+    pyrightWorker.addEventListener("message", (event) => {
+        const data = event.data;
+        if (data.method === "textDocument/publishDiagnostics") {
+            updateDiagnostics(data.params.diagnostics, data.params.uri.replaceAll("/" + encodeURIComponent("<default workspace root>") + "/", "micromonkey/"));
+        } else if (data.method === "window/logMessage") {
+            console.log("pyright message", data.params.message);
+        }
+    })
+
+    window.addEventListener("beforeunload", () => {
+        pyrightWorker.terminate();
+    })
+
+    pyrightWorker.postMessage({
+        jsonrpc: '2.0',
+        id: requestId++,
+        method: 'initialize',
+        params: {
+            rootUri: 'file:///',
+            capabilities: {
+                general: {
+                    trace: "verbose"
+                }
+            },
+            initializationOptions: {
+                files: {
+                    ...stubs,
+                    "/src/pyrightconfig.json": JSON.stringify({
+                        "typeCheckingMode": "basic",
+                        "typeshedPath": "/typeshed/",
+                        "reportMissingModuleSource": false,
+                        "verboseOutput": true
+                    })
+                }
+            }
+        }
+    });
+}
+
 export function openFile(uri, content) {
     uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     fileVersions[uri] = 1;
