@@ -14,7 +14,7 @@ let editor;
 export function setUpMonaco() {
     // Start pyright
     initializePyright();
-    
+
     // Define MonacoEnviroment so it gets the service worker from the right spot
     self.MonacoEnvironment = {
         getWorker: function (_moduleId, label) {
@@ -170,13 +170,14 @@ export function setUpMonaco() {
  * Get a model for a file
  * @param {string} content Contents of the file
  * @param {string} uri URI for the model. Should start with file://micromonkey/
+ * @param {string} language Language of the file, defaults to python
  * @returns The monaco model
  */
-export function createModel(content, uri) {
+export function createModel(content, uri, language = "python") {
     // Create the model
     const model = monaco.editor.createModel(
         content,
-        'python',
+        language,
         monaco.Uri.parse(uri)
     );
 
@@ -237,6 +238,12 @@ export function updateDiagnostics(diagnostics, uri) {
     // Don't show diagnostics if they're disabled
     if (!getSetting("syntax-checking")) return;
 
+    // Get the monaco model
+    const model = monaco.editor.getModel(uri);
+
+    // If the language of the model is not python, don't render the diagnostics
+    if (model.getLanguageId() !== "python") return;
+
     // An array of monaco marker types to convert LSP to Monaco
     const monacoMarkerType = [
         undefined,
@@ -288,5 +295,5 @@ export function updateDiagnostics(diagnostics, uri) {
     });
 
     // Update Monaco with the new diagnostics
-    monaco.editor.setModelMarkers(monaco.editor.getModel(uri), "pyright", newDiagnostics);
+    monaco.editor.setModelMarkers(model, "pyright", newDiagnostics);
 }
