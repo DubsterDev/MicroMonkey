@@ -11,6 +11,10 @@ pyrightWorker.addEventListener("message", (event) => {
     }
 })
 
+window.addEventListener("beforeunload", () => {
+    pyrightWorker.terminate();
+})
+
 let requestId = 0;
 
 pyrightWorker.postMessage({
