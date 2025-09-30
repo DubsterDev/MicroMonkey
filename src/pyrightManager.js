@@ -45,7 +45,7 @@ pyrightWorker.postMessage({
 const fileVersions = {};
 
 let currentlyOpenUri = "";
-function openFile(uri, content) {
+export function openFile(uri, content) {
     uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     fileVersions[uri] = 1;
     if (currentlyOpenUri !== "") closeFile(currentlyOpenUri);
@@ -67,7 +67,7 @@ function openFile(uri, content) {
     currentlyOpenUri = uri;
 }
 
-function closeFile(uri) {
+export function closeFile(uri) {
     uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const didClose = {
         jsonrpc: '2.0',
@@ -82,7 +82,7 @@ function closeFile(uri) {
     pyrightWorker.postMessage(didClose);
 }
 
-function updateFile(uri, changes) {
+export function updateFile(uri, changes) {
     uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const didChange = {
         jsonrpc: '2.0',
@@ -99,7 +99,7 @@ function updateFile(uri, changes) {
     pyrightWorker.postMessage(didChange);
 }
 
-function getCompletions(uri, position = { line: 0, character: 0 }) {
+export function getCompletions(uri, position = { line: 0, character: 0 }) {
     uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const usedRequestId = requestId;
     const message = {
@@ -128,7 +128,7 @@ function getCompletions(uri, position = { line: 0, character: 0 }) {
     });
 }
 
-function getSignatureHelp(uri, position = { line: 0, character: 0 }) {
+export function getSignatureHelp(uri, position = { line: 0, character: 0 }) {
     uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const usedRequestId = requestId;
     const message = {
@@ -160,7 +160,7 @@ function getSignatureHelp(uri, position = { line: 0, character: 0 }) {
     });
 }
 
-function getHover(uri, position = { line: 0, character: 0 }) {
+export function getHover(uri, position = { line: 0, character: 0 }) {
     uri = uri.replaceAll("micromonkey/", "/<default workspace root>/");
     const usedRequestId = requestId;
     const message = {
@@ -191,5 +191,3 @@ function getHover(uri, position = { line: 0, character: 0 }) {
         pyrightWorker.addEventListener("message", messageReceived);
     });
 }
-
-export { openFile, closeFile, updateFile, getCompletions, getSignatureHelp, getHover };
