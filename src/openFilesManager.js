@@ -43,8 +43,24 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
             // Get the file's content from the board
             const content = await getFile(path);
 
+            // A list of file extensions and their corresponding languages in Monaco
+            const languages = {
+                "py": "python",
+                "json": "json",
+                "md": "markdown",
+                "js": "javascript",
+                "html": "html",
+                "css": "css"
+            }
+
+            // Split the file path by .
+            const segments = path.split(".");
+
+            // Get the last segment, which is the file extension, and look up the language
+            const language = languages[segments[segments.length - 1]] ?? "plaintext";
+
             // Create a monaco model for the file
-            model = createModel(content, "file://micromonkey" + path);
+            model = createModel(content, "file://micromonkey" + path, language);
         }
 
         // Add the tab to the list of tabs
