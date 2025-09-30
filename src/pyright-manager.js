@@ -32,14 +32,9 @@ pyrightWorker.postMessage({
             files: {
                 ...stubs,
                 "/src/pyrightconfig.json": JSON.stringify({
-                    "pythonVersion": "3.12",
-                    "pythonPlatform": "Linux",
                     "typeCheckingMode": "basic",
                     "typeshedPath": "/typeshed/",
                     "reportMissingModuleSource": false,
-                    // "reportUnusedFunction": false,
-                    // "reportWildcardImportFromLibrary": false,
-                    // "reportMissingImports": false,
                     "verboseOutput": true
                 })
             }
