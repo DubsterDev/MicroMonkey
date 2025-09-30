@@ -243,13 +243,28 @@ export function updateDiagnostics(diagnostics, uri) {
         monaco.MarkerSeverity.Hint
     ];
 
+    // A list of diagnostic codes to ingore
+    const ignoreDiagnostics = [
+        "reportMissingImports",
+        "reportMissingModuleSource",
+        "reportGeneralTypeIssues",
+        "reportReturnType",
+        "reportUnknownParameterType",
+        "reportUnknownArgumentType",
+        "reportUnknownLambdaType",
+        "reportUnknownVariableType",
+        "reportUnknownMemberType",
+        "reportMissingParameterType",
+        "reportMissingTypeArgument"
+    ];
+
     // An array containing the diagnostics for Monaco
     const newDiagnostics = [];
 
     // Loop through the array of diagnostics
     diagnostics.forEach(diagnostic => {
         // Skip it if it is a missing module source or unknown module
-        if (diagnostic.code === "reportMissingModuleSource" || diagnostic.code === "reportMissingImports") return;
+        if (ignoreDiagnostics.includes(diagnostic.code)) return;
         // Create a Monaco style diagnostic
         const newDiagnostic = {
             endColumn: diagnostic.range.end.character + 1,
