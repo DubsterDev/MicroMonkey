@@ -9,9 +9,12 @@
     --error-color: #bd0000;
 }
 
-*:not(#codeEditor *):not(.material-symbols-outlined) {
-    font-family: "Open Sans";
+* {
     box-sizing: border-box;
+}
+
+body, main, button {
+    font-family: "Open Sans";
 }
 
 html, body, main {
