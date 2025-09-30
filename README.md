@@ -19,6 +19,6 @@ MicroMonkey is a web-based IDE for managing code on MicroPython devices.
    - Close all tabs/saved tabs option in tab bar
    - Make tab bar scrollable
  - **Editor**
-   - Get pyright type checker to not complain about almost every type
+   - Make pyright use the passed `pyrightconfig.json` instead of ignoring it
   - **Miscellaneous**
     - Make built-in MicroPython flasher more user friendly
