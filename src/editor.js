@@ -186,6 +186,14 @@ export function createModel(content, uri) {
  * @param {*} model The model to switch to. You can get one of these with {@link createModel}
  */
 export function changeModel(model) {
+    // Set the size of the editor to make sure it's right
+    const serialMonitor = document.getElementById("serialMonitor");
+    const rightPanel = document.getElementById("rightPanel");
+    editor.layout({
+        width: rightPanel.clientWidth,
+        height: rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight
+    });
+
     // Convert the URI to a string
     const modelUriString = model.uri.toString();
 
