@@ -255,7 +255,10 @@ export function updateDiagnostics(diagnostics, uri) {
         "reportUnknownVariableType",
         "reportUnknownMemberType",
         "reportMissingParameterType",
-        "reportMissingTypeArgument"
+        "reportMissingTypeArgument",
+        "reportArgumentType",
+        "reportCallIssue",
+        "reportIndexIssue"
     ];
 
     // An array containing the diagnostics for Monaco
