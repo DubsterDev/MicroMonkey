@@ -1,6 +1,6 @@
 // Import dependencies
 import * as monaco from "monaco-editor";
-import { openFile, updateFile, getCompletions, getSignatureHelp, getHover } from "./pyright-manager";
+import { openFile, updateFile, getCompletions, getSignatureHelp, getHover } from "./pyrightManager";
 import { fileChanged } from "./openFilesManager";
 import { getSetting } from "./settings";
 
