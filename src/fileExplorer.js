@@ -43,7 +43,7 @@ export function addNewFileEventListeners() {
 async function newFile(base="/") {
     if (!base.endsWith("/")) base = base + "/";
     // Get input from the command palette for a name
-    const fileName = await getInput("Enter a name for the file");
+    const fileName = await getInput("Enter a name for the file", "Enter a name for the file");
 
     // If escaped or hit enter with no content, don't create the file
     if (fileName === undefined || fileName.trim() === "") return;
@@ -62,7 +62,7 @@ async function newFile(base="/") {
 async function newFolder(base="/") {
     if (!base.endsWith("/")) base = base + "/";
     // Get input from the command palette for a name
-    const folderName = await getInput("Enter a name for the folder");
+    const folderName = await getInput("Enter a name for the folder", "Enter a name for the folder");
 
     // If escaped or hit enter with no content, don't create the folder
     if (folderName === undefined || folderName.trim() === "") return;
