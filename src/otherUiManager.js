@@ -1,11 +1,11 @@
 // Used when renaming files, gets input using the command palette
-import { getInput } from "./commandPalette";
+import { addCommand, getInput } from "./commandPalette";
 import { MICROMONKEY_VERSION } from "./constants";
 import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
 import { newFolderStructure } from "./fileExplorer";
-import { closeTab, closeTabsInDirectory } from "./openFilesManager";
+import { closeTab, closeTabsInDirectory, openTab } from "./openFilesManager";
 
 // Helper functions for interacting with the board
 import { getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
@@ -177,4 +177,24 @@ export async function renderWhatsNewScreen(rootElement) {
     addParagraph("- Added syntax checking, autocompletion, and hover to view information about modules, classes, functions, and variables", rootElement);
     addParagraph("- Made file actions always visible on root folder", rootElement);
     addParagraph("- Various internal modifications", rootElement);
+}
+
+export function startWhatsNewScreenIfVersionChanged() {
+    // Get the last version from local storage
+    const lastVersion = localStorage.getItem("micromonkey-version");
+
+    // If the version has changed, open the What's New tab
+    if (lastVersion !== null && lastVersion !== undefined && lastVersion !== MICROMONKEY_VERSION) {
+        openWhatsNewTab();
+    }
+
+    // Update the MicroMonkey version in local storage
+    localStorage.setItem("micromonkey-version", MICROMONKEY_VERSION);
+
+    // Add an option to the Command Palette to view the What's New screen again
+    addCommand("openWhatsNew", "What's New", openWhatsNewTab);
+}
+
+function openWhatsNewTab() {
+    openTab("/.default_files/micromonkey/whats_new.mm", "What's New", "custom", renderWhatsNewScreen);
 }

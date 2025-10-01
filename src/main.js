@@ -11,7 +11,7 @@ import { addNewFileEventListeners, newFolderStructure } from "./fileExplorer";
 import { initializeOpenFilesManager, openTab, saveActiveFile } from "./openFilesManager";
 
 // Mainly just for the context menu, but there are also some render functions here
-import { renderWelcomeScreen, renderWhatsNewScreen, setupUiManager } from "./otherUiManager";
+import { renderWelcomeScreen, renderWhatsNewScreen, setupUiManager, startWhatsNewScreenIfVersionChanged } from "./otherUiManager";
 
 // For starting the flasher
 import { addFlasherEventListeners } from "./flasher";
@@ -36,13 +36,7 @@ setupSettings();
 openTab("/.default_files/micromonkey/welcome.mm", "Welcome to MicroMonkey", "custom", renderWelcomeScreen);
 
 // Open the "What's New" screen if the version has changed since last load
-const lastVersion = localStorage.getItem("micromonkey-version");
-if (lastVersion !== null && lastVersion !== undefined && lastVersion !== MICROMONKEY_VERSION) {
-    openTab("/.default_files/micromonkey/whats_new.mm", "What's New", "custom", renderWhatsNewScreen);
-}
-
-// Update the MicroMonkey version in local storage
-localStorage.setItem("micromonkey-version", MICROMONKEY_VERSION);
+startWhatsNewScreenIfVersionChanged();
 
 // Begin listening for clicks on the Connect to board button
 // and manage communication with it
