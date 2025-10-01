@@ -172,6 +172,7 @@ export async function renderWhatsNewScreen(rootElement) {
 
     // Define some what's new text
     addParagraph("Here's what's new in this version of MicroMonkey:", rootElement);
+    addParagraph("- Added What's New page", rootElement);
     addParagraph("- Added builtin ESP32 flasher, accessible via Command Palette (CTRL+SHIFT+P) > Flash MicroPython", rootElement);
     addParagraph("- Added syntax checking, autocompletion, and hover to view information about modules, classes, functions, and variables", rootElement);
     addParagraph("- Made file actions always visible on root folder", rootElement);
