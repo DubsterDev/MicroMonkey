@@ -123,6 +123,8 @@ main {
 
 #customEditor {
     padding: 12px 0 0 12px;
+    overflow: auto;
+    flex: 0 0 auto;
 }
 
 .bottomBar {

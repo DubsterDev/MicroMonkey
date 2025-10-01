@@ -10,6 +10,8 @@ const tabs = {};
 // References to monaco and custom editor in the DOM
 const codeEditorElement = document.getElementById("codeEditor");
 const customEditorElement = document.getElementById("customEditor");
+const serialMonitor = document.getElementById("serialMonitor");
+const rightPanel = document.getElementById("rightPanel");
 
 /**
  * Renders the tabs for the first time.
@@ -315,6 +317,7 @@ function renderTabs(activateActiveTab=true) {
             codeEditorElement.style.display = "none";
             customEditorElement.style.display = "block";
             customEditorElement.innerText = "";
+            customEditorElement.style.height = (rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight) + "px";
             tab.renderFunction(customEditorElement);
         }
     });
