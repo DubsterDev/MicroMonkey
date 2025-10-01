@@ -299,6 +299,7 @@ main {
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--background-color-variant);
+    border: var(--border-color) 1px solid;
     padding: 12px;
     border-radius: 12px;
     width: 50%;
@@ -312,6 +313,12 @@ main {
     height: 30px;
     border-radius: 6px;
     margin-bottom: 12px;
+}
+
+.commandPalette h4 {
+    margin: 0 0 12px 0;
+    padding: 0;
+    display: none;
 }
 
 .commandPalette .suggestions p {

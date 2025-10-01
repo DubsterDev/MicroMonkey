@@ -5,6 +5,7 @@ import Fuse from "fuse.js";
 const commandPalette = document.getElementById("commandPalette");
 const commandPaletteInput = document.getElementById("commandPaletteInput");
 const commandPaletteSuggestions = document.getElementById("commandPaletteSuggestions");
+const commandPaletteTitle = document.getElementById("commandPaletteTitle");
 
 // Create a default list of commands
 const commands = [];
@@ -81,6 +82,7 @@ export function setupCommandPalette() {
 
 /**
  * Opens the command palette, clears it to the default value provided, and displays the suggestions.
+ * @param {string|null} title An optional title for the command palette
  * @param {string} placeholder A placeholder for the command palette input
  * @param {string} defaultValue The default value for the command palette input
  * @param {array} useCommands An array of commands to suggest
@@ -88,7 +90,9 @@ export function setupCommandPalette() {
  * @param {Function} escaped A function, called when the user escapes from the input
  * @returns {void}
  */
-export function showCommandPalette(placeholder="", defaultValue="", useCommands=commands, optionPicked, escaped) {
+export function showCommandPalette(title=null, placeholder="", defaultValue="", useCommands=commands, optionPicked, escaped) {
+    commandPaletteTitle.style.display = title ? "block" : "none";
+    commandPaletteTitle.innerText = title ? title : "Command Palette";
     commandPalette.style.display = "block";
     commandPaletteInput.value = defaultValue;
     commandPaletteInput.placeholder = placeholder;
@@ -104,13 +108,14 @@ export function showCommandPalette(placeholder="", defaultValue="", useCommands=
 /**
  * Launches the command palette and resolves with the input in the input,
  * or undefined if the user pressed the escape key.
+ * @param {string|null} title An optional title for the command palette
  * @param {string} placeholder A placeholder for the command palette input
  * @param {string} defaultValue The default value for the command palette input
  * @param {array} options An array of options to suggest
  * @param {boolean} allowArbitraryInput Whether to allow arbitrary input, or only allow selecting from the options
  * @returns {Promise<string|undefined>} The user inputted string, or undefined if ESCAPE was pressed.
  */
-export function getInput(placeholder, defaultValue, options=[], allowArbitraryInput=true) {
+export function getInput(title=null, placeholder, defaultValue, options=[], allowArbitraryInput=true) {
     return new Promise((resolve) => {
         options.forEach((option, index) => {
             if (typeof option === "object" && "name" in option) {
@@ -124,7 +129,7 @@ export function getInput(placeholder, defaultValue, options=[], allowArbitraryIn
                 };
             } 
         });
-        showCommandPalette(placeholder, defaultValue, options, allowArbitraryInput ? resolve : null, resolve);
+        showCommandPalette(title, placeholder, defaultValue, options, allowArbitraryInput ? resolve : null, resolve);
     })
 }
 
