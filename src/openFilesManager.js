@@ -1,4 +1,5 @@
 // Import functions from editor to change what is showing
+import { getInput } from "./commandPalette";
 import { changeModel, createModel } from "./editor";
 
 // Functions to get files from the serial device and write files
@@ -276,12 +277,19 @@ function renderTabs(activateActiveTab=true) {
         // And add it to the tab container
         tabContainer.appendChild(closeBtn);
 
-        closeBtn.addEventListener("click", (ev) => {
+        closeBtn.addEventListener("click", async (ev) => {
+            // Prevent the tab container's click event from being triggered
+            ev.stopPropagation();
+
+            // If the tab is unsaved, confirm with the user
+            if (!tab.saved) {
+                const result = await getInput(`${tab.title} isn't saved. Are you sure you want to close it?`, "Pick an option", "", ["No", "Yes"], false);
+                if (result !== "Yes") return alert(result);
+            }
+
             // Close the tab
             closeTab(path);
 
-            // Prevent the tab container's click event from being triggered
-            ev.stopPropagation();
         });
 
         // When the tab is clicked, set it as active
