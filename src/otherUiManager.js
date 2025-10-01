@@ -197,11 +197,11 @@ export async function renderWhatsNewScreen(rootElement) {
     addHeading(`What's New in MicroMonkey ${MICROMONKEY_VERSION}`, "h2", rootElement);
 
     // Define some what's new text
+    // This should be updated with each release, so check the changelog for what to put here.
+    // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
     addParagraph("Here's what's new in this version of MicroMonkey:", rootElement);
-    addParagraph(" - Added options to close tabs in context menu when right-clicking on a tab", rootElement);
-    addParagraph(" - Made tab bar scrollable", rootElement);
-    addParagraph(" - Made tabs change the locations they reference when they are renamed or they're parent directories are renamed so that it always references an existing file", rootElement);
-    addParagraph(" - Made custom editors (Welcome to MicroMonkey, Settings, etc), stay inside the right area", rootElement);
+    addParagraph("- Added ability to use arrow keys to select commands shown in command palette (CTRL+SHIFT+P)", rootElement);
+    addParagraph("- Made it so MicroMonkey requests confirmation when closing an unsaved file", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
