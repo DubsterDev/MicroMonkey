@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1 (Not Released Yet)
+ - Made tab bar scrollable
+
 ## 1.1.0
  - Added What's New page
  - Added builtin ESP32 flasher, accessible via `Command Palette (CTRL+SHIFT+P) > Flash MicroPython`
