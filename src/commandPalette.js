@@ -106,11 +106,25 @@ export function showCommandPalette(placeholder="", defaultValue="", useCommands=
  * or undefined if the user pressed the escape key.
  * @param {string} placeholder A placeholder for the command palette input
  * @param {string} defaultValue The default value for the command palette input
+ * @param {array} options An array of options to suggest
+ * @param {boolean} allowArbitraryInput Whether to allow arbitrary input, or only allow selecting from the options
  * @returns {Promise<string|undefined>} The user inputted string, or undefined if ESCAPE was pressed.
  */
-export function getInput(placeholder, defaultValue) {
+export function getInput(placeholder, defaultValue, options=[], allowArbitraryInput=true) {
     return new Promise((resolve) => {
-        showCommandPalette(placeholder, defaultValue, [], resolve, resolve);
+        options.forEach((option, index) => {
+            if (typeof option === "object" && "name" in option) {
+                if (!("id" in option)) option.id = `option${index}`;
+                if (!("callback" in option)) option.callback = () => { resolve(option.name) };
+            } else {
+                options[index] = {
+                    "name": option,
+                    "id": `option${index}`,
+                    "callback": () => { resolve(option) }
+                };
+            } 
+        });
+        showCommandPalette(placeholder, defaultValue, options, allowArbitraryInput ? resolve : null, resolve);
     })
 }
 
