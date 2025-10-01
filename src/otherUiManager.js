@@ -170,7 +170,7 @@ export async function renderWhatsNewScreen(rootElement) {
     // Header
     addHeading(`What's New in MicroMonkey ${MICROMONKEY_VERSION}`, "h2", rootElement);
 
-    // Define some welcome text
+    // Define some what's new text
     addParagraph("Here's what's new in this version of MicroMonkey:", rootElement);
     addParagraph("- Added builtin ESP32 flasher, accessible via Command Palette (CTRL+SHIFT+P) > Flash MicroPython", rootElement);
     addParagraph("- Added syntax checking, autocompletion, and hover to view information about modules, classes, functions, and variables", rootElement);
