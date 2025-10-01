@@ -1,5 +1,6 @@
 // Used when renaming files, gets input using the command palette
 import { getInput } from "./commandPalette";
+import { MICROMONKEY_VERSION } from "./constants";
 import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
@@ -158,4 +159,21 @@ export async function renderWelcomeScreen(rootElement) {
     addParagraph("If the device does not load, try pressing the 'EN' button on the board or refreshing the page.", rootElement);
     addParagraph("To soft-reboot device, click into the serial monitor and use the keyboard shortcut CTRL+D.", rootElement);
     addParagraph("For more information about controlling your board with the serial monitor, run help()", rootElement);
+}
+
+/**
+ * Renders the what's new screen on a custom tab
+ * This is shown when the version changes, and should be updated with each release
+ * @param {Element} rootElement The element to use as root
+ */
+export async function renderWhatsNewScreen(rootElement) {
+    // Header
+    addHeading(`What's New in MicroMonkey ${MICROMONKEY_VERSION}`, "h2", rootElement);
+
+    // Define some welcome text
+    addParagraph("Here's what's new in this version of MicroMonkey:", rootElement);
+    addParagraph("- Added builtin ESP32 flasher, accessible via Command Palette (CTRL+SHIFT+P) > Flash MicroPython", rootElement);
+    addParagraph("- Added syntax checking, autocompletion, and hover to view information about modules, classes, functions, and variables", rootElement);
+    addParagraph("- Made file actions always visible on root folder", rootElement);
+    addParagraph("- Various internal modifications", rootElement);
 }
