@@ -1,8 +1,9 @@
 # Changelog
 
 ## 1.1.1 (Not Released Yet)
- - Made tab bar scrollable
  - Added options to close tabs in context menu when right-clicking on a tab
+ - Made tab bar scrollable
+ - Made tabs change the locations they reference when they are renamed or they're parent directories are renamed so that it always references an existing file
 
 ## 1.1.0
  - Added What's New page
