@@ -13,6 +13,9 @@ const commands = [];
 let usingCommands = commands;
 let callbackEnter, callbackEscape;
 
+// The ID of the currently selected suggestion
+let selectedSuggestionId = "noCommandSelected";
+
 /**
  * Adds event listeners to launch the command palette (CTRL+SHIFT+P),
  * and to close the command palette with ESC,
@@ -41,8 +44,35 @@ export function setupCommandPalette() {
             if (callbackEnter) {
                 commandPalette.style.display = "none";
                 callbackEnter(commandPaletteInput.value);
+            } else {
+                const activeSuggestion = document.querySelector(".commandPalette .suggestions p.active");
+                if (activeSuggestion) {
+                    const commandId = activeSuggestion.dataset.commandId;
+                    usingCommands.forEach((command) => {
+                        if (command.id === commandId) {
+                            commandPalette.style.display = "none";
+                            command.callback();
+                        }
+                    });
+                }
             }
             return true;
+        } else if (ev.key.toLowerCase() === "arrowdown") {
+            ev.preventDefault();
+            const activeSuggestion = document.querySelector(".commandPalette .suggestions p.active");
+            if (activeSuggestion && activeSuggestion.nextSibling) {
+                selectedSuggestionId = activeSuggestion.nextSibling.dataset.commandId;
+            } else {
+                selectedSuggestionId = "noCommandSelected";
+            }
+        } else if (ev.key.toLowerCase() === "arrowup") {
+            ev.preventDefault();
+            const activeSuggestion = document.querySelector(".commandPalette .suggestions p.active");
+            if (activeSuggestion && activeSuggestion.previousSibling) {
+                selectedSuggestionId = activeSuggestion.previousSibling.dataset.commandId;
+            } else {
+                selectedSuggestionId = document.querySelector(".commandPalette .suggestions p:last-child").dataset.commandId;
+            }
         }
 
         displaySuggestions(commandPaletteInput.value);
@@ -66,6 +96,7 @@ export function showCommandPalette(placeholder="", defaultValue="", useCommands=
     usingCommands = useCommands;
     callbackEnter = optionPicked;
     callbackEscape = escaped;
+    selectedSuggestionId = "noCommandSelected";
 
     displaySuggestions();
 }
@@ -154,12 +185,21 @@ function displaySuggestions(searchTerm="") {
     const searchResults = searchTerm.trim() !== "" ? fuse.search(searchTerm) : usingCommands;
 
     // Loop through the search results
-    searchResults.forEach((item) => {
+    searchResults.forEach((item, index) => {
         // Destructure the result
         const { name, id, callback } = "item" in item ? item.item : item;
 
         // Create an element for the suggestion
         const suggestion = document.createElement("p");
+
+        // Add the active class to the first suggestion or the one that matches the selected suggestion id
+        if ((index === 0 && selectedSuggestionId === "noCommandSelected") || id === selectedSuggestionId) {
+            suggestion.classList.add("active");
+            selectedSuggestionId = id;
+        }
+
+        // Add the command id as a data attribute
+        suggestion.dataset.commandId = id;
 
         // Set it's name
         suggestion.innerText = name;

@@ -311,6 +311,18 @@ main {
     border: none;
     height: 30px;
     border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.commandPalette .suggestions p {
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 0;
+}
+
+.commandPalette .suggestions p:hover, .commandPalette .suggestions p.active {
+    background-color: var(--background-color);
 }
 
 .messagebox {
