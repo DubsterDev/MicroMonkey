@@ -122,7 +122,6 @@ export function saveActiveFile() {
  * @param {boolean} skipRender Whether or not to skip rendering the tabs again, defaults to false
  */
 export function renameTab(oldPath, newPath, skipRender=false) {
-    alert(oldPath + " -> " + newPath);
     // Get the tab
     const tab = tabs[oldPath];
 
@@ -284,7 +283,7 @@ function renderTabs(activateActiveTab=true) {
             // If the tab is unsaved, confirm with the user
             if (!tab.saved) {
                 const result = await getInput(`${tab.title} isn't saved. Are you sure you want to close it?`, "Pick an option", "", ["No", "Yes"], false);
-                if (result !== "Yes") return alert(result);
+                if (result !== "Yes") return;
             }
 
             // Close the tab

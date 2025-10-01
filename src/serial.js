@@ -413,11 +413,11 @@ export function runCode(code) {
                 } else if (bytes[0] === 0x52 && bytes[1] === 0x00) {
                     // The board understood the command,
                     // but it doesn't support raw paste mode
-                    alert("Sorry, your board is not compatible with MicroMonkey.");
+                    alert("Hmmm, something didn't work. Your board might not be compatible with MicroMonkey, or you might just need to try that again.");
                     removeSerialCallback(dataCallback);
                 } else if (bytes[0] === 0x72 && bytes[1] === 0x61) {
                     // The board doesn't even know what raw paste mode is
-                    alert("Sorry, your board is not compatible with MicroMonkey.");
+                    alert("Hmmm, something didn't work. Your board might not be compatible with MicroMonkey, or you might just need to try that again.");
                     removeSerialCallback(dataCallback);
                 }
 
