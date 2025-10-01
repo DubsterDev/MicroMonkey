@@ -16,6 +16,7 @@ const serialCallbacks = [];
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");
 const rightPanel = document.getElementById("rightPanel");
+const customEditorElement = document.getElementById("customEditor");
 
 // Create the terminal
 const terminalFontSize = 18;
@@ -773,6 +774,7 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
             width: rightPanel.clientWidth,
             height: rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight
         });
+        customEditorElement.style.height = (rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight) + "px";
 
         // Use the fit addon to fit the terminal
         fitAddon.fit();
