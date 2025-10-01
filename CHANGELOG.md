@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.2 (Upcoming)
+## 1.1.2
  - Added ability to use arrow keys to select command shown in command palette (`CTRL+SHIFT+P`)
  - Added ability to request input with options
  - Added ability to supply a title for the command palette
