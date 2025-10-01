@@ -157,9 +157,13 @@ export function closeTabsInDirectory(path) {
  * @param {string} path The file path of the custom editor that wants to be rendered
  */
 export function requestReRender(path) {
+    // Get the tab
     const tab = tabs[path];
+
+    // If the tab doesn't exist, return
     if (tab === null || tab === undefined) return;
 
+    // If the tab is a custom editor, and it is active, render it again
     if (tab.active && tab.type === "custom") {
         customEditorElement.innerText = "";
         tab.renderFunction(customEditorElement);
