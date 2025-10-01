@@ -1,8 +1,10 @@
 # Changelog
 
 ## 1.1.2 (Upcoming)
- - Made it possible to use arrow keys to select command shown in command palette (`CTRL+SHIFT+P`)
- - Made it possible to request input with options
+ - Added ability to use arrow keys to select command shown in command palette (`CTRL+SHIFT+P`)
+ - Added ability to request input with options
+ - Added ability to supply a title for the command palette
+ - Made it so that it requests confirmation when closing an unsaved file
 
 ## 1.1.1
  - Added options to close tabs in context menu when right-clicking on a tab
