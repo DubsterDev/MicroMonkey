@@ -39,10 +39,10 @@ openTab("/.default_files/micromonkey/welcome.mm", "Welcome to MicroMonkey", "cus
 const lastVersion = localStorage.getItem("micromonkey-version");
 if (lastVersion !== null && lastVersion !== undefined && lastVersion !== MICROMONKEY_VERSION) {
     openTab("/.default_files/micromonkey/whats_new.mm", "What's New", "custom", renderWhatsNewScreen);
-
-    // Update the stored version
-    localStorage.setItem("micromonkey-version", MICROMONKEY_VERSION);
 }
+
+// Update the MicroMonkey version in local storage
+localStorage.setItem("micromonkey-version", MICROMONKEY_VERSION);
 
 // Begin listening for clicks on the Connect to board button
 // and manage communication with it
