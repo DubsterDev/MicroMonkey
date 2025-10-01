@@ -203,6 +203,10 @@ function displaySuggestions(searchTerm="") {
     // If there is a search term, fuzzy search it, else do all commands
     const searchResults = searchTerm.trim() !== "" ? fuse.search(searchTerm) : usingCommands;
 
+    // Check if the selected command is in the results, if not, reset it
+    let selectedCommandInResults = searchResults.find(result => result.item ? result.item.id === selectedSuggestionId : result.id === selectedSuggestionId);
+    if (!selectedCommandInResults) selectedSuggestionId = "noCommandSelected";
+    
     // Loop through the search results
     searchResults.forEach((item, index) => {
         // Destructure the result
