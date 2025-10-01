@@ -32,6 +32,8 @@ Once all the dependecies are installed, you can start the development server at 
 
 ### Brief Overview
 
+All new functions should have a JSDoc, and ideally plenty of comments.
+
 Most of the files should be pretty self-explanatory, but here's the basic ideas:
  - [commandPalette.js](src/commandPalette.js) contains the command palette that shows up when the user presses `CTRL+SHIFT+P`
  - [constants.js](src/constants.js) contains constants that are used in various places. Right now, this only includes the MicroMonkey version number
