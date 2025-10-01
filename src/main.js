@@ -10,8 +10,8 @@ import { addNewFileEventListeners, newFolderStructure } from "./fileExplorer";
 // For managing the open tabs
 import { initializeOpenFilesManager, openTab, saveActiveFile } from "./openFilesManager";
 
-// Mainly just for the context menu
-import { renderWelcomeScreen, setupUiManager } from "./otherUiManager";
+// Mainly just for the context menu, but there are also some render functions here
+import { renderWelcomeScreen, renderWhatsNewScreen, setupUiManager } from "./otherUiManager";
 
 // For starting the flasher
 import { addFlasherEventListeners } from "./flasher";
@@ -19,6 +19,9 @@ import { addFlasherEventListeners } from "./flasher";
 // Handles CTRL+SHIFT+P and running commands
 import { setupCommandPalette } from "./commandPalette";
 import { setupSettings } from "./settings";
+
+// Constant values
+import { MICROMONKEY_VERSION } from "./constants";
 
 // Insert the editor into the DOM
 const editor = setUpMonaco();
@@ -31,6 +34,15 @@ setupSettings();
 
 // Create a Welcome to MicroMonkey tab
 openTab("/.default_files/micromonkey/welcome.mm", "Welcome to MicroMonkey", "custom", renderWelcomeScreen);
+
+// Open the "What's New" screen if the version has changed since last load
+const lastVersion = localStorage.getItem("micromonkey-version");
+if (lastVersion !== null && lastVersion !== undefined && lastVersion !== MICROMONKEY_VERSION) {
+    openTab("/.default_files/micromonkey/whats_new.mm", "What's New", "custom", renderWhatsNewScreen);
+
+    // Update the stored version
+    localStorage.setItem("micromonkey-version", MICROMONKEY_VERSION);
+}
 
 // Begin listening for clicks on the Connect to board button
 // and manage communication with it
