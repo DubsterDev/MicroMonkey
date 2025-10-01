@@ -198,11 +198,10 @@ export async function renderWhatsNewScreen(rootElement) {
 
     // Define some what's new text
     addParagraph("Here's what's new in this version of MicroMonkey:", rootElement);
-    addParagraph("- Added What's New page", rootElement);
-    addParagraph("- Added builtin ESP32 flasher, accessible via Command Palette (CTRL+SHIFT+P) > Flash MicroPython", rootElement);
-    addParagraph("- Added syntax checking, autocompletion, and hover to view information about modules, classes, functions, and variables", rootElement);
-    addParagraph("- Made file actions always visible on root folder", rootElement);
-    addParagraph("- Various internal modifications", rootElement);
+    addParagraph(" - Added options to close tabs in context menu when right-clicking on a tab", rootElement);
+    addParagraph(" - Made tab bar scrollable", rootElement);
+    addParagraph(" - Made tabs change the locations they reference when they are renamed or they're parent directories are renamed so that it always references an existing file", rootElement);
+    addParagraph(" - Made custom editors (Welcome to MicroMonkey, Settings, etc), stay inside the right area", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
