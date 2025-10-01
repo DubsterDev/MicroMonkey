@@ -763,10 +763,10 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
     // Toggle the serial monitor's visiblity with the Serial Monitor button
     document.getElementById("openSerialMonitor").addEventListener("click", () => {
         // If it's showing hide it, if it's not, show it
-        if (serialMonitor.style.display == "block") {
-            serialMonitor.style.display = "none";
-        } else {
+        if (serialMonitor.style.display == "none") {
             serialMonitor.style.display = "block";
+        } else {
+            serialMonitor.style.display = "none";
         }
 
         // Update the sizing of the editor based on the height left after removing all the other elements
