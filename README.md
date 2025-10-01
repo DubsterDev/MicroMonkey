@@ -1,4 +1,4 @@
-# MicroMonkey
+# <img src="public/assets/monkeyheadshot.png" style="width: 35px;"> MicroMonkey
 
 MicroMonkey is a web-based IDE for managing code on MicroPython devices.
 
