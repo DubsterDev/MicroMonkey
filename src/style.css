@@ -46,6 +46,7 @@ main {
     border-right: 1px solid var(--border-color);
     overflow: auto;
     padding: 12px;
+    flex: 0 0 auto;
 }
 
 .leftSidebar .fileExplorerHeader {
@@ -92,7 +93,7 @@ main {
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: 100%;
+    width: 75%;
     flex: 1;
     position: relative;
 }
@@ -223,6 +224,9 @@ main {
     justify-content: flex-start;
     height: 50px;
     background-color: var(--background-color);
+    overflow-x: auto;
+    overflow-y: clip;
+    flex: 0 1 auto;
 }
 
 .tabs .tab {
@@ -258,6 +262,25 @@ main {
 .tabs .tab button:hover {
     background-color: #78787825;
     color: var(--text-color);
+}
+
+.tabs::-webkit-scrollbar {
+  height: 5px;
+}
+
+.tabs::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+.tabs::-webkit-scrollbar-thumb {
+  background: var(--background-color-variant);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.tabs::-webkit-scrollbar-thumb:hover {
+  background: var(--border-color);
+  border-radius: 10px;
 }
 
 .rightClickMenu {
