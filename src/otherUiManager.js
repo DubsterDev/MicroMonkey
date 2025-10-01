@@ -5,7 +5,7 @@ import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
 import { newFolderStructure } from "./fileExplorer";
-import { closeTab, closeTabsInDirectory, openTab } from "./openFilesManager";
+import { closeSavedTabs, closeTab, closeTabsInDirectory, openTab } from "./openFilesManager";
 
 // Helper functions for interacting with the board
 import { getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
@@ -67,6 +67,20 @@ export function setupUiManager() {
 
                 // Refresh the file explorer
                 newFolderStructure(await getFiles());
+            }]);
+        } else if (ev.target.classList.contains("tab") || ev.target.parentElement.classList.contains("tab")) {
+            menuOptions.push(["Close Tab", () => {
+                // Get the path of the tab
+                const path = ev.target.classList.contains("tab") ? ev.target.dataset.path : ev.target.parentElement.dataset.path;
+
+                // Close the tab
+                closeTab(path);
+            }]);
+            menuOptions.push(["Close Saved Tabs", () => {
+                closeSavedTabs();
+            }]);
+            menuOptions.push(["Close All Tabs", () => {
+                closeTabsInDirectory("/");
             }]);
         } else {
             // Add a item that does nothing if no other branch matches

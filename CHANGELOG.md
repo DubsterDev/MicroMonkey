@@ -2,6 +2,7 @@
 
 ## 1.1.1 (Not Released Yet)
  - Made tab bar scrollable
+ - Added options to close tabs in context menu when right-clicking on a tab
 
 ## 1.1.0
  - Added What's New page

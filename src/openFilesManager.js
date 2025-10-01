@@ -167,6 +167,17 @@ export function requestReRender(path) {
 }
 
 /**
+ * Closes all saved tabs
+ */
+export function closeSavedTabs() {
+    Object.keys(tabs).forEach(path => {
+        // If the tab is saved, close it
+        const tab = tabs[path];
+        if (tab.saved) closeTab(path);
+    });
+}
+
+/**
  * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco or calls the render function
  * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco or show call the custom render function
  */
