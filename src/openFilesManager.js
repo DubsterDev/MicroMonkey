@@ -257,5 +257,8 @@ function renderTabs(activateActiveTab=true) {
             customEditorElement.innerText = "";
             tab.renderFunction(customEditorElement);
         }
-    })
+    });
+
+    // Scroll the active tab into view
+    document.querySelector(".tabs .tab.active")?.scrollIntoView({behavior: "smooth", block: "nearest", inline: "center"});
 }
