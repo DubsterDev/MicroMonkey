@@ -113,6 +113,51 @@ export function saveActiveFile() {
 }
 
 /**
+ * Renames a tab
+ * @param {string} oldPath The current path of the file
+ * @param {string} newPath The new path of the file
+ * @param {boolean} skipRender Whether or not to skip rendering the tabs again, defaults to false
+ */
+export function renameTab(oldPath, newPath, skipRender=false) {
+    alert(oldPath + " -> " + newPath);
+    // Get the tab
+    const tab = tabs[oldPath];
+
+    // If the tab doesn't exist, return
+    if (tab === undefined || tab === null) return;
+
+    // Delete the old tab
+    delete tabs[oldPath];
+
+    // Change the title to the last segment of the new path
+    const newTitle = newPath.split("/").at(-1);
+
+    // Set the tab in the list of tabs with the new path and title
+    tabs[newPath] = tab;
+    tabs[newPath].title = newTitle;
+
+    // Render the tabs
+    if (!skipRender) renderTabs();
+}
+
+/**
+ * Rename all tabs that are in a directory from the tab strip
+ * @param {string} oldPath The file path to rename everything under, should end with a /
+ * @param {string} newPath The file path to rename everything under to, should end with a /
+ */
+export function renameTabsInDirectory(oldPath, newPath) {
+    // Loop through all the tabs
+    Object.keys(tabs).forEach(tabPath => {
+        // And rename a tab if the path starts with the provided path
+        if (tabPath.startsWith(oldPath)) renameTab(tabPath, tabPath.replace(oldPath, newPath), true);
+    });
+
+    // Render the tabs after all renaming is done
+    renderTabs();
+}
+
+
+/**
  * Remove a tab from the tab strip if it's open
  * @param {string} path The file path
  */

@@ -5,7 +5,7 @@ import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
 import { newFolderStructure } from "./fileExplorer";
-import { closeSavedTabs, closeTab, closeTabsInDirectory, openTab } from "./openFilesManager";
+import { closeSavedTabs, closeTab, closeTabsInDirectory, openTab, renameTab, renameTabsInDirectory } from "./openFilesManager";
 
 // Helper functions for interacting with the board
 import { getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
@@ -125,6 +125,9 @@ export function setupUiManager() {
  * @param {string} fileName The filename
  */
 async function launchRename(directory="", fileName="") {
+    // Whether the directory originally ended with a slash
+    const wasDirectory = directory.endsWith("/");
+
     // If no fileName is provided, use the last part
     if (fileName === "") {
         // If the directory ends with /, remove the slash
@@ -153,8 +156,17 @@ async function launchRename(directory="", fileName="") {
     const oldPath = `${directory}${fileName}`;
     const newPath = `${directory}${newName}`;
 
-    // Tell the device to rename the file and refresh the file explorer
+    // Tell the device to rename the file
     await renameFile(oldPath, newPath);
+
+    // Rename any open tabs
+    if (wasDirectory) {
+        renameTabsInDirectory(`${oldPath}/`, `${newPath}/`);
+    } else {
+        renameTab(oldPath, newPath);
+    }
+
+    // Refresh the file explorer
     newFolderStructure(await getFiles());
 }
 
