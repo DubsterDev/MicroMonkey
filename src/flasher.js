@@ -147,7 +147,6 @@ function renderFlasherPage(root) {
 
         addParagraph("To get started with MicroMonkey, reboot your device.", root);
         if (boardType === "espressif") addParagraph("On an ESP32 or ESP8266, this is done by pressing the EN button.", root);
-        addParagraph("Then, refresh MicroMonkey and reconnect.", root);
-        addButton("Refresh MicroMonkey", root, () => location.reload());
+        addParagraph("You may need to press the refresh button in the file explorer once or twice to retrieve the file listing from your board.", root);
     }
 }
