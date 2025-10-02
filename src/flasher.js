@@ -40,7 +40,12 @@ let flashingStage = "not_started";
  */
 async function beginFlash() {
     // Disconnect the serial port from serial.js
-    await disconnectSerialPort();
+    try {
+        await disconnectSerialPort();
+    } catch (e) {
+        console.error("Error disconnecting serial port:", e);
+        // Even if there is an error disconnecting, we can still try to flash. It may have been disconnected already.
+    }
 
     // Get the serial port from serial.js
     const device = getPort();
@@ -92,39 +97,56 @@ function renderFlasherPage(root) {
     // Add the heading
     addHeading("MicroPython Flasher", "h2", root);
 
-    if (flashingStage === "not_started") {
+    if (flashingStage === "not_started" || flashingStage === "error") {
         // If the flashing process has not started, show the user the file input and instructions
-        if (boardType === "espressif") {
+        if (boardType === "espressif" && flashingStage !== "error") {
             // A warning message to ensure the user is using the right type of device
             addMessageBox("warning", "This flasher is for flashing Espressif devices, such as the ESP32 or ESP8266. If this is not the right type of device, reopen the flasher", root);
         }
 
+        if (flashingStage === "error") {
+            // If there was an error during flashing, show an error message
+            addMessageBox("error", "There was an error during flashing. Feel free to try again, carefully following the instructions. If this still doesn't fix it, please see the developer tools (CTRL+SHIFT+I) for the error and report a bug.", root);
+        }
+
         // The file input for the user to upload the firmware
-        addParagraph(fileInput.files.length > 0 ? "Firmware selected" : "You must upload the firmware to flash.", root);
+        addParagraph(fileInput.files.length > 0 ? "Firmware selected. You can change it with the change button if needed." : "First, upload a .bin file for the firmware. You can download this from MicroPython's website.", root);
         addButton(fileInput.files.length > 0 ? "Change" : "Upload", root, () => fileInput.click())
 
-        // Explanatory text and button to begin the flashing process
-        addParagraph("Connect to a board with the button on the bottom left, then press continue.", root);
-        addParagraph("Press and hold the Boot button on your board while pressing the continue button.", root);
+        if (fileInput.files.length > 0) {
+            // Explanatory text and button to begin the flashing process
+            addParagraph("Now, make sure you're connected to a board by checking the button on the bottom left of the screen.", root);
+            addParagraph("If it says you're connected, you're good to go, otherwise, go ahead and click it and choose a serial port.", root);
 
-        /// The button to begin the flashing process
-        addButton("Continue", root, beginFlash);
+            // The button to begin the flashing process
+            addButton("Continue", root, beginFlash);
+        }
     } else if (flashingStage === "getting_ready") {
         // If the flashing process is getting ready, show a message
         addParagraph("Getting ready to flash MicroPython...", root);
+        if (boardType === "espressif") addParagraph("Please press and hold the BOOT button on your development board until it starts flashing.", root);
     } else if (flashingStage === "flashing") {
         // If the flashing process is in progress, show a message and a progress bar
         addParagraph("Flashing MicroPython...", root);
+        addParagraph("At this point, if you disconnect your board/close this tab you will need to flash it again to be able to use it.", root);
 
         // The progress bar showing the flashing progress
         const percentHolder = document.createElement("progress");
-        percentHolder.max = flashingTotal;
-        percentHolder.value = flashingAmountDone;
+
+        // Only set the max and value if we have some progress to show
+        // This makes the progress bar indeterminate until we have some progress
+        if (flashingAmountDone > 0) {
+            percentHolder.max = flashingTotal;
+            percentHolder.value = flashingAmountDone;
+        }
         root.appendChild(percentHolder);
     } else if (flashingStage === "done") {
         // If the flashing process is done, show a message and a button to refresh the IDE
-        addParagraph("Done flashing.", root);
-        addParagraph("Reboot your device by pressing the EN button.", root);
+        addParagraph("Done flashing!", root);
+        addParagraph("Your board should now be running MicroPython.", root);
+
+        addParagraph("To get started with MicroMonkey, reboot your device.", root);
+        if (boardType === "espressif") addParagraph("On an ESP32 or ESP8266, this is done by pressing the EN button.", root);
         addParagraph("Then, refresh MicroMonkey and reconnect.", root);
         addButton("Refresh MicroMonkey", root, () => location.reload());
     }

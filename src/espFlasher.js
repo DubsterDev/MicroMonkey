@@ -1,6 +1,7 @@
 // Import dependencies from esptool-js and spark-md5
 import { ESPLoader, Transport } from "esptool-js";
 import SparkMD5 from "spark-md5";
+import { connectToBoard } from "./serial";
 
 // A simple terminal object to log messages from esptool-js to the console
 const espLoaderTerminal = {
@@ -46,10 +47,17 @@ export async function flashESP(device, setFlashingStage, setFlashingProgress, fi
     esploader = new ESPLoader(flashOptions);
     
     // Detect the chip
-    chip = await esploader.main();
+    try {
+      chip = await esploader.main();
+    } catch (e) {
+      console.error("Error during chip detection:", e);
+      setFlashingStage("error");
+      await transport.disconnect();
+      return;
+    }
 
     // Start flashing MicroPython
-    flashOS(setFlashingStage, setFlashingProgress, file);
+    flashOS(setFlashingStage, setFlashingProgress, file, device);
 }
 
 /**
@@ -57,8 +65,9 @@ export async function flashESP(device, setFlashingStage, setFlashingProgress, fi
  * @param {Function} setFlashingStage A callback used to update the flashing stage, called with one parameter, the stage as a string
  * @param {Function} setFlashingProgress A callback used to update the flashing progress, called with two parameters, total amount to flash and amount that has been flashed
  * @param {File} file The firmware file to flash
+ * @param {*} device The serial port to flash
  */
-async function flashOS(setFlashingStage, setFlashingProgress, file) {
+async function flashOS(setFlashingStage, setFlashingProgress, file, device) {
     // Update the flashing stage to "flashing"
     setFlashingStage("flashing");
 
@@ -86,6 +95,10 @@ async function flashOS(setFlashingStage, setFlashingProgress, file) {
     // Write the flash and finalize
     await esploader.writeFlash(flashOptions);
     await esploader.after();
+    await transport.disconnect();
+    
+    // Try to reconnect to the board so the user can use it right away
+    await connectToBoard(device);
 
     // Update the flashing stage to "done"
     setFlashingStage("done");
