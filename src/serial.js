@@ -69,6 +69,7 @@ export async function writeFile(code, filename = "main.py") {
     await interruptScript();
     await interruptScript();
     await interruptScript();
+    await wait(100);
 
     // Create code snippet that opens the file
     let fileWriteCode = `file = open("${filename.replaceAll("\"", "\\\"")}", "w")`;
@@ -107,7 +108,7 @@ export async function getFile(filename) {
     await interruptScript();
 
     // Wait a little bit for the interrupted script to terminate
-    await wait(100);
+    await wait(250);
 
     // Get the contents of the file
     const {result} = await runCode(`
@@ -134,7 +135,7 @@ export async function getFiles() {
     await interruptScript();
 
     // Wait a bit to allow any scripts to terminate
-    await wait(100);
+    await wait(250);
 
     // Read the folders from the board
     const {result} = await runCode(`import os
@@ -170,7 +171,7 @@ export async function createFile(filePath) {
     await interruptScript();
 
     // Wait a bit for any running scripts to terminate
-    await wait(100);
+    await wait(250);
 
     // Run code to create a new file on the board
     await runCode(`import os
@@ -195,7 +196,7 @@ export async function createDirectory(filePath) {
     await interruptScript();
 
     // Wait a bit for any running scripts to terminate
-    await wait(100);
+    await wait(250);
 
     // Create a folder on the board
     await runCode(`import os
@@ -221,7 +222,7 @@ export async function renameFile(oldFilePath, newFilePath) {
     await interruptScript();
 
     // Wait a bit for any running scripts to finish
-    await wait(100);
+    await wait(250);
 
     // Rename the file on the board
     await runCode(`import os
@@ -245,7 +246,7 @@ export async function removeFile(filePath) {
     await interruptScript();
 
     // Wait a little bit for the script to terminate
-    await wait(100);
+    await wait(250);
 
     // Delete the file from the board
     await runCode(`import os
@@ -269,7 +270,7 @@ export async function removeDirectory(filePath) {
     await interruptScript();
 
     // Wait a bit for any running scripts to terminate
-    await wait(100);
+    await wait(250);
 
     // Delete a folder off the board
     await runCode(`import os
@@ -293,7 +294,7 @@ export async function removeDirectoryRecursively(filePath) {
     await interruptScript();
 
     // Wait a bit for any running scripts to terminate
-    await wait(100);
+    await wait(250);
 
     // Run the script to delete the contents of the directory
     await runCode(`import os
@@ -703,7 +704,7 @@ export async function connectToBoard(port) {
     await interruptScript();
 
     // Wait for scripts to finish
-    await wait(100);
+    await wait(250);
 
     // Call the up and running callback
     readyCallback();
