@@ -40,7 +40,7 @@ export async function flashESP(device, setFlashingStage, setFlashingProgress, fi
         transport,
         baudrate: 460800,
         terminal: espLoaderTerminal,
-        debugLogging: true,
+        debugLogging: false,
     };
 
     // Create a new esploader object with the flashing options
