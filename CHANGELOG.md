@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3 (Upcoming)
+ - Improved MicroPython flasher UI
+ - Seperated logic for espressif devices in flasher to a seperate file
+
 ## 1.1.2
  - Added ability to use arrow keys to select command shown in command palette (`CTRL+SHIFT+P`)
  - Added ability to request input with options
