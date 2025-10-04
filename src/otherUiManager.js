@@ -8,7 +8,7 @@ import { newFolderStructure } from "./fileExplorer";
 import { closeSavedTabs, closeTab, closeTabsInDirectory, openTab, renameTab, renameTabsInDirectory } from "./openFilesManager";
 
 // Helper functions for interacting with the board
-import { getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
+import { getAllFilesAsZip, getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
 
 // Get the context menu element
 const menu = document.getElementById("contextMenu");
@@ -117,6 +117,9 @@ export function setupUiManager() {
     document.addEventListener("click", () => {
         menu.style.display = "none";
     });
+
+    // Add an option to the Command Palette to download all files as a ZIP
+    addCommand("downloadAllFiles", "Download All Files as ZIP [BETA]", downloadAllFiles);
 }
 
 /**
@@ -220,6 +223,23 @@ export function startWhatsNewScreenIfVersionChanged() {
     addCommand("openWhatsNew", "What's New", openWhatsNewTab);
 }
 
+/**
+ * Opens the What's New tab
+ */
 function openWhatsNewTab() {
     openTab("/.default_files/micromonkey/whats_new.mm", "What's New", "custom", renderWhatsNewScreen);
+}
+
+/**
+ * Generates and downloads a ZIP file of the current board files
+ */
+async function downloadAllFiles() {
+    const blob = await getAllFilesAsZip();
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = "files.zip";
+    a.click();
 }

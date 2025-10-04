@@ -4,6 +4,7 @@ import { FitAddon } from "@xterm/addon-fit";
 import '@xterm/xterm/css/xterm.css';
 import { getSetting } from "./settings";
 import { newFolderStructure } from "./fileExplorer";
+import JSZip from "jszip";
 
 // Create some variables to be defined later
 let activePort;
@@ -571,6 +572,48 @@ function softReboot() {
 
     // Write CTRL+D to the board
     return writer.write(new Uint8Array([0x04]));
+}
+
+/**
+ * Returns a blob of all the files on the board in ZIP format.
+ * @returns {Promise<Blob>} A promise that resolves to a Blob of the ZIP file.
+ */
+export async function getAllFilesAsZip() {
+    // Exit early if not connected to a board
+    if (!activePort || !writer) return;
+
+    // Interrupt any running scripts
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+    await wait(500);
+
+    // Get all the files on the board
+    const files = await getFiles();
+
+    // A JSZip instance
+    const zip = new JSZip();
+    
+    // A recursive function that adds files to the zip
+    async function addFilesToZip(folder, path) {
+        for (const key in folder) {
+            if (typeof folder[key] === "string") {
+                // If it's a string, it's a file, so get the file and add it to the zip
+                const fileContents = await getFile((path !== "" ? path + "/" : "") + folder[key]);
+                zip.file((path !== "" ? path + "/" : "") + folder[key], fileContents);
+            } else {
+                // If it's not a string, it's a folder, so create the folder and call this function again
+                zip.folder((path !== "" ? path + "/" : "") + key);
+                await addFilesToZip(folder[key], (path !== "" ? path + "/" : "") + key);
+            }
+        }
+    }
+
+    // Start the recursive function
+    await addFilesToZip(files, "");
+
+    // Generate the zip and return it as a blob
+    return zip.generateAsync({type: "blob"});
 }
 
 /**
