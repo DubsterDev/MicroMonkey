@@ -51,4 +51,4 @@ Before a new version of MicroMonkey is released, several things need to be updat
  - The new version number should be set in [package.json](package.json) and [constants.js](src/constants.js)
  - A changelog for the new version number must be present in [CHANGELOG.md](CHANGELOG.md)
  - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 173, but it doesn't have to be identical. Basically, it doesn't need the details of backend changes in this file
- - Then you can deploy the changes with `npm run deploy` (which will build MicroMonkey with Vite and then deploy with Firebase), or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](dist/)
+ - Then you can deploy the changes with `npm run deploy` (which will build MicroMonkey with Vite and then deploy with Firebase in prod, `deploy-beta` will deploy  the beta site), or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](dist/)
