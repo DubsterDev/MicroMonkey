@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Improved MicroPython flasher UI
  - Seperated logic for espressif devices in flasher to a seperate file
 
-## 1.1.2
+## 1.1.2 (2025-10-01)
 
 ### Added
  - Ability to use arrow keys to select command shown in command palette (`CTRL+SHIFT+P`)
@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Requests confirmation when closing an unsaved file
 
-## 1.1.1
+## 1.1.1 (2025-10-01)
 
 ### Added
  - Options to close tabs in context menu when right-clicking on a tab
@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Made tabs change the locations they reference when they are renamed or they're parent directories are renamed so that it always references an existing file
  - Made custom editors (Welcome to MicroMonkey, Settings, etc), stay inside the right area
 
-## 1.1.0
+## 1.1.0 (2025-09-30)
 
 ### Added
  - What's New page
