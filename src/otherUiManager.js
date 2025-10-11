@@ -202,9 +202,11 @@ export async function renderWhatsNewScreen(rootElement) {
     // Define some what's new text
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
-    addParagraph("Here's what's new in this version of MicroMonkey:", rootElement);
-    addParagraph("- Added ability to use arrow keys to select commands shown in command palette (CTRL+SHIFT+P)", rootElement);
-    addParagraph("- Made it so MicroMonkey requests confirmation when closing an unsaved file", rootElement);
+    addHeading("Added", "h3", rootElement);
+    addParagraph("- Beta download as ZIP functionality in command palette", rootElement);
+
+    addHeading("Changed", "h3", rootElement);
+    addParagraph("- Improved MicroPython flasher UI", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
