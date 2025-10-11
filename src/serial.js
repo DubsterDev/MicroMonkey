@@ -771,6 +771,29 @@ function portDisconnected() {
 }
 
 /**
+ * Toggle the serial monitor state,
+ * if it's open close it, if it's closed open it.
+ */
+export function toggleTerminal() {
+    // If it's showing hide it, if it's not, show it
+    if (serialMonitor.style.display == "none") {
+        serialMonitor.style.display = "block";
+    } else {
+        serialMonitor.style.display = "none";
+    }
+
+    // Update the sizing of the editor based on the height left after removing all the other elements
+    editor.layout({
+        width: rightPanel.clientWidth,
+        height: rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight
+    });
+    customEditorElement.style.height = (rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight) + "px";
+
+    // Use the fit addon to fit the terminal
+    fitAddon.fit();
+}
+
+/**
  * Add event listeners for starting a serial connection
  * @param {*} editor A reference to the monaco editor
  * @param {Function} upandrunningCallback A callback that is called when successfully connected to a board
@@ -805,22 +828,12 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
     });
 
     // Toggle the serial monitor's visiblity with the Serial Monitor button
-    document.getElementById("openSerialMonitor").addEventListener("click", () => {
-        // If it's showing hide it, if it's not, show it
-        if (serialMonitor.style.display == "none") {
-            serialMonitor.style.display = "block";
-        } else {
-            serialMonitor.style.display = "none";
+    document.getElementById("openSerialMonitor").addEventListener("click", toggleTerminal);
+
+    // Toggle the serial monitor's visibility with the keyboard shortcut CTRL+`
+    document.addEventListener("keydown", (event) => {
+        if (event.ctrlKey && event.key === "`") {
+            toggleTerminal();
         }
-
-        // Update the sizing of the editor based on the height left after removing all the other elements
-        editor.layout({
-            width: rightPanel.clientWidth,
-            height: rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight
-        });
-        customEditorElement.style.height = (rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight) + "px";
-
-        // Use the fit addon to fit the terminal
-        fitAddon.fit();
     })
 }
