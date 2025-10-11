@@ -773,8 +773,9 @@ function portDisconnected() {
 /**
  * Toggle the serial monitor state,
  * if it's open close it, if it's closed open it.
+ * @param {*} editor The monaco editor
  */
-export function toggleTerminal() {
+export function toggleTerminal(editor) {
     // If it's showing hide it, if it's not, show it
     if (serialMonitor.style.display == "none") {
         serialMonitor.style.display = "block";
@@ -833,7 +834,7 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
     // Toggle the serial monitor's visibility with the keyboard shortcut CTRL+`
     document.addEventListener("keydown", (event) => {
         if (event.ctrlKey && event.key === "`") {
-            toggleTerminal();
+            toggleTerminal(editor);
         }
     })
 }
