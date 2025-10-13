@@ -236,9 +236,13 @@ function openWhatsNewTab() {
  * Generates and downloads a ZIP file of the current board files
  */
 async function downloadAllFiles() {
+    // Get a zip blob
     const blob = await getAllFilesAsZip();
+
+    // Create a blob:// url
     const url = URL.createObjectURL(blob);
 
+    // Create a link element to download it and then click it
     const a = document.createElement("a");
     a.style.display = "none";
     a.href = url;
