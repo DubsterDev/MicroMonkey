@@ -321,6 +321,12 @@ main {
     display: none;
 }
 
+.commandPalette .suggestions {
+    max-height: 50vh;
+    overflow: auto;
+    scrollbar-width: thin;
+}
+
 .commandPalette .suggestions p {
     cursor: pointer;
     border-radius: 6px;

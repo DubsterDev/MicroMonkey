@@ -235,5 +235,8 @@ function displaySuggestions(searchTerm="") {
 
         // Add it to the suggestions box
         commandPaletteSuggestions.appendChild(suggestion);
+
+        // Scroll it into view if it's active
+        if (selectedSuggestionId === id) suggestion.scrollIntoView({behavior: "instant", block: "nearest", inline: "nearest"});
     });
 }

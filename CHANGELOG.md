@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - Keyboard shortcut CTRL+` for toggling serial monitor visibility
  - Beta upload files as ZIP functionality
+ - Support for more commands in command palette
 
 ## 1.1.3 (2025-10-10)
 
