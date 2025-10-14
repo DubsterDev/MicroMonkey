@@ -55,8 +55,9 @@ terminal.onData(data => {
  * as long as the folder containing the new file exists.
  * @param {string} code Contents of the file being written
  * @param {string} filename The path to store the file, e.g. main.py or /utils/utils.py
+ * @param {boolean} allowSoftReboot Whether to honor the user preferences for rebooting after save.
  */
-export async function writeFile(code, filename = "main.py") {
+export async function writeFile(code, filename, allowSoftReboot=true) {
     // If the serial port has not been opened, exit
     if (!activePort || !writer) return;
 
@@ -91,7 +92,7 @@ export async function writeFile(code, filename = "main.py") {
     await interruptScript();
 
     // Reboot the board if that setting is checked
-    if (getSetting("reboot-on-save")) await softReboot();
+    if (getSetting("reboot-on-save") && allowSoftReboot) await softReboot();
 }
 
 /**
