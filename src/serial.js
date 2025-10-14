@@ -5,6 +5,7 @@ import '@xterm/xterm/css/xterm.css';
 import { getSetting } from "./settings";
 import { newFolderStructure } from "./fileExplorer";
 import JSZip from "jszip";
+import { addCommand } from "./commandPalette";
 
 // Create some variables to be defined later
 let activePort;
@@ -853,6 +854,25 @@ export function toggleTerminal(editor) {
 }
 
 /**
+ * Starts the find ports dialog.
+ */
+export async function findPorts() {
+    if (activePort && activePort.readable !== null && activePort.writable !== null) {
+        // Disconnect listeners from the Serial Port and close it
+        await disconnectSerialPort();
+
+        // Call the callback
+        portDisconnected();
+    } else {
+        // Request a device
+        const port = await navigator.serial.requestPort();
+        
+        // Finish connecting to the board
+        connectToBoard(port);
+    }
+}
+
+/**
  * Add event listeners for starting a serial connection
  * @param {*} editor A reference to the monaco editor
  * @param {Function} upandrunningCallback A callback that is called when successfully connected to a board
@@ -870,21 +890,10 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
     navigator.serial.addEventListener("disconnect", portDisconnected);
 
     // Add an event listener for when the user clicks the find ports button
-    document.getElementById("findPorts").addEventListener("click", async () => {
-        if (activePort && activePort.readable !== null && activePort.writable !== null) {
-            // Disconnect listeners from the Serial Port and close it
-            await disconnectSerialPort();
+    document.getElementById("findPorts").addEventListener("click", findPorts);
 
-            // Call the callback
-            portDisconnected();
-        } else {
-            // Request a device
-            const port = await navigator.serial.requestPort();
-            
-            // Finish connecting to the board
-            connectToBoard(port);
-        }
-    });
+    // Add a command to the command palette to launch the port selector
+    addCommand("findPorts", "Connect to board", findPorts);
 
     // Toggle the serial monitor's visiblity with the Serial Monitor button
     document.getElementById("openSerialMonitor").addEventListener("click", toggleTerminal);
