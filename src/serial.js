@@ -266,6 +266,9 @@ export async function removeDirectory(filePath) {
     // Exit early if we are not connected to a board
     if (!activePort || !writer) return;
 
+    // Don't do anything if it's an empty slash or a space, these don't work
+    if (filePath === "/" || filePath === "\\" || filePath.trim() === "") return;
+
     // Interrupt any running scripts
     await interruptScript();
     await interruptScript();
@@ -615,6 +618,61 @@ export async function getAllFilesAsZip() {
 
     // Generate the zip and return it as a blob
     return zip.generateAsync({type: "blob"});
+}
+
+/**
+ * Loads the contents of a ZIP file onto the connected board.
+ * @param {ArrayBuffer} zip Accepts a ArrayBuffer of the ZIP containing the new files.
+ * @param {boolean} deleteCurrentFiles Whether or not to delete everything on the board.
+ * @returns {Promise<Blob>} A promise that resolves to a Blob of the ZIP file.
+ */
+export async function uploadAllFilesFromZip(zip, deleteCurrentFiles) {
+    // Exit early if not connected to a board
+    if (!activePort || !writer) return;
+
+    // Interrupt any running scripts
+    await interruptScript();
+    await interruptScript();
+    await interruptScript();
+    await wait(500);
+
+    // Delete all the files on the board
+    if (deleteCurrentFiles) await removeDirectoryRecursively("/");
+
+    // A JSZip instance
+    const jsZip = new JSZip();
+
+    // Load the ZIP
+    await jsZip.loadAsync(zip);
+
+    // Get all the files
+    const files = Object.values(jsZip.files);
+
+    // Sort the files so we loop through the directories and create them first
+    files.sort((a, b) => {
+        if (a.dir) {
+            return -1;
+        } else if (b.dir) {
+            return 1;
+        } else {
+            return b.name.length - a.name.length;
+        }
+    })
+
+    // Loop through the zip
+    for (let i = 0; i < files.length; i++) {
+        await wait(100);
+        const file = files[i];
+        console.log(file)
+
+        if (file.dir) {
+            await createDirectory(file.name);
+            continue;
+        }
+        
+        const contents = await file.async("text");
+        await writeFile(contents.replace("\r", ""), file.name, false);
+    }
 }
 
 /**

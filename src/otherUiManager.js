@@ -8,7 +8,7 @@ import { newFolderStructure } from "./fileExplorer";
 import { closeSavedTabs, closeTab, closeTabsInDirectory, openTab, renameTab, renameTabsInDirectory } from "./openFilesManager";
 
 // Helper functions for interacting with the board
-import { getAllFilesAsZip, getFiles, removeDirectoryRecursively, removeFile, renameFile } from "./serial";
+import { getAllFilesAsZip, getFiles, removeDirectoryRecursively, removeFile, renameFile, uploadAllFilesFromZip } from "./serial";
 
 // Get the context menu element
 const menu = document.getElementById("contextMenu");
@@ -120,6 +120,9 @@ export function setupUiManager() {
 
     // Add an option to the Command Palette to download all files as a ZIP
     addCommand("downloadAllFiles", "Download All Files as ZIP [BETA]", downloadAllFiles);
+
+    // Add an option to the Command Palette to upload and overwrite all files as a ZIP
+    addCommand("uploadAllFiles", "Upload All Files from a ZIP [BETA]", uploadAllFiles);
 }
 
 /**
@@ -248,4 +251,51 @@ async function downloadAllFiles() {
     a.href = url;
     a.download = "files.zip";
     a.click();
+}
+
+/**
+ * Initiates an upload of a zip file to overwrite contents on the board.
+ */
+async function uploadAllFiles() {
+    // Options the user can pick
+    const DELETE = "Delete all files from the board and write the new ones";
+    const OVERWRITE = "Overwrite any files with the same names as those in the ZIP";
+    const CANCEL = "Cancel";
+
+    // Ask the user whether they want to proceed
+    const whatToDo = await getInput("What would you like to do?", "", "", [DELETE, OVERWRITE, CANCEL], false);
+
+    // If the user said no, break out of the function
+    if (whatToDo === CANCEL || whatToDo === undefined) {
+        return;
+    }
+
+    // Create a file input
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".zip";
+    
+    // Add a onchange listener
+    input.addEventListener("change", () => {
+        // Exit early if no file is selected
+        if (input.files[0] === null) return;
+
+        // Create a new FileReader to read the file
+        const reader = new FileReader();
+
+        reader.onload = async (ev) => {
+            // When the zip is loaded, continue.
+            await uploadAllFilesFromZip(ev.target.result, whatToDo === DELETE);
+
+            // Reload the file explorer
+            newFolderStructure(await getFiles());
+        }
+
+        // Read the zip as an array buffer
+        reader.readAsArrayBuffer(input.files[0])
+    });
+
+    // Launch the input
+    input.click();
+
 }
