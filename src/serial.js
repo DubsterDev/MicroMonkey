@@ -663,7 +663,6 @@ export async function uploadAllFilesFromZip(zip, deleteCurrentFiles) {
     for (let i = 0; i < files.length; i++) {
         await wait(100);
         const file = files[i];
-        console.log(file)
 
         if (file.dir) {
             await createDirectory(file.name);
