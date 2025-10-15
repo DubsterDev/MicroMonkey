@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
  - Command palette can no longer hide behind the editor
+ - Tab strip shrinking when serial monitor is toggled
 
 ## 1.1.3 (2025-10-10)
 

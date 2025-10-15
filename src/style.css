@@ -115,8 +115,7 @@ main {
 }
 
 #codeEditor, #customEditor {
-    flex-basis: 100%;
-    flex: 1;
+    flex: 0 1 100%;
     display: none;
 }
 

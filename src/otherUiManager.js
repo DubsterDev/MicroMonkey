@@ -214,6 +214,10 @@ export async function renderWhatsNewScreen(rootElement) {
 
     addHeading("Changed", "h3", rootElement);
     addParagraph("- Command palette is now sorted alphabetically when no search term has been provided", rootElement);
+
+    addHeading("Fixed", "h3", rootElement);
+    addParagraph("- Command palette can no longer hide behind the editor", rootElement);
+    addParagraph("- Tab strip shrinking when serial monitor is toggled", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
