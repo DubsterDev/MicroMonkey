@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Command palette is now sorted alphabetically when no search term has been provided
 
+### Fixed
+ - Command palette can no longer hide behind the editor
+
 ## 1.1.3 (2025-10-10)
 
 ### Added
