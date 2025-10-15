@@ -46,4 +46,4 @@ Before a new version of MicroMonkey is released, several things need to be done:
  - The changelog should be modified so the `-beta` suffix is removed in [CHANGELOG.md](CHANGELOG.md). Make sure that every substantial change is in here.
  - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 173, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy` (which will build MicroMonkey with Vite and then deploy with Firebase in release) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](dist/)
- - Change the [README](README.md) to reflect the release stage.
+ - Change the [README](README.md) to reflect the release stage, and tag the last commit for this version with the version number in the format `v1.2.0`.
