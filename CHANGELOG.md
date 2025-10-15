@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Support for more commands in command palette
  - A command to connect to board in command palette
 
+### Changed
+ - Command palette is now sorted alphabetically when no search term has been provided
+
 ## 1.1.3 (2025-10-10)
 
 ### Added

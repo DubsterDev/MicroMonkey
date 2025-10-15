@@ -97,7 +97,11 @@ export function showCommandPalette(title=null, placeholder="", defaultValue="", 
     commandPaletteInput.value = defaultValue;
     commandPaletteInput.placeholder = placeholder;
     commandPaletteInput.focus();
-    usingCommands = useCommands;
+    usingCommands = useCommands.sort((a, b) => {
+        if (a.name === b.name) return 0;
+        else if (a.name < b.name) return -1;
+        else return 1;
+    });
     callbackEnter = optionPicked;
     callbackEscape = escaped;
     selectedSuggestionId = "noCommandSelected";
