@@ -206,10 +206,14 @@ export async function renderWhatsNewScreen(rootElement) {
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
     addHeading("Added", "h3", rootElement);
-    addParagraph("- Beta download as ZIP functionality in command palette", rootElement);
+    addParagraph("- Keyboard shortcut CTRL+` for toggling serial monitor visibility", rootElement);
+    addParagraph("- Beta upload files as ZIP functionality", rootElement);
+    addParagraph("- Support for more commands in command palette", rootElement);
+    addParagraph("- A command to connect to board in command palette", rootElement);
+    addParagraph("- A command to toggle the serial monitor in the command palette", rootElement);
 
     addHeading("Changed", "h3", rootElement);
-    addParagraph("- Improved MicroPython flasher UI", rootElement);
+    addParagraph("- Command palette is now sorted alphabetically when no search term has been provided", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
