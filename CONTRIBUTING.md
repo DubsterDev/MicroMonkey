@@ -6,6 +6,8 @@ After cloning the GitHub repository, you can run `npm run install` to make sure 
 
 Once all the dependecies are installed, you can start the development server at any time with the command `npm run dev`.
 
+When the first change is made, the [README](README.md) should be updated to reflect the preparing for next beta stage.
+
 ## Brief Overview
 
 All new functions should have a JSDoc, and ideally plenty of comments.
@@ -34,6 +36,7 @@ When enough changes have been made, it's time to deploy MicroMonkey to beta. To 
  - A changelog for the new version number must be present in [CHANGELOG.md](CHANGELOG.md). There should be an Unreleased section which you can rename to the version number and add the date at the end, following the style of previous releases.
  - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 173, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy-beta` (which will build MicroMonkey with Vite and then deploy with Firebase in beta) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](dist/)
+ - Change the [README](README.md) to reflect the beta stage.
 
 ## Deploying to Release
 
@@ -43,3 +46,4 @@ Before a new version of MicroMonkey is released, several things need to be done:
  - The changelog should be modified so the `-beta` suffix is removed in [CHANGELOG.md](CHANGELOG.md). Make sure that every substantial change is in here.
  - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 173, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy` (which will build MicroMonkey with Vite and then deploy with Firebase in release) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](dist/)
+ - Change the [README](README.md) to reflect the release stage.
