@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Beta upload files as ZIP functionality
  - Support for more commands in command palette
  - A command to connect to board in command palette
+ - A command to toggle the serial monitor in the command palette
 
 ### Changed
  - Command palette is now sorted alphabetically when no search term has been provided

@@ -903,5 +903,8 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
         if (event.ctrlKey && event.key === "`") {
             toggleTerminal(editor);
         }
-    })
+    });
+
+    // Toggle the serial monitor's visibility with the command palette
+    addCommand("toggleSerialMonitor", "Show/Hide Serial Monitor", toggleTerminal);
 }
