@@ -34,7 +34,7 @@ When enough changes have been made, it's time to deploy MicroMonkey to beta. To 
  - Decide on a good version number for this release, and then add -beta to the end. (e.g. 1.2.0-beta)
  - The new version number should be set in [package.json](package.json) and [constants.js](src/constants.js)
  - A changelog for the new version number must be present in [CHANGELOG.md](CHANGELOG.md). There should be an Unreleased section which you can rename to the version number and add the date at the end, following the style of previous releases.
- - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 173, obviously modified to fit the right format.
+ - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 208, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy-beta` (which will build MicroMonkey with Vite and then deploy with Firebase in beta) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](dist/)
  - Change the [README](README.md) to reflect the beta stage.
 
@@ -44,6 +44,6 @@ Before a new version of MicroMonkey is released, several things need to be done:
  - MicroMonkey should have been tested in Beta for a week, following the prior section's instructions.
  - The version number should be changed to remove the `-beta` suffix in [package.json](package.json) and [constants.js](src/constants.js)
  - The changelog should be modified so the `-beta` suffix is removed in [CHANGELOG.md](CHANGELOG.md). Make sure that every substantial change is in here.
- - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 173, obviously modified to fit the right format.
+ - This changelog must be copied over to [otherUiManager.js](src/otherUiManager.js) on line 208, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy` (which will build MicroMonkey with Vite and then deploy with Firebase in release) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](dist/)
  - Change the [README](README.md) to reflect the release stage, and tag the last commit for this version with the version number in the format `v1.2.0`.
