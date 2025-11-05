@@ -64,5 +64,5 @@ function renderSettings(root) {
     addCheckbox("Reboots the device when the file is saved", root, getSetting("reboot-on-save"), (bool) => setSetting("reboot-on-save", bool));
 
     addHeading("Syntax Checking", "h3", root);
-    addCheckbox("Show syntax errors such as missing colons and undefined variables..", root, getSetting("syntax-checking"), (bool) => setSetting("syntax-checking", bool));
+    addCheckbox("Show syntax errors such as missing colons and undefined variables.", root, getSetting("syntax-checking"), (bool) => setSetting("syntax-checking", bool));
 }
