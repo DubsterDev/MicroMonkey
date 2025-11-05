@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - Monkey image when no tabs are opened
 
+### Fixed
+ - Exception when trying to access the language ID on a undefined Monaco Model
+
 ## 1.2.0 (2025-10-14)
 
 ### Added
