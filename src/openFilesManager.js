@@ -332,6 +332,12 @@ function renderTabs(activateActiveTab=true) {
     // Scroll the active tab into view
     const activeTab = document.querySelector(".tabs .tab.active");
     if (activeTab !== null && activeTab !== undefined && !isInViewport(activeTab)) activeTab?.scrollIntoView({behavior: "instant", block: "nearest", inline: "nearest"});
+
+    // If there are no tabs, set the custom editor to visible to get the monkey to appear
+    if (tabPaths.length === 0) {
+        codeEditorElement.style.display = "none";
+        customEditorElement.style.display = "block";
+    }
 }
 
 function isInViewport(element) {

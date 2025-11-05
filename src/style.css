@@ -125,6 +125,14 @@ main {
     flex: 0 0 auto;
 }
 
+#customEditor:empty {
+    background-image: url(/assets/monkeyheadshot.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: opacity(.1) grayscale(1);
+}
+
 .bottomBar {
     display: flex;
     flex-direction: row;
