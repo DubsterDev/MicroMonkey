@@ -241,6 +241,9 @@ export function updateDiagnostics(diagnostics, uri) {
     // Get the monaco model
     const model = monaco.editor.getModel(uri);
 
+    // Return if monaco model is undefined/null
+    if (model === undefined || model === null) return;
+
     // If the language of the model is not python, don't render the diagnostics
     if (model.getLanguageId() !== "python") return;
 
