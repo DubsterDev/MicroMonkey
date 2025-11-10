@@ -907,4 +907,7 @@ export function startSerial(editor, upandrunningCallback=() => {}) {
 
     // Toggle the serial monitor's visibility with the command palette
     addCommand("toggleSerialMonitor", "Show/Hide Serial Monitor", toggleTerminal);
+
+    // Soft-reboot the connected device with the command palette
+    addCommand("softRebootDevice", "Reboot connected device", softReboot);
 }

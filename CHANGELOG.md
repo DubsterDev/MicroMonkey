@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  - Monkey image when no tabs are opened
+ - Reboot command to command palette
 
 ### Fixed
  - Exception when trying to access the language ID on a undefined Monaco Model
