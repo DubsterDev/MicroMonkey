@@ -20,6 +20,8 @@ You can try it out at [MicroMonkey.web.app](https://micromonkey.web.app)!
  - Create files/folders
  - Rename files/folders
  - Delete files/folders
+ - Adaptive dark/light theme, based on your OS setting
+ - MicroPython flashing (`CTRL+SHIFT+P` > Flash MicroPython)
 
 
 ## Stages
