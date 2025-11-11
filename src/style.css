@@ -47,6 +47,7 @@ main {
     overflow: auto;
     padding: 12px;
     flex: 0 0 auto;
+    overflow-x: hidden;
 }
 
 .leftSidebar .fileExplorerHeader {
@@ -192,6 +193,11 @@ main {
     cursor: pointer;
 }
 
+.leftSidebar .file {    
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .leftSidebar .folder-name:hover, .leftSidebar .file:hover {
     background-color: #78787825;
 }
@@ -212,6 +218,8 @@ main {
 
 .leftSidebar .folder-name span {
     margin-right: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .leftSidebar .file::before {
@@ -234,7 +242,7 @@ main {
     background-color: var(--background-color);
     overflow-x: auto;
     overflow-y: clip;
-    flex: 0 1 auto;
+    flex: 0 0 50px;
 }
 
 .tabs .tab {
@@ -274,6 +282,10 @@ main {
 
 .tabs::-webkit-scrollbar {
   height: 5px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
 }
 
 .tabs::-webkit-scrollbar-track {

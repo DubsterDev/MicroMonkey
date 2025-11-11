@@ -111,19 +111,22 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
             const folderDiv = document.createElement("div");
             folderDiv.classList.add("folder-container");
             folderDiv.classList.add("item");
-
+            
             // Retrieves the collapsed state, and, if it is collapsed, collapse it
             const isCollapsed = fileExplorerCollapsedState[currentDir + key] ?? true;
             if (isCollapsed) folderDiv.classList.add("collapsed");
-
+            
             // Create a paragraph tag to hold the name of the folder
             const folderName = document.createElement("p");
 
             // Create a span to hold the folder's name
             const folderNameSpan = document.createElement("span");
-
+            
             // Put the name in the <span>
             folderNameSpan.innerText = key;
+
+            // Add the full path to the title
+            folderNameSpan.title = currentDir + key;
 
             // Add the span to the paragraph tag
             folderName.appendChild(folderNameSpan);
@@ -203,6 +206,7 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
 
             // Add the name
             p.innerText = key;
+            p.title = currentDir + key;
             p.dataset.fileName = key;
 
             // Add the file and item classes
