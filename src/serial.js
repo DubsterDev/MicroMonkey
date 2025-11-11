@@ -844,10 +844,10 @@ export function toggleTerminal(editor) {
 
     // Update the sizing of the editor based on the height left after removing all the other elements
     editor.layout({
-        width: rightPanel.clientWidth,
-        height: rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight
+        width: rightPanel.offsetWidth,
+        height: rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight
     });
-    customEditorElement.style.height = (rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight) + "px";
+    customEditorElement.style.height = (rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight) + "px";
 
     // Use the fit addon to fit the terminal
     fitAddon.fit();

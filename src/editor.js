@@ -28,8 +28,7 @@ export function setUpMonaco() {
     editor = monaco.editor.create(document.getElementById('codeEditor'), {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
-        theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark",
-        automaticLayout: true
+        theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark"
     });
 
     // Dynamically change the theme of the editor based on the system theme
@@ -194,8 +193,8 @@ export function changeModel(model) {
     const serialMonitor = document.getElementById("serialMonitor");
     const rightPanel = document.getElementById("rightPanel");
     editor.layout({
-        width: rightPanel.clientWidth,
-        height: rightPanel.clientHeight - serialMonitor.clientHeight - document.getElementById("tabs").clientHeight
+        width: rightPanel.offsetWidth,
+        height: rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight
     });
 
     // Convert the URI to a string
