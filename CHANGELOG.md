@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Monkey image when no tabs are opened
  - Reboot command to command palette
 
+### Changed
+ - Files and folder names overflow with an ellipsis instead of adding a scrollbar
+ - Full paths can now be viewed for files and folders by hovering over the title
+ - Renamed `File Explorer` to `Files`
+
 ### Fixed
  - Exception when trying to access the language ID on a undefined Monaco Model
 
