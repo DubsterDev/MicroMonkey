@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
  - Exception when trying to access the language ID on a undefined Monaco Model
 
-## 1.2.0 (2025-10-14)
+## 1.2.0 (2025-10-23)
 
 ### Added
  - Keyboard shortcut CTRL+` for toggling serial monitor visibility
