@@ -762,7 +762,7 @@ async function startReadingOutput() {
         // Show the output in the REPL
         terminal.write(value);
 
-        // Call the registered callbacks with the text and butes just received
+        // Call the registered callbacks with the text and bytes just received
         serialCallbacks.forEach(callback => {
             callback(text, value);
         })
