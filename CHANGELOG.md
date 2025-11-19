@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 1.2.1-beta (2025-11-19)
 
 ### Added
  - Monkey image when no tabs are opened
@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
  - Files and folder names overflow with an ellipsis instead of adding a scrollbar
- - Full paths can now be viewed for files and folders by hovering over the title
+ - Full paths can now be viewed for files and folders by hovering over the title in the file explorer
  - Renamed `File Explorer` to `Files`
 
 ### Fixed

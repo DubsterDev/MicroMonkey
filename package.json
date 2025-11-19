@@ -10,7 +10,7 @@
     "vite": "^7.0.2"
   },
   "name": "micromonkey",
-  "version": "1.2.0",
+  "version": "1.2.1-beta",
   "main": "editor.js",
   "scripts": {
     "dev": "vite",

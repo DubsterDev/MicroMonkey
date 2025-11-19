@@ -206,18 +206,13 @@ export async function renderWhatsNewScreen(rootElement) {
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
     addHeading("Added", "h3", rootElement);
-    addParagraph("- Keyboard shortcut CTRL+` for toggling serial monitor visibility", rootElement);
-    addParagraph("- Beta upload files as ZIP functionality", rootElement);
-    addParagraph("- Support for more commands in command palette", rootElement);
-    addParagraph("- A command to connect to board in command palette", rootElement);
-    addParagraph("- A command to toggle the serial monitor in the command palette", rootElement);
+    addParagraph("- Monkey image when no tabs are opened", rootElement);
+    addParagraph("- Reboot command to command palette", rootElement);
 
     addHeading("Changed", "h3", rootElement);
-    addParagraph("- Command palette is now sorted alphabetically when no search term has been provided", rootElement);
-
-    addHeading("Fixed", "h3", rootElement);
-    addParagraph("- Command palette can no longer hide behind the editor", rootElement);
-    addParagraph("- Tab strip shrinking when serial monitor is toggled", rootElement);
+    addParagraph("- Files and folder names overflow with an ellipsis instead of adding a scrollbar", rootElement);
+    addParagraph("- Full paths can now be viewed for files and folders by hovering over the title in the file explorer", rootElement);
+    addParagraph("- Renamed 'File Explorer' to 'Files'", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
