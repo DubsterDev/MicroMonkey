@@ -1,4 +1,4 @@
-# <img src="public/assets/monkeyheadshot.png" style="width: 35px;"> MicroMonkey
+# <img src="web/public/assets/monkeyheadshot.png" style="width: 35px;"> MicroMonkey
 
 <!-- These stages can be swapped out for each other when needed -->
 
