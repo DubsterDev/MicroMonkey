@@ -426,4 +426,8 @@ main {
     .bottomBar .item.onlyOnMobile {
        display: flex;
     }
+
+    .commandPalette {
+        width: 80%;
+    }
 }

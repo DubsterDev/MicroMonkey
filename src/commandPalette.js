@@ -33,6 +33,14 @@ export function setupCommandPalette() {
         }
     });
 
+    // Hides command palette on click out
+    document.body.addEventListener("click", (ev) => {
+        if (!commandPalette.contains(ev.target)) {
+            commandPalette.style.display = "none";
+            if (callbackEscape) callbackEscape();
+        }
+    });
+
     // Detect escapes and enters and filter suggestions as the user types
     commandPaletteInput.addEventListener("keydown", (ev) => {
         if (ev.key.toLowerCase() === "escape") {
@@ -232,7 +240,8 @@ function displaySuggestions(searchTerm="") {
         suggestion.innerText = name;
 
         // Add a callback
-        suggestion.addEventListener("click", () => {
+        suggestion.addEventListener("click", (ev) => {
+            ev.stopPropagation();
             commandPalette.style.display = "none";
             callback();
         });

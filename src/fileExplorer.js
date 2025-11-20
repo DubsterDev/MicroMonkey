@@ -32,8 +32,14 @@ export function newFolderStructure(folderStructure) {
  * Adds new file and folder event listeners.
  */
 export function addNewFileEventListeners() {
-    document.getElementById("newFileRoot").addEventListener("click", () => newFile("/"));
-    document.getElementById("newFolderRoot").addEventListener("click", () => newFolder("/"));
+    document.getElementById("newFileRoot").addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        newFile("/")
+    });
+    document.getElementById("newFolderRoot").addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        newFolder("/")
+    });
 }
 
 /**
