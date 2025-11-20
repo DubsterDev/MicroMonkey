@@ -177,6 +177,7 @@ main {
 .leftSidebar .file, .folder-container {
     margin-left: 20px;
     vertical-align: middle;
+    user-select: none;
 }
 
 .leftSidebar .folder-container {
@@ -313,6 +314,7 @@ main {
     background-color: var(--background-color-variant);
     padding: 10px;
     border-radius: 10px;
+    z-index: 101;
 }
 
 .commandPalette {
