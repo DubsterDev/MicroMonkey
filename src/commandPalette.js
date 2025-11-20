@@ -33,6 +33,13 @@ export function setupCommandPalette() {
         }
     });
 
+    // Add click listener for open command palette button
+    document.getElementById("openCommandPalette").addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        showCommandPalette();
+        return true;
+    })
+
     // Hides command palette on click out
     document.body.addEventListener("click", (ev) => {
         if (!commandPalette.contains(ev.target)) {
