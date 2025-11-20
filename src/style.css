@@ -430,4 +430,12 @@ main {
     .commandPalette {
         width: 80%;
     }
+
+    .fileExplorerHeader .newActions button, .folder-name .newActions button {
+        opacity: 0.6;
+    }
+
+    .tabs .tab button {
+        opacity: 1;
+    }
 }
