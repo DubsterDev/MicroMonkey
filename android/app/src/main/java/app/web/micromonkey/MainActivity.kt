@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
                             )
 
                             webView = this
-                            
+
                             if (savedInstanceState === null) {
                                  loadUrl("https://appassets.androidplatform.net/index.html")
                             }
