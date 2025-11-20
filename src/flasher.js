@@ -69,6 +69,14 @@ async function beginFlash() {
  * Opens the flasher tab after asking the user what type of board they are trying to flash.
  */
 async function openFlasher() {
+    // Are we in the Android WebView?
+    const isAndroid = 'serialPolyfill' in window;
+
+    // Tell the user flashing is currently not supported.
+    // TODO: Make it possible.
+    // To do this, we're going to have to clone esptool-js and add support for our polyfill.
+    if (isAndroid) return getInput("Sorry, flashing is currently not supported on mobile.", "", "", ["Okay"], true);
+
     // Get what type of board the user is trying to flash
     const flasherType = await getInput("What type of board are you trying to flash?", "Filter results", "", ["ESP32 or ESP8266", "Cancel"], false);
 
