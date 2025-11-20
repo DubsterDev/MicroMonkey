@@ -13,6 +13,10 @@ const codeEditorElement = document.getElementById("codeEditor");
 const customEditorElement = document.getElementById("customEditor");
 const serialMonitor = document.getElementById("serialMonitor");
 const rightPanel = document.getElementById("rightPanel");
+const saveButton = document.getElementById("saveFile");
+
+// Map the save button to the save function
+saveButton.addEventListener("click", saveActiveFile);
 
 /**
  * Renders the tabs for the first time.
@@ -237,6 +241,9 @@ function renderTabs(activateActiveTab=true) {
     const tabsContainer = document.getElementById("tabs");
     tabsContainer.innerText = "";
 
+    // Hide the save button
+    saveButton.style.display = "none";
+
     // Loop through the paths of the tabs
     const tabPaths = Object.keys(tabs);
     tabPaths.forEach(path => {
@@ -319,6 +326,10 @@ function renderTabs(activateActiveTab=true) {
         if (activateActiveTab && tab.active && tab.type === "monaco") {
             codeEditorElement.style.display = "block";
             customEditorElement.style.display = "none";
+
+            // Show the save button
+            saveButton.style.display = "flex";
+
             changeModel(tab.model);
         } else if (activateActiveTab && tab.active && tab.type === "custom") {
             codeEditorElement.style.display = "none";
