@@ -170,6 +170,10 @@ main {
     gap: 5px;
 }
 
+.bottomBar .item.onlyOnMobile {
+    display: none;
+}
+
 .leftSidebar .file, .folder-container {
     margin-left: 20px;
     vertical-align: middle;
@@ -395,5 +399,31 @@ main {
 
     html, body, main {
         color-scheme: light;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .leftSidebar {
+        transition: .25s;
+        position: fixed;
+        top: 0;
+        left: -95%;
+        /* Height of bottom bar */
+        bottom: 36px;
+        height: calc(100% - 36px);
+        width: 90%;
+        z-index: 100;
+    }
+
+    .leftSidebar.show {
+        left: 0;
+    }
+
+    .bottomBar .item span {
+        display: none;
+    }
+
+    .bottomBar .item.onlyOnMobile {
+       display: flex;
     }
 }
