@@ -1,0 +1,9 @@
+{
+    "type": "module",
+    "scripts": {
+        "build": "cd web && npm run build && cd .. && node copyBuildToAndroid.js",
+        "android-build-apk": "cd android && gradlew.bat assembleRelease && apksigner sign --ks key.keystore --ks-key-alias micromonkey --out app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-release-unsigned.apk && cd ..",
+        "web-deploy": "cd web && npm run deploy && cd ..",
+        "web-deploy-beta": "cd web && npm run deploy-beta && cd .."
+    }
+}
