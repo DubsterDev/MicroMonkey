@@ -12,6 +12,12 @@ let activePort;
 let reader;
 let writer;
 
+// Variable to determine if running in Android app or Web app
+const isAndroid = 'serialPolyfill' in window;
+
+// Make it easier to interact with the serial interface
+const serialInterface = isAndroid ? serialPolyfill : navigator.serial;
+
 // A list of callbacks that are called when output is received from the serial device
 const serialCallbacks = [];
 
@@ -58,7 +64,7 @@ terminal.onData(data => {
  * @param {string} filename The path to store the file, e.g. main.py or /utils/utils.py
  * @param {boolean} allowSoftReboot Whether to honor the user preferences for rebooting after save.
  */
-export async function writeFile(code, filename, allowSoftReboot=true) {
+export async function writeFile(code, filename, allowSoftReboot = true) {
     // If the serial port has not been opened, exit
     if (!activePort || !writer) return;
 
@@ -114,7 +120,7 @@ export async function getFile(filename) {
     await wait(250);
 
     // Get the contents of the file
-    const {result} = await runCode(`
+    const { result } = await runCode(`
 file = open("${filename.replaceAll("\"", "\\\"")}", "r")
 print(file.read())
 file.close()`);
@@ -141,7 +147,7 @@ export async function getFiles() {
     await wait(250);
 
     // Read the folders from the board
-    const {result} = await runCode(`import os
+    const { result } = await runCode(`import os
 def get_contents_of_dir(dir_name="/"):
     files = os.ilistdir(dir_name)
     result = {}
@@ -387,7 +393,7 @@ export function runCode(code) {
         // The content of the execution and exceptions
         let executionResult = "";
         let exceptions = "";
-        
+
         // A serial callback called with new data
         function dataCallback(_, orgBytes) {
             // Add the unread bytes before the received bytes
@@ -475,7 +481,7 @@ export function runCode(code) {
                     rawMode(false);
 
                     // Resolve the result, removing the last \r\n
-                    resolve({"result": executionResult.replace(/\r\n$/, ""), "exceptions": exceptions.replace(/\r\n$/, "")});
+                    resolve({ "result": executionResult.replace(/\r\n$/, ""), "exceptions": exceptions.replace(/\r\n$/, "") });
                     alreadyReadBytes++;
                 } else if (byte === 0x04 && !doneWriting) {
                     // This means the board wants to stop receiving data
@@ -512,10 +518,10 @@ export function runCode(code) {
 
                 // If the board hasn't said it's ready for more bytes, skip writing.
                 if (remainingWindowSize === 0) await wait(25);
-                
+
                 // Calculate the amount of bytes we are going to write to the board right now
                 const amountToWrite = Math.min(codeBytes.length - bytesWritten, remainingWindowSize);
-                
+
                 // Slice the bytes from the bytes array
                 const bytes = codeBytes.slice(bytesWritten, bytesWritten + amountToWrite);
 
@@ -540,7 +546,7 @@ export function runCode(code) {
         // Enter raw-paste mode
         writer.write(new Uint8Array([0x05, 0x41, 0x01]));
     })
-    
+
 }
 
 /**
@@ -598,7 +604,7 @@ export async function getAllFilesAsZip() {
 
     // A JSZip instance
     const zip = new JSZip();
-    
+
     // A recursive function that adds files to the zip
     async function addFilesToZip(folder, path) {
         for (const key in folder) {
@@ -618,7 +624,7 @@ export async function getAllFilesAsZip() {
     await addFilesToZip(files, "");
 
     // Generate the zip and return it as a blob
-    return zip.generateAsync({type: "blob"});
+    return zip.generateAsync({ type: "blob" });
 }
 
 /**
@@ -669,7 +675,7 @@ export async function uploadAllFilesFromZip(zip, deleteCurrentFiles) {
             await createDirectory(file.name);
             continue;
         }
-        
+
         const contents = await file.async("text");
         await writeFile(contents.replace("\r", ""), file.name, false);
     }
@@ -715,6 +721,9 @@ export function getPort() {
  * allowing the port to be closed or used by another process
  */
 export async function disconnectSerialPortListeners() {
+    // Don't run if we're using the Android polyfill
+    if (isAndroid) return;
+
     // Cancels and releases the lock of the reader stream
     await reader.cancel();
     reader.releaseLock();
@@ -731,9 +740,9 @@ export async function disconnectSerialPortListeners() {
 export async function disconnectSerialPort() {
     // Removes listeners
     await disconnectSerialPortListeners();
-    
-    // Disconnects it
-    await activePort.close();
+
+    // Disconnects it, using the right interface
+    isAndroid ? serialInterface.close() : await activePort.close();
 }
 
 /**
@@ -741,6 +750,9 @@ export async function disconnectSerialPort() {
  * and calls serial callbacks
  */
 async function startReadingOutput() {
+    // Run the Android output reader instead of we're in the Android app
+    if (isAndroid) return startReadingOutputAndroid();
+
     // Create a textDecoder
     const textDecoder = new TextDecoder();
 
@@ -769,6 +781,38 @@ async function startReadingOutput() {
     }
 }
 
+/**
+ * Infinitely loops and gets output from the connected board,
+ * , when running in Android WebView, and calls serial callbacks
+ */
+async function startReadingOutputAndroid() {
+    // Create a textDecoder
+    const textDecoder = new TextDecoder();
+
+    // This is what the Android app calls with serial data
+    window.onSerialDataReceived = (base64) => {
+        // Get a binary string of the base64
+        const binaryString = atob(base64);
+
+        // Convert it to a Uint8Array
+        const value = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            value[i] = binaryString.charCodeAt(i);
+        }
+
+        // Convert to UTF-8
+        const text = textDecoder.decode(value);
+
+        // Show the output in the REPL
+        terminal.write(value);
+
+        // Call the registered callbacks with the text and bytes just received
+        serialCallbacks.forEach(callback => {
+            callback(text, value);
+        })
+    }
+}
+
 let readyCallback;
 
 /**
@@ -782,17 +826,26 @@ export async function connectToBoard(port) {
     // Store the received port in a variable that is accessible by other functions
     activePort = port;
 
-    // Open the connection to the port
-    await port.open({
+    // Open the connection to the port, if we're on web
+    if (!isAndroid) await port.open({
         baudRate: 115200
     });
 
-    // Open a writer object
-    writer = port.writable.getWriter();
+    // Open a writer object, or create a polyfill if necessary
+    if (!isAndroid) writer = port.writable.getWriter();
+    else writer = {
+        write: (uint8Array) => {
+            let binary = '';
+            for (let i = 0; i < uint8Array.length; i++) {
+                binary += String.fromCharCode(uint8Array[i]);
+            }
+
+            serialInterface.write(btoa(binary));
+        }
+    };
 
     // Start getting decoded text from the board
-    reader = port.readable.getReader();
-
+    if (!isAndroid) reader = port.readable.getReader();
     // Clear the terminal display and show that the board has been connected
     terminal.clear();
     terminal.writeln("[Connecting to board...]");
@@ -865,8 +918,8 @@ export async function findPorts() {
         portDisconnected();
     } else {
         // Request a device
-        const port = await navigator.serial.requestPort();
-        
+        const port = await serialInterface.requestPort();
+
         // Finish connecting to the board
         connectToBoard(port);
     }
@@ -877,17 +930,17 @@ export async function findPorts() {
  * @param {*} editor A reference to the monaco editor
  * @param {Function} upandrunningCallback A callback that is called when successfully connected to a board
  */
-export function startSerial(editor, upandrunningCallback=() => {}) {
+export function startSerial(editor, upandrunningCallback = () => { }) {
     readyCallback = upandrunningCallback;
-    // Add an event listener for when a board is connected
-    navigator.serial.addEventListener("connect", (ev) => {
+    // Add an event listener for when a board is connected, if not on Android
+    if (!isAndroid) serialInterface.addEventListener("connect", (ev) => {
         // Write the text "[Board Connected]" to the terminal
         terminal.writeln("[Board Connected]");
         connectToBoard(ev.target);
     });
 
-    // Add an event listener for when the board is disconnected
-    navigator.serial.addEventListener("disconnect", portDisconnected);
+    // Add an event listener for when the board is disconnected, if not on Android
+    if (!isAndroid) serialInterface.addEventListener("disconnect", portDisconnected);
 
     // Add an event listener for when the user clicks the find ports button
     document.getElementById("findPorts").addEventListener("click", findPorts);
