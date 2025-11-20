@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Context.USB_SERVICE
 import android.content.Intent
 import android.hardware.usb.UsbManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Base64
@@ -13,12 +14,14 @@ import android.util.Log
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +31,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewClientCompat
 import app.web.micromonkey.ui.theme.MicroMonkeyTheme
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
@@ -40,6 +45,10 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
 
         enableEdgeToEdge()
         setContent {
@@ -55,7 +64,7 @@ class MainActivity : ComponentActivity() {
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.MATCH_PARENT
                             )
-                            webViewClient = MyWebViewClient()
+                            webViewClient = MyWebViewClient(assetLoader)
                             settings.javaScriptEnabled = true
                             settings.domStorageEnabled = true
                             addJavascriptInterface(
@@ -64,10 +73,9 @@ class MainActivity : ComponentActivity() {
                             )
 
                             webView = this
-
-                            // TODO: Change to micromonkey.web.app when changes are in production
+                            
                             if (savedInstanceState === null) {
-                                loadUrl("https://micromonkeybeta--android-support-2o20yhdx.web.app/")
+                                 loadUrl("https://appassets.androidplatform.net/index.html")
                             }
                         }
                     }, modifier = Modifier.padding(innerPadding))
@@ -92,16 +100,21 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-class MyWebViewClient: WebViewClient() {
-    override fun shouldOverrideUrlLoading(view: WebView?, resource: WebResourceRequest?): Boolean {
+class MyWebViewClient(private val assetLoader: WebViewAssetLoader): WebViewClientCompat() {
+    @RequiresApi(21)
+    override fun shouldInterceptRequest(
+        view: WebView,
+        request: WebResourceRequest
+    ): WebResourceResponse? {
+        return assetLoader.shouldInterceptRequest(request.url)
+    }
 
-        // TODO: Swap out below lines when changes are in prod
-//        if(resource?.url != null && resource.url.toString().startsWith("https://micromonkey.web.app")){
-        if (resource?.url != null) {
-            view?.loadUrl(resource.url.toString())
-            return true
-        }
-        return false
+    // To support API < 21.
+    override fun shouldInterceptRequest(
+        view: WebView,
+        url: String
+    ): WebResourceResponse? {
+        return assetLoader.shouldInterceptRequest(Uri.parse(url))
     }
 }
 
