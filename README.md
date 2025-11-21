@@ -2,9 +2,9 @@
 
 <!-- These stages can be swapped out for each other when needed -->
 
-<!-- ![Stage: Stable/Release](https://img.shields.io/badge/stage-stable/release-4caf50?style=for-the-badge) -->
+![Stage: Stable/Release](https://img.shields.io/badge/stage-stable/release-4caf50?style=for-the-badge)
 
-![Stage: Beta](https://img.shields.io/badge/stage-beta-9e9d24?style=for-the-badge)
+<!-- ![Stage: Beta](https://img.shields.io/badge/stage-beta-9e9d24?style=for-the-badge) -->
 
 <!-- ![Stage: Preparing for next beta](https://img.shields.io/badge/stage-preparing_for_next_beta-ffa000?style=for-the-badge) -->
 

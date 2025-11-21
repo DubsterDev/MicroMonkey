@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Save button and command palette button in bottom bar
  - Expiremental support for running on Android via Android app
 
-## 1.2.1-beta (2025-11-19)
+## 1.2.1 (2025-11-21)
 
 ### Added
  - Monkey image when no tabs are opened
