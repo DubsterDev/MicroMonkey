@@ -45,7 +45,7 @@ When enough changes have been made, it's time to deploy MicroMonkey to beta. To 
 
 Before a new version of MicroMonkey is released, several things need to be done:
  - MicroMonkey should have been tested in Beta for a week, following the prior section's instructions.
- - The version number should be changed to remove the `-beta` suffix in [package.json](web/package.json) and [constants.js](web/src/constants.js)
+ - The version number should be changed to remove the `-beta` suffix. You can run `node setNewVersion.js [VERSION_NUMBER]` from the root of the project with the new version number.
  - The changelog should be modified so the `-beta` suffix is removed in [CHANGELOG.md](CHANGELOG.md). Make sure that every substantial change is in here.
  - This changelog must be copied over to [otherUiManager.js](web/src/otherUiManager.js) on line 208, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy` (which will build MicroMonkey with Vite and then deploy with Firebase in release) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](web/dist/)
