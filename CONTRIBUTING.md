@@ -2,7 +2,7 @@
 
 ## Running MicroMonkey locally
 
-After cloning the GitHub repository, you can run `npm run install` to make sure all the dependecies are installed.
+After cloning the GitHub repository, `cd` to `web`, and then you can run `npm run install` to make sure all the dependecies are installed.
 
 Once all the dependecies are installed, you can start the development server at any time with the command `npm run dev`.
 
@@ -28,14 +28,17 @@ Most of the files should be pretty self-explanatory, but here's the basic ideas:
  - [style.css](web/src/style.css) is where all the styling for MicroMonkey is defined
  - [index.html](web/index.html) is where the main MicroMonkey interface is, but some things are added programmatically in the previously mentioned JavaScript files
 
+Under [android](android/), is a small WebView wrapper app to allow running MicroMonkey on Android, due to the fact that the Web Serial API is not supported there yet. In the root of the micromonkey project, you will want to build the website first (with `npm run build`), and then running the Android app will work.
+
 ## Deploying to Beta
 
 When enough changes have been made, it's time to deploy MicroMonkey to beta. To do this, we must do the following:
  - Decide on a good version number for this release, and then add -beta to the end. (e.g. 1.2.0-beta)
- - The new version number should be set in [package.json](web/package.json) and [constants.js](web/src/constants.js)
+ - The new version number should be set everywhere, using the set version command. You can run it with `node setNewVersion.js [VERSION_NUMBER]` from the root of the project.
  - A changelog for the new version number must be present in [CHANGELOG.md](CHANGELOG.md). There should be an Unreleased section which you can rename to the version number and add the date at the end, following the style of previous releases.
  - This changelog must be copied over to [otherUiManager.js](web/src/otherUiManager.js) on line 208, obviously modified to fit the right format.
- - Then you can deploy the changes with `npm run deploy-beta` (which will build MicroMonkey with Vite and then deploy with Firebase in beta) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](web/dist/)
+ - Then you can deploy the changes with `npm run web-deploy-beta` (which will build MicroMonkey with Vite and then deploy with Firebase in beta) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](web/dist/)
+ - If you want to also release the Android version, you can run `npm run android-build-apk`, and it will prompt you for your keystore password. [See here to set up the keystore](#setting-up-for-the-android-app). Then, the APK can be found [here](android/app/build/outputs/apk/release/app-release.apk).
  - Change the [README](README.md) to reflect the beta stage.
 
 ## Deploying to Release
@@ -47,3 +50,8 @@ Before a new version of MicroMonkey is released, several things need to be done:
  - This changelog must be copied over to [otherUiManager.js](web/src/otherUiManager.js) on line 208, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy` (which will build MicroMonkey with Vite and then deploy with Firebase in release) or `npm run build`, and then the built MicroMonkey can be found in the [dist folder](web/dist/)
  - Change the [README](README.md) to reflect the release stage, and tag the last commit for this version with the version number in the format `v1.2.0`.
+
+## Setting up for the Android app
+Before being able to build the android app, you'll have to create a keystore, using the following command: `keytool -genkey -v -keystore key.keystore -alias micromonkey -keyalg RSA -keysize 2048 -validity 365000`, in the [android](android/) directory.
+
+You'll also need to add the `apksigner.bat` to your PATH. You can [search to find out information about this](https://www.google.com/search?q=android+apksigner+add+to+path)
