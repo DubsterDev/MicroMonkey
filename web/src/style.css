@@ -127,7 +127,7 @@ main {
 }
 
 #customEditor:empty {
-    background-image: url(/assets/monkeyheadshot.png);
+    background-image: url(/assets/monkeyface.svg);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
