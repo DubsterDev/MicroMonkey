@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/xterm": "^5.5.0",
+    "esptool-js": "^0.5.7",
+    "fuse.js": "^7.1.0",
+    "jszip": "^3.10.1",
+    "monaco-editor": "^0.52.2",
+    "spark-md5": "^3.0.2",
+    "vite": "^7.0.2"
+  },
+  "name": "micromonkey",
+  "version": "1.2.1",
+  "main": "editor.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && node copy-firebase-json.mjs prod && firebase deploy",
+    "deploy-beta": "npm run build && node copy-firebase-json.mjs beta && firebase deploy"
+  },
+  "keywords": [],
+  "author": "Dubster Web",
+  "license": "GPL-3.0-only",
+  "description": ""
+}
