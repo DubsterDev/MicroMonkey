@@ -1,0 +1,3 @@
+Name: spark-md5
+Source: https://github.com/satazor/js-spark-md5
+License: Public Domain
