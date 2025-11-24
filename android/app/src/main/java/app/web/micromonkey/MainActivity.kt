@@ -24,15 +24,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
@@ -92,7 +88,7 @@ class MainActivity : ComponentActivity() {
 
                                     val intent = try {
                                         fileChooserParams.createIntent()
-                                    } catch (e: ActivityNotFoundException) {
+                                    } catch (_: ActivityNotFoundException) {
                                         fileCallback = null
                                         return false
                                     }
@@ -139,20 +135,11 @@ class MainActivity : ComponentActivity() {
 }
 
 class MyWebViewClient(private val assetLoader: WebViewAssetLoader): WebViewClientCompat() {
-    @RequiresApi(21)
     override fun shouldInterceptRequest(
         view: WebView,
         request: WebResourceRequest
     ): WebResourceResponse? {
         return assetLoader.shouldInterceptRequest(request.url)
-    }
-
-    // To support API < 21.
-    override fun shouldInterceptRequest(
-        view: WebView,
-        url: String
-    ): WebResourceResponse? {
-        return assetLoader.shouldInterceptRequest(Uri.parse(url))
     }
 }
 
@@ -169,12 +156,12 @@ class SerialPolyfill {
     @JavascriptInterface
     fun requestPort(): Boolean {
         val permissionIntent =
-        PendingIntent.getBroadcast(
-            context,
-            0,
-            Intent("com.dubster.hazelhope.micromonkey.USB_PERMISSION"),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent("app.web.micromonkey.USB_PERMISSION"),
+                PendingIntent.FLAG_IMMUTABLE
+            )
 
         // Find all available drivers from attached devices.
         val manager = context.getSystemService(USB_SERVICE) as UsbManager
@@ -190,7 +177,7 @@ class SerialPolyfill {
         val connection = manager.openDevice(driver.device)
         if (connection == null) {
             Toast.makeText(context, "No connection", Toast.LENGTH_SHORT).show()
-            manager.requestPermission(driver.device, permissionIntent);
+            manager.requestPermission(driver.device, permissionIntent)
             return false
         }
 
@@ -213,7 +200,7 @@ class SerialPolyfill {
     @JavascriptInterface
     @Deprecated("DO NOT USE. Blocks WebView thread")
     fun read(): String {
-        val bytes: ByteArray = ByteArray(64)
+        val bytes = ByteArray(64)
         port?.read(bytes, 10000)
         val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
         return base64
@@ -239,23 +226,5 @@ class OutputManager : SerialInputOutputManager.Listener {
 
     override fun onRunError(p0: Exception?) {
         p0?.printStackTrace()
-    }
-}
-
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MicroMonkeyTheme {
-        Greeting("Android")
     }
 }
