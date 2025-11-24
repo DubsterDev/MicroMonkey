@@ -3,6 +3,7 @@ package app.web.micromonkey
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
+import android.content.ContentValues
 import android.content.Context
 import android.content.Context.USB_SERVICE
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.hardware.usb.UsbManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.provider.MediaStore
 import android.util.Base64
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
@@ -36,6 +38,8 @@ import app.web.micromonkey.ui.theme.MicroMonkeyTheme
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
+import java.io.BufferedOutputStream
+import java.io.IOException
 
 
 class MainActivity : ComponentActivity() {
@@ -106,6 +110,11 @@ class MainActivity : ComponentActivity() {
                                 "serialPolyfill"
                             )
 
+                            addJavascriptInterface(
+                                FileBridge(applicationContext),
+                                "androidFileBridge"
+                            )
+
                             webView = this
 
                             if (savedInstanceState === null) {
@@ -143,6 +152,44 @@ class MyWebViewClient(private val assetLoader: WebViewAssetLoader): WebViewClien
     }
 }
 
+class FileBridge {
+    var context: Context
+    constructor(context: Context) {
+        this.context = context
+    }
+
+    @JavascriptInterface
+    fun downloadFile(fileName: String, mimeType: String, base64: String) {
+        try {
+            val decodedBase64 = Base64.decode(base64, Base64.DEFAULT)
+
+            val resolver = context.contentResolver
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, mimeType)  // e.g. "application/pdf"
+                put(MediaStore.Downloads.IS_PENDING, 1)
+            }
+
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                ?: throw IOException("Failed to create file")
+
+            resolver.openOutputStream(uri)?.use { outputStream ->
+                BufferedOutputStream(outputStream).use { bos ->
+                    bos.write(decodedBase64)
+                }
+            } ?: throw IOException("Failed to open output stream")
+
+            contentValues.clear()
+            contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+            resolver.update(uri, contentValues, null, null)
+            Toast.makeText(context, "File saved to Downloads folder", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Sorry, the file was not successfully saved.", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
+        }
+    }
+}
 
 class SerialPolyfill {
     var context: Context
