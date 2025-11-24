@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Base64
-import android.util.Log
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -208,7 +207,6 @@ class SerialPolyfill {
     @JavascriptInterface
     fun write(base64: String) {
         val bytes = Base64.decode(base64, Base64.DEFAULT)
-        Log.d("BOB", "write: $base64")
         port?.write(bytes, 10000)
     }
 
@@ -235,7 +233,6 @@ class OutputManager : SerialInputOutputManager.Listener {
     }
 
     override fun onNewData(data: ByteArray) {
-        Log.d("BOB", String(data))
         val base64 = Base64.encodeToString(data, Base64.NO_WRAP)
         webview.post { webview.evaluateJavascript("onSerialDataReceived(\"$base64\")", null) }
     }
