@@ -13,7 +13,7 @@ let reader;
 let writer;
 
 // Variable to determine if running in Android app or Web app
-const isAndroid = 'serialPolyfill' in window;
+const isAndroid = import.meta.env.MODE === "android" && 'serialPolyfill' in window;
 
 // Make it easier to interact with the serial interface
 const serialInterface = isAndroid ? serialPolyfill : navigator.serial;
