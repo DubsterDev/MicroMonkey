@@ -587,9 +587,11 @@ function softReboot() {
 
 /**
  * Returns a blob of all the files on the board in ZIP format.
+ * @param {string} [type="blob"] What type the output of this function should be. Default is blob, see JSZip's supported types for more information.
+ * @see https://stuk.github.io/jszip/documentation/api_jszip/generate_async.html
  * @returns {Promise<Blob>} A promise that resolves to a Blob of the ZIP file.
  */
-export async function getAllFilesAsZip() {
+export async function getAllFilesAsZip(type="blob") {
     // Exit early if not connected to a board
     if (!activePort || !writer) return;
 
@@ -624,7 +626,7 @@ export async function getAllFilesAsZip() {
     await addFilesToZip(files, "");
 
     // Generate the zip and return it as a blob
-    return zip.generateAsync({ type: "blob" });
+    return zip.generateAsync({ type: type });
 }
 
 /**
