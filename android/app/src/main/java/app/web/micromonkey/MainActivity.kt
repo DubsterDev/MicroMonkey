@@ -2,6 +2,7 @@ package app.web.micromonkey
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Context.USB_SERVICE
 import android.content.Intent
@@ -13,14 +14,17 @@ import android.util.Base64
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,11 +44,24 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 
 
 class MainActivity : ComponentActivity() {
+    private var fileCallback: ValueCallback<Array<Uri>>? = null
+
+    private lateinit var fileChooserLauncher: ActivityResultLauncher<Intent>
     private var webView: WebView? = null
+
     // Suppressed because I'm only loading a trusted page
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        fileChooserLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            val data: Intent? = result.data
+            val resultUris = WebChromeClient.FileChooserParams.parseResult(result.resultCode, data)
+            fileCallback?.onReceiveValue(resultUris)
+            fileCallback = null
+        }
 
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this))
@@ -65,7 +82,29 @@ class MainActivity : ComponentActivity() {
                                 ViewGroup.LayoutParams.MATCH_PARENT
                             )
                             webViewClient = MyWebViewClient(assetLoader)
+                            webChromeClient = object : WebChromeClient() {
+                                override fun onShowFileChooser(
+                                    webView: WebView?,
+                                    filePathCallback: ValueCallback<Array<Uri>>,
+                                    fileChooserParams: FileChooserParams
+                                ): Boolean {
+                                    fileCallback?.onReceiveValue(null)
+                                    fileCallback = filePathCallback
+
+                                    val intent = try {
+                                        fileChooserParams.createIntent()
+                                    } catch (e: ActivityNotFoundException) {
+                                        fileCallback = null
+                                        return false
+                                    }
+
+                                    fileChooserLauncher.launch(intent)
+                                    return true
+                                }
+                            }
+
                             settings.javaScriptEnabled = true
+                            settings.allowFileAccess = true
                             settings.domStorageEnabled = true
                             addJavascriptInterface(
                                 SerialPolyfill(applicationContext, this),
@@ -75,7 +114,7 @@ class MainActivity : ComponentActivity() {
                             webView = this
 
                             if (savedInstanceState === null) {
-                                 loadUrl("https://appassets.androidplatform.net/index.html")
+                                loadUrl("https://appassets.androidplatform.net/index.html")
                             }
                         }
                     }, modifier = Modifier.padding(innerPadding))
