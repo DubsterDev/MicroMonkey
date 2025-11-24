@@ -20,9 +20,6 @@ import { addFlasherEventListeners } from "./flasher";
 import { setupCommandPalette } from "./commandPalette";
 import { setupSettings } from "./settings";
 
-// Constant values
-import { MICROMONKEY_VERSION } from "./constants";
-
 // Insert the editor into the DOM
 const editor = setUpMonaco();
 
