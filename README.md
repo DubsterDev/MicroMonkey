@@ -1,4 +1,4 @@
-# <img src="web/public/assets/monkeyface.svg" style="height: 45px; vertical-align: middle;"> MicroMonkey
+# <img src="core/public/assets/monkeyface.svg" style="height: 45px; vertical-align: middle;"> MicroMonkey
 
 <!-- These stages can be swapped out for each other when needed -->
 

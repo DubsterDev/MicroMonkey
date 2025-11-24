@@ -1,10 +1,10 @@
 {
     "type": "module",
     "scripts": {
-        "dev": "cd web && npm run dev && cd ..",
-        "build": "cd web && npm run build && cd .. && node copyBuildToAndroid.js",
+        "dev": "cd core && npm run dev && cd ..",
+        "build": "cd core && npm run build && cd .. && node copyBuildToAndroid.js",
         "android-build-apk": "cd android && gradlew.bat assembleRelease && apksigner sign --ks key.keystore --ks-key-alias micromonkey --out app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-release-unsigned.apk && cd ..",
-        "web-deploy": "cd web && npm run deploy && cd ..",
-        "web-deploy-beta": "cd web && npm run deploy-beta && cd .."
+        "web-deploy": "cd core && npm run deploy && cd ..",
+        "web-deploy-beta": "cd core && npm run deploy-beta && cd .."
     }
 }
