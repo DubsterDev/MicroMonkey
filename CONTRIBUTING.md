@@ -6,8 +6,6 @@ After cloning the GitHub repository, `cd` to `core`, and then you can run `npm r
 
 Once all the dependecies are installed, you can start the development server at any time with the command `npm run dev`.
 
-When the first change is made, the [README](README.md) should be updated to reflect the preparing for next beta stage.
-
 ## Brief Overview
 
 All new functions should have a JSDoc, and ideally plenty of comments.
@@ -39,7 +37,6 @@ When enough changes have been made, it's time to deploy MicroMonkey to beta. To 
  - This changelog must be copied over to [otherUiManager.js](core/src/otherUiManager.js) on line 208, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy-beta-web` (which will build MicroMonkey with Vite and then deploy with Firebase in beta) or `npm run build-web`, and then the built MicroMonkey can be found in the [dist folder](core/dist/)
  - If you want to also release the Android version, you can run `npm run build-android-apk`, and it will prompt you for your keystore password. [See here to set up the keystore](#setting-up-for-the-android-app). Then, the APK can be found [here](android/app/build/outputs/apk/release/app-release.apk).
- - Change the [README](README.md) to reflect the beta stage.
 
 ## Deploying to Release
 
@@ -49,7 +46,7 @@ Before a new version of MicroMonkey is released, several things need to be done:
  - The changelog should be modified so the `-beta` suffix is removed in [CHANGELOG.md](CHANGELOG.md). Make sure that every substantial change is in here.
  - This changelog must be copied over to [otherUiManager.js](core/src/otherUiManager.js) on line 208, obviously modified to fit the right format.
  - Then you can deploy the changes with `npm run deploy-web` (which will build MicroMonkey with Vite and then deploy with Firebase in release) or `npm run build-web`, and then the built MicroMonkey can be found in the [dist folder](core/dist/)
- - Change the [README](README.md) to reflect the release stage, and tag the last commit for this version with the version number in the format `v1.2.0`.
+ - Tag the last commit for this version with the version number in the format `v1.2.0`.
 
 ## Setting up for the Android app
 Before being able to build the android app, you'll have to create a keystore, using the following command: `keytool -genkey -v -keystore key.keystore -alias micromonkey -keyalg RSA -keysize 2048 -validity 365000`, in the [android](android/) directory.
