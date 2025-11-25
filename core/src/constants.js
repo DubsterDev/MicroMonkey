@@ -1,1 +1,1 @@
-export const MICROMONKEY_VERSION = "1.2.1";
+export const MICROMONKEY_VERSION = "1.3.0-beta";

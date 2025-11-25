@@ -206,13 +206,9 @@ export async function renderWhatsNewScreen(rootElement) {
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
     addHeading("Added", "h3", rootElement);
-    addParagraph("- Monkey image when no tabs are opened", rootElement);
-    addParagraph("- Reboot command to command palette", rootElement);
-
-    addHeading("Changed", "h3", rootElement);
-    addParagraph("- Files and folder names overflow with an ellipsis instead of adding a scrollbar", rootElement);
-    addParagraph("- Full paths can now be viewed for files and folders by hovering over the title in the file explorer", rootElement);
-    addParagraph("- Renamed 'File Explorer' to 'Files'", rootElement);
+    addParagraph("- Mobile layout", rootElement);
+    addParagraph("- Save button and command palette button in bottom bar", rootElement);
+    addParagraph("- Expiremental support for running on Android via Android app", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
