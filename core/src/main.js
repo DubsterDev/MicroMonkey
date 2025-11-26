@@ -19,6 +19,10 @@ import { addFlasherEventListeners } from "./flasher";
 // Handles CTRL+SHIFT+P and running commands
 import { setupCommandPalette } from "./commandPalette";
 import { setupSettings } from "./settings";
+import { WebSerial } from "./communicationProtocols/webSerial";
+
+// Get the serial interface
+window.serialInterface = new WebSerial();
 
 // Insert the editor into the DOM
 const editor = setUpMonaco();
