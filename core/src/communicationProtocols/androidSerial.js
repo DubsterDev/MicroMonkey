@@ -12,10 +12,17 @@ export class AndroidSerial {
     supportsFlashing = false;
 
     /**
+     * Initializes Android Serial and connects immediately.
+     */
+    constructor() {
+        this.establishConnection();
+    }
+
+    /**
      * Opens the WebSocket
      */
     async establishConnection() {
-        const myUrl = new URL(location.href).host
+        const myUrl = new URL(location.href).host;
         this.webSocket = new WebSocket(`ws://${myUrl}/serial`);
         this.webSocket.onopen = () => {
             this.ready = true;
