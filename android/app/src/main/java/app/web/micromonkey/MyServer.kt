@@ -73,7 +73,7 @@ object MyServer {
                             }
                         }
                     } catch (e: Exception) {
-                        call.respond(HttpStatusCode.NotFound, "Asset not found: $assetPath")
+                        call.respond(HttpStatusCode.NotFound, "Not found: $assetPath")
                     }
                 }
             }

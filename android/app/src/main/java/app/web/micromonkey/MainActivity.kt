@@ -10,21 +10,29 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_OFF
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import app.web.micromonkey.ui.theme.MicroMonkeyTheme
-import com.google.androidbrowserhelper.trusted.TwaLauncher
 
 
 class MainActivity : ComponentActivity() {
     private val receiver = object : ResultReceiver(Handler(Looper.getMainLooper())) {
         override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
             if (resultCode == 1) {
-                TwaLauncher(this@MainActivity).launch("http://localhost:64276".toUri())
+                val intent = CustomTabsIntent.Builder()
+                    .setShowTitle(true)
+                    .setShareState(SHARE_STATE_OFF)
+                intent.build().launchUrl(this@MainActivity, "http://localhost:64276".toUri())
             }
         }
     }
@@ -47,7 +55,15 @@ class MainActivity : ComponentActivity() {
                         .fillMaxWidth()
                         .fillMaxHeight()
                 ) { innerPadding ->
-                    Text("Connect a board")
+                    Column(
+                        modifier = Modifier.padding(innerPadding)
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Connect a board with USB to start Native Serial proxy")
+                    }
                 }
             }
         }

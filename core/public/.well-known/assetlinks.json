@@ -1,5 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target" : { "namespace": "android_app", "package_name": "app.web.micromonkey",
-               "sha256_cert_fingerprints": [" 5E:13:4D:95:B5:3D:94:C4:BA:63:1C:84:45:B8:8C:B5:9B:38:AD:8B:76:19:3F:5E:74:6A:B6:1D:DE:02:04:43      "] }
-}]
