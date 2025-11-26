@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Connect a board with USB to start Native Serial proxy")
+                        Text("Connect a board with USB")
                     }
                 }
             }
