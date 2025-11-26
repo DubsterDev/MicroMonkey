@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.ResultReceiver
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,7 +45,6 @@ class MainActivity : ComponentActivity() {
         } else {
             startService(intent)
         }
-        Toast.makeText(this, "Hello!", Toast.LENGTH_SHORT).show()
         enableEdgeToEdge()
         setContent {
             MicroMonkeyTheme {
