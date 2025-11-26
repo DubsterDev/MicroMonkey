@@ -238,27 +238,18 @@ function openWhatsNewTab() {
  * Generates and downloads a ZIP file of the current board files
  */
 async function downloadAllFiles() {
-    const onAndroid = import.meta.env.MODE === "android";
+    // Get a zip blob
+    const blob = await getAllFilesAsZip();
 
-    if (onAndroid) {
-        // Get a zip in base64 format
-        const base64 = await getAllFilesAsZip("base64");
+    // Create a blob:// url
+    const url = URL.createObjectURL(blob);
 
-        androidFileBridge.downloadFile("files.zip", "application/zip", base64);
-    } else {
-        // Get a zip blob
-        const blob = await getAllFilesAsZip();
-
-        // Create a blob:// url
-        const url = URL.createObjectURL(blob);
-
-        // Create a link element to download it and then click it
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = "files.zip";
-        a.click();
-    }
+    // Create a link element to download it and then click it
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = "files.zip";
+    a.click();
 }
 
 /**

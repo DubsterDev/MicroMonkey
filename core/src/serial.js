@@ -7,20 +7,6 @@ import { newFolderStructure } from "./fileExplorer";
 import JSZip from "jszip";
 import { addCommand } from "./commandPalette";
 
-// Create some variables to be defined later
-let activePort;
-let reader;
-let writer;
-
-// Variable to determine if running in Android app or Web app
-const isAndroid = import.meta.env.MODE === "android" && 'serialPolyfill' in window;
-
-// Make it easier to interact with the serial interface
-const serialInterface = isAndroid ? serialPolyfill : navigator.serial;
-
-// A list of callbacks that are called when output is received from the serial device
-const serialCallbacks = [];
-
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");
 const rightPanel = document.getElementById("rightPanel");
@@ -66,7 +52,7 @@ terminal.onData(data => {
  */
 export async function writeFile(code, filename, allowSoftReboot = true) {
     // If the serial port has not been opened, exit
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // If the filename starts with a slash, remove it
     if (filename.startsWith("/")) {
@@ -109,7 +95,7 @@ export async function writeFile(code, filename, allowSoftReboot = true) {
  */
 export async function getFile(filename) {
     // Exit early if we are not connected to a board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt the script a few times to make sure there's nothing running
     await interruptScript();
@@ -136,7 +122,7 @@ file.close()`);
  */
 export async function getFiles() {
     // Exit early if not connected
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any scripts that are running
     await interruptScript();
@@ -172,7 +158,7 @@ print(get_contents_of_dir())`);
  */
 export async function createFile(filePath) {
     // Exit early if we are not connected to a board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any running scripts
     await interruptScript();
@@ -197,7 +183,7 @@ f.close()`)
  */
 export async function createDirectory(filePath) {
     // Exit early if we are not connected to a board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any running scripts
     await interruptScript();
@@ -223,7 +209,7 @@ os.mkdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAl
  */
 export async function renameFile(oldFilePath, newFilePath) {
     // Exit early if we are not connected to the board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any running scripts
     await interruptScript();
@@ -247,7 +233,7 @@ os.rename("${oldFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").repla
  */
 export async function removeFile(filePath) {
     // If we are not connected, exit early
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any running scripts
     await interruptScript();
@@ -271,7 +257,7 @@ os.remove("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceA
  */
 export async function removeDirectory(filePath) {
     // Exit early if we are not connected to a board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Don't do anything if it's an empty slash or a space, these don't work
     if (filePath === "/" || filePath === "\\" || filePath.trim() === "") return;
@@ -298,7 +284,7 @@ os.rmdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAl
  */
 export async function removeDirectoryRecursively(filePath) {
     // Exit early if we are not connected to a board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any running scripts
     await interruptScript();
@@ -333,12 +319,12 @@ recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\
  */
 export function writeString(string, newlineString = "\r\n") {
     // Exit early if there is no board to target
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Encode the text using TextEncoder, and then write it
     const textEncoder = new TextEncoder();
     const encoded = textEncoder.encode(string + newlineString);
-    return writer.write(encoded);
+    return serialInterface.write(encoded);
 }
 
 /**
@@ -347,10 +333,10 @@ export function writeString(string, newlineString = "\r\n") {
  */
 function rawMode(enable = true) {
     // If there is no connection to a board, exit early
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Write a code to the board to enable or disable
-    return writer.write(new Uint8Array([enable ? 0x01 : 0x02]));
+    return serialInterface.write(new Uint8Array([enable ? 0x01 : 0x02]));
 }
 
 /**
@@ -427,11 +413,11 @@ export function runCode(code) {
                     // The board understood the command,
                     // but it doesn't support raw paste mode
                     alert("Hmmm, something didn't work. Your board might not be compatible with MicroMonkey, or you might just need to try that again.");
-                    removeSerialCallback(dataCallback);
+                    serialInterface.removeSerialCallback(dataCallback);
                 } else if (bytes[0] === 0x72 && bytes[1] === 0x61) {
                     // The board doesn't even know what raw paste mode is
                     alert("Hmmm, something didn't work. Your board might not be compatible with MicroMonkey, or you might just need to try that again.");
-                    removeSerialCallback(dataCallback);
+                    serialInterface.removeSerialCallback(dataCallback);
                 }
 
                 // Increment the read bytes counter
@@ -475,7 +461,7 @@ export function runCode(code) {
                     // done outputting data
 
                     // Remove this callback
-                    removeSerialCallback(dataCallback);
+                    serialInterface.removeSerialCallback(dataCallback);
 
                     // Exit raw mode
                     rawMode(false);
@@ -529,22 +515,22 @@ export function runCode(code) {
                 bytesWritten += amountToWrite;
 
                 // Write the bytes
-                writer.write(bytes);
+                serialInterface.write(bytes);
 
                 // Decrement the remaining window size
                 remainingWindowSize -= amountToWrite;
             }
 
             // Now that we're done writing, let the board know
-            writer.write(new Uint8Array([0x04]));
+            serialInterface.write(new Uint8Array([0x04]));
             doneWriting = true;
         }
 
         // Add the dataCallback for serial events
-        addSerialCallback(dataCallback);
+        serialInterface.addSerialCallback(dataCallback);
 
         // Enter raw-paste mode
-        writer.write(new Uint8Array([0x05, 0x41, 0x01]));
+        serialInterface.write(new Uint8Array([0x05, 0x41, 0x01]));
     })
 
 }
@@ -554,10 +540,10 @@ export function runCode(code) {
  */
 function runRawCode() {
     // If a connection has not been established with a board, exit early
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Write CTRL+D to the board
-    return writer.write(new Uint8Array([0x04]));
+    return serialInterface.write(new Uint8Array([0x04]));
 }
 
 /**
@@ -565,10 +551,10 @@ function runRawCode() {
  */
 function interruptScript() {
     // Exit early if no connection
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Write CTRL+C to the board
-    return writer.write(new Uint8Array([0x03]));
+    return serialInterface.write(new Uint8Array([0x03]));
 }
 
 /**
@@ -576,13 +562,13 @@ function interruptScript() {
  */
 function softReboot() {
     // Execute early if needed
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Clear the terminal
     terminal.clear();
 
     // Write CTRL+D to the board
-    return writer.write(new Uint8Array([0x04]));
+    return serialInterface.write(new Uint8Array([0x04]));
 }
 
 /**
@@ -593,7 +579,7 @@ function softReboot() {
  */
 export async function getAllFilesAsZip(type="blob") {
     // Exit early if not connected to a board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any running scripts
     await interruptScript();
@@ -637,7 +623,7 @@ export async function getAllFilesAsZip(type="blob") {
  */
 export async function uploadAllFilesFromZip(zip, deleteCurrentFiles) {
     // Exit early if not connected to a board
-    if (!activePort || !writer) return;
+    if (!serialInterface.ready) return;
 
     // Interrupt any running scripts
     await interruptScript();
@@ -695,162 +681,39 @@ function wait(ms) {
 }
 
 /**
- * Add a callback that will be called when new serial data is received
- * @param {Function} callback The callback. Called with two parameters: text, bytes
- */
-export function addSerialCallback(callback) {
-    serialCallbacks.push(callback);
-}
-
-/**
- * Remove a callback that is called when new serial data is received
- * @param {Function} callback The callback to be removed
- */
-export function removeSerialCallback(callback) {
-    serialCallbacks.splice(serialCallbacks.indexOf(callback), 1)
-}
-
-/**
- * Returns the serial port that is connected
- * @returns {*} The connected serial port, or null if one is not connected
- */
-export function getPort() {
-    return activePort;
-}
-
-/**
- * Removes the reader and writer from the serial port,
- * allowing the port to be closed or used by another process
- */
-export async function disconnectSerialPortListeners() {
-    // Don't run if we're using the Android polyfill
-    if (isAndroid) return;
-
-    // Cancels and releases the lock of the reader stream
-    await reader.cancel();
-    reader.releaseLock();
-
-    // Closes and releases the lock of the writer stream
-    await writer.close();
-    writer.releaseLock();
-}
-
-/**
  * Removes the reader and writer from the serial port,
  * and closes it.
  */
 export async function disconnectSerialPort() {
     // Removes listeners
-    await disconnectSerialPortListeners();
+    await serialInterface.preDisconnect();
 
     // Disconnects it, using the right interface
-    isAndroid ? serialInterface.close() : await activePort.close();
+    serialInterface.disconnect();
 }
 
 /**
- * Infinitely loops and gets output from the connected board,
- * and calls serial callbacks
+ * Outputs serial output to terminal.
  */
-async function startReadingOutput() {
-    // Run the Android output reader instead of we're in the Android app
-    if (isAndroid) return startReadingOutputAndroid();
-
-    // Create a textDecoder
-    const textDecoder = new TextDecoder();
-
-    // Infinitely loop to read output from the board
-    while (true) {
-        // Get the output from the reader
-        const { value, done } = await reader.read();
-
-        // If done reading, stop looping
-        if (done) {
-            // Allow the serial port to be closed later.
-            reader.releaseLock();
-            break;
-        }
-
-        // Convert to UTF-8
-        const text = textDecoder.decode(value);
-
-        // Show the output in the REPL
-        terminal.write(value);
-
-        // Call the registered callbacks with the text and bytes just received
-        serialCallbacks.forEach(callback => {
-            callback(text, value);
-        })
+async function addTerminalCallback() {
+    async function terminalDataReceived(text, bytes) {
+        terminal.write(text);
     }
-}
-
-/**
- * Infinitely loops and gets output from the connected board,
- * , when running in Android WebView, and calls serial callbacks
- */
-async function startReadingOutputAndroid() {
-    // Create a textDecoder
-    const textDecoder = new TextDecoder();
-
-    // This is what the Android app calls with serial data
-    window.onSerialDataReceived = (base64) => {
-        // Get a binary string of the base64
-        const binaryString = atob(base64);
-
-        // Convert it to a Uint8Array
-        const value = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-            value[i] = binaryString.charCodeAt(i);
-        }
-
-        // Convert to UTF-8
-        const text = textDecoder.decode(value);
-
-        // Show the output in the REPL
-        terminal.write(value);
-
-        // Call the registered callbacks with the text and bytes just received
-        serialCallbacks.forEach(callback => {
-            callback(text, value);
-        })
-    }
+    terminalDataReceived.bind(this);
+    serialInterface.addSerialCallback(terminalDataReceived)
 }
 
 let readyCallback;
 
 /**
  * Finish connecting to a board after getting a reference to the port.
- * @param {*} port The serial port to read data from
  */
-export async function connectToBoard(port) {
+export async function boardConnected() {
     // Change the board status to Connected
     document.getElementById("boardStatus").innerText = "Connected";
 
-    // Store the received port in a variable that is accessible by other functions
-    activePort = port;
-
-    // Open the connection to the port, if we're on web
-    if (!isAndroid) await port.open({
-        baudRate: 115200
-    });
-
-    // Open a writer object, or create a polyfill if necessary
-    if (!isAndroid) writer = port.writable.getWriter();
-    else writer = {
-        write: (uint8Array) => {
-            let binary = '';
-            for (let i = 0; i < uint8Array.length; i++) {
-                binary += String.fromCharCode(uint8Array[i]);
-            }
-
-            serialInterface.write(btoa(binary));
-        }
-    };
-
-    // Start getting decoded text from the board
-    if (!isAndroid) reader = port.readable.getReader();
-    // Clear the terminal display and show that the board has been connected
+    // Clear the terminal display
     terminal.clear();
-    terminal.writeln("[Connecting to board...]");
 
     // Wait for board to finish booting in case it was just turned on
     await wait(200);
@@ -865,9 +728,6 @@ export async function connectToBoard(port) {
 
     // Call the up and running callback
     readyCallback();
-
-    // Start reading output from the board to show in the terminal
-    startReadingOutput();
 }
 
 /**
@@ -912,7 +772,7 @@ export function toggleTerminal(editor) {
  * Starts the find ports dialog.
  */
 export async function findPorts() {
-    if (activePort && activePort.readable !== null && activePort.writable !== null) {
+    if (serialInterface.ready) {
         // Disconnect listeners from the Serial Port and close it
         await disconnectSerialPort();
 
@@ -920,11 +780,21 @@ export async function findPorts() {
         portDisconnected();
     } else {
         // Request a device
-        const port = await serialInterface.requestPort();
-
-        // Finish connecting to the board
-        connectToBoard(port);
+        await serialInterface.establishConnection();
     }
+}
+
+export function onSerialInterfaceChange() {
+    // Start reading output from the board to show in the terminal
+    addTerminalCallback();
+
+    serialInterface.onConnect = () => {
+        terminal.writeln("[Board Connected]");
+        boardConnected();
+    }
+
+    // Add an event listener for when the board is disconnected
+    serialInterface.onDisconnect = portDisconnected;
 }
 
 /**
@@ -934,15 +804,7 @@ export async function findPorts() {
  */
 export function startSerial(editor, upandrunningCallback = () => { }) {
     readyCallback = upandrunningCallback;
-    // Add an event listener for when a board is connected, if not on Android
-    if (!isAndroid) serialInterface.addEventListener("connect", (ev) => {
-        // Write the text "[Board Connected]" to the terminal
-        terminal.writeln("[Board Connected]");
-        connectToBoard(ev.target);
-    });
-
-    // Add an event listener for when the board is disconnected, if not on Android
-    if (!isAndroid) serialInterface.addEventListener("disconnect", portDisconnected);
+    onSerialInterfaceChange();
 
     // Add an event listener for when the user clicks the find ports button
     document.getElementById("findPorts").addEventListener("click", findPorts);

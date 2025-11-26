@@ -1,7 +1,6 @@
 // Import dependencies from esptool-js and spark-md5
 import { ESPLoader, Transport } from "esptool-js";
 import SparkMD5 from "spark-md5";
-import { connectToBoard } from "./serial";
 
 // A simple terminal object to log messages from esptool-js to the console
 const espLoaderTerminal = {
@@ -98,7 +97,7 @@ async function flashOS(setFlashingStage, setFlashingProgress, file, device) {
     await transport.disconnect();
     
     // Try to reconnect to the board so the user can use it right away
-    await connectToBoard(device);
+    serialInterface.setPort(device);
 
     // Update the flashing stage to "done"
     setFlashingStage("done");
