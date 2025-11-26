@@ -70,7 +70,7 @@ async function beginFlash() {
  */
 async function openFlasher() {
     // Are we in the Android WebView?
-    const isAndroid = 'serialPolyfill' in window;
+    const isAndroid = import.meta.env.MODE === "android";
 
     // Tell the user flashing is currently not supported.
     // TODO: Make it possible.
