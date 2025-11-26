@@ -20,9 +20,10 @@ import { addFlasherEventListeners } from "./flasher";
 import { setupCommandPalette } from "./commandPalette";
 import { setupSettings } from "./settings";
 import { WebSerial } from "./communicationProtocols/webSerial";
+import { AndroidSerial } from "./communicationProtocols/androidSerial";
 
 // Get the serial interface
-window.serialInterface = new WebSerial();
+window.serialInterface = import.meta.env.MODE === "android" ? new AndroidSerial() : new WebSerial();
 
 // Insert the editor into the DOM
 const editor = setUpMonaco();

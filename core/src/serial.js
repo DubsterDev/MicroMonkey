@@ -696,9 +696,11 @@ export async function disconnectSerialPort() {
  * Outputs serial output to terminal.
  */
 async function addTerminalCallback() {
-    serialInterface.addSerialCallback((_, bytes) => {
-        terminal.write(bytes);
-    })
+    async function terminalDataReceived(text, bytes) {
+        terminal.write(text);
+    }
+    terminalDataReceived.bind(this);
+    serialInterface.addSerialCallback(terminalDataReceived)
 }
 
 let readyCallback;
