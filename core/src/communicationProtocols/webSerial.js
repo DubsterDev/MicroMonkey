@@ -25,7 +25,7 @@ export class WebSerial {
         // Add an event listener for new devices
         navigator.serial.addEventListener("connect", (ev) => {
             // If we haven't already connected to something, connect to this one
-            if (!this.ready) this.setPort(ev.target);
+            if (!this.ready && !document.hidden) this.setPort(ev.target);
         });
 
         // Add an event listener for disconnected devices
