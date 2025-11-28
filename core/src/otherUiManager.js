@@ -205,10 +205,9 @@ export async function renderWhatsNewScreen(rootElement) {
     // Define some what's new text
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
-    addHeading("Added", "h3", rootElement);
-    addParagraph("- Mobile layout", rootElement);
-    addParagraph("- Save button and command palette button in bottom bar", rootElement);
-    addParagraph("- Expiremental support for running on Android via Android app", rootElement);
+    addHeading("Changed", "h3", rootElement);
+    addParagraph("- Doesn't automatically connect to device if not shown", rootElement);
+    addParagraph("- Use Android Custom Tab instead of WebView for Android app", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
