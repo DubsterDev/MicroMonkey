@@ -759,7 +759,7 @@ export function toggleTerminal(editor) {
 
     // Update the sizing of the editor based on the height left after removing all the other elements
     editor.layout({
-        width: rightPanel.offsetWidth,
+        width: rightPanel.offsetWidth - 1,
         height: rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight
     });
     customEditorElement.style.height = (rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight) + "px";
@@ -813,7 +813,7 @@ export function startSerial(editor, upandrunningCallback = () => { }) {
     addCommand("findPorts", "Connect to board", findPorts);
 
     // Toggle the serial monitor's visiblity with the Serial Monitor button
-    document.getElementById("openSerialMonitor").addEventListener("click", toggleTerminal);
+    document.getElementById("openSerialMonitor").addEventListener("click", () => toggleTerminal(editor));
 
     // Toggle the serial monitor's visibility with the keyboard shortcut CTRL+`
     document.addEventListener("keydown", (event) => {
@@ -823,7 +823,7 @@ export function startSerial(editor, upandrunningCallback = () => { }) {
     });
 
     // Toggle the serial monitor's visibility with the command palette
-    addCommand("toggleSerialMonitor", "Show/Hide Serial Monitor", toggleTerminal);
+    addCommand("toggleSerialMonitor", "Show/Hide Serial Monitor", () => toggleTerminal(editor));
 
     // Soft-reboot the connected device with the command palette
     addCommand("softRebootDevice", "Reboot connected device", softReboot);

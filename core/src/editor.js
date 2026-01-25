@@ -193,7 +193,7 @@ export function changeModel(model) {
     const serialMonitor = document.getElementById("serialMonitor");
     const rightPanel = document.getElementById("rightPanel");
     editor.layout({
-        width: rightPanel.offsetWidth,
+        width: rightPanel.offsetWidth - 1,
         height: rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight
     });
 
