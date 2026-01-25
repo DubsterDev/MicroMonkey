@@ -31,7 +31,8 @@ export function setupUiManager() {
             const currentDir = ev.target.classList.contains("folder-name") ? ev.target.parentElement.dataset.fileExplorerPath : ev.target.parentElement.parentElement.dataset.fileExplorerPath;
 
             // Add a rename function that launches a rename
-            menuOptions.push(["Rename", () => {
+            menuOptions.push(["Rename", (ev) => {
+                ev.stopPropagation();
                 launchRename(currentDir);
             }]);
 
@@ -55,7 +56,8 @@ export function setupUiManager() {
             const fileName = ev.target.dataset.fileName;
 
             // Add a rename action that launches a rename
-            menuOptions.push(["Rename", () => {
+            menuOptions.push(["Rename", (ev) => {
+                ev.stopPropagation();
                 launchRename(currentDir, fileName);
             }]);
 
