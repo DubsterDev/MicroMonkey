@@ -207,13 +207,9 @@ export async function renderWhatsNewScreen(rootElement) {
     // Define some what's new text
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
-    addHeading("Changed", "h3", rootElement);
-    addParagraph("- Doesn't automatically connect to device if not in focus", rootElement);
-
-    addHeading("Added", "h3", rootElement);
-    addParagraph("- Mobile layout", rootElement);
-    addParagraph("- Save button and command palette button in bottom bar", rootElement);
-    addParagraph("- Expiremental support for running on Android via Android app", rootElement);
+    addHeading("Fixed", "h3", rootElement);
+    addParagraph("- Rename action didn't launch rename action", rootElement);
+    addParagraph("- Editor going off screen slightly", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
