@@ -15,6 +15,11 @@ You can try it out at [MicroMonkey.web.app](https://micromonkey.web.app)!
  - Adaptive dark/light theme, based on your OS setting
  - MicroPython flashing (`CTRL+SHIFT+P` > Flash MicroPython)
 
+> [!NOTE]
+> Android support is in the works. The Android app is currently usable but depending on the speed of your device parts of the Serial data is lost making it unpractical.
+> 
+> Ideally Chrome on Android would support Web Serial so we don't have to make an app.
+
 ## To-do
  - **Best Practices**
    - Tests
