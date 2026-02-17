@@ -1,6 +1,5 @@
 // The Android Serial Protocol
 export class AndroidSerial {
-    webSocket;
     serialCallbacks = [];
     onConnect;
     onDisconnect;
@@ -19,21 +18,13 @@ export class AndroidSerial {
     }
 
     /**
-     * Opens the WebSocket
+     * For compatability
      */
     async establishConnection() {
-        const myUrl = new URL(location.href).host;
-        this.webSocket = new WebSocket(`ws://${myUrl}/serial`);
-        this.webSocket.onopen = () => {
+        if (serialPolyfill.requestPort()) {
             this.ready = true;
             if (this.onConnect) this.onConnect();
         }
-        this.webSocket.onclose = () => {
-            this.ready = false;
-            if (this.onDisconnect) this.onDisconnect();
-        }
-
-        this.webSocket.addEventListener("message", this.serialDataReceived.bind(this));
     }
 
     /**
@@ -48,7 +39,12 @@ export class AndroidSerial {
      * @param {Uint8Array} bytes The bytes to write
      */
     async write(bytes) {
-        this.webSocket.send(bytes);
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+
+        serialPolyfill.write(btoa(binary));
     }
     
 
@@ -72,23 +68,21 @@ export class AndroidSerial {
      * Start disconnecting from the serial port, for compatibility
      */
     async preDisconnect() {
+        ready = false;
     }
     
     /**
      * Closes the serial port. Call preDisconnect first!
      */
     async disconnect() {
-        await this.webSocket.close();
         if (this.onDisconnect) this.onDisconnect();
     }
 
     /**
      * Notifies callbacks of serial data
+     * @param {Uint8Array} bytes
      */
-    async serialDataReceived(ev) {
-        // Convert the blob to an arraybuffer
-        const bytes = new Uint8Array(await ev.data.arrayBuffer());
-
+    async serialDataReceived(bytes) {
         // Create a textDecoder
         const textDecoder = new TextDecoder();
 
@@ -99,5 +93,21 @@ export class AndroidSerial {
         this.serialCallbacks.forEach(callback => {
             callback(text, bytes);
         })
+    }
+
+    /**
+     * Callback used by Android app to send Serial data
+     */
+    async _receiveSerialData(base64) {
+        // Get a binary string of the base64
+        const binaryString = atob(base64);
+
+        // Convert it to a Uint8Array
+        const value = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            value[i] = binaryString.charCodeAt(i);
+        }
+
+        this.serialDataReceived(value);
     }
 }
