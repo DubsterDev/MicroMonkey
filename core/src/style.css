@@ -97,6 +97,7 @@ main {
     width: 75%;
     flex: 1;
     position: relative;
+    overflow: hidden;
 }
 
 .serialMonitor {
