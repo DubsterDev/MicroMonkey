@@ -810,7 +810,7 @@ export function startSerial(editor, upandrunningCallback = () => { }) {
 
     // Toggle the serial monitor's visibility with the keyboard shortcut CTRL+`
     document.addEventListener("keydown", (event) => {
-        if (event.ctrlKey && event.key === "`") {
+        if (event.ctrlKey && event.code === "Backquote") {
             toggleTerminal(editor);
         }
     });
