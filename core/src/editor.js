@@ -28,7 +28,8 @@ export function setUpMonaco() {
     editor = monaco.editor.create(document.getElementById('codeEditor'), {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
-        theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark"
+        theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark",
+        automaticLayout: true
     });
 
     // Dynamically change the theme of the editor based on the system theme
@@ -189,14 +190,6 @@ export function createModel(content, uri, language = "python") {
  * @param {*} model The model to switch to. You can get one of these with {@link createModel}
  */
 export function changeModel(model) {
-    // Set the size of the editor to make sure it's right
-    const serialMonitor = document.getElementById("serialMonitor");
-    const rightPanel = document.getElementById("rightPanel");
-    editor.layout({
-        width: rightPanel.offsetWidth - 1,
-        height: rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight
-    });
-
     // Convert the URI to a string
     const modelUriString = model.uri.toString();
 

@@ -335,7 +335,6 @@ function renderTabs(activateActiveTab=true) {
             codeEditorElement.style.display = "none";
             customEditorElement.style.display = "block";
             customEditorElement.innerText = "";
-            customEditorElement.style.height = (rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight) + "px";
             tab.renderFunction(customEditorElement);
         }
     });
