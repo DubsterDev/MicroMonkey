@@ -208,8 +208,11 @@ export async function renderWhatsNewScreen(rootElement) {
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
     addHeading("Fixed", "h3", rootElement);
-    addParagraph("- Rename action didn't launch rename action", rootElement);
-    addParagraph("- Editor going off screen slightly", rootElement);
+    addParagraph("- Ctrl+` shortcut on Linux", rootElement);
+    addParagraph("- Automatic resizing of editor", rootElement);
+
+    addHeading("Changed", "h3", rootElement);
+    addParagraph("- Type checker is now ty instead of pyright", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
