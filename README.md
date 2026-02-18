@@ -23,8 +23,6 @@ You can try it out at [MicroMonkey.web.app](https://micromonkey.web.app)!
 ## To-do
  - **Best Practices**
    - Tests
- - **Editor**
-   - Make pyright use the passed `pyrightconfig.json` instead of ignoring it
 
 ## Contributing
 
