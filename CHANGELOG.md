@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Automatic resizing of editor
 
 ### Changed
- - Type checker is now ty instead of pyright
+ - Type checker is now ty instead of pyright (#4)
+ - Android app uses WebView again (#3)
 
 ## [1.3.2] - 2026-02-05
 

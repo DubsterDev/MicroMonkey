@@ -213,6 +213,7 @@ export async function renderWhatsNewScreen(rootElement) {
 
     addHeading("Changed", "h3", rootElement);
     addParagraph("- Type checker is now ty instead of pyright", rootElement);
+    addParagraph("- Android app uses WebView again", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
