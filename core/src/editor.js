@@ -30,7 +30,8 @@ export function setUpMonaco() {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
         theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark",
-        automaticLayout: true
+        automaticLayout: true,
+        fixedOverflowWidgets: true
     });
 
     // Dynamically change the theme of the editor based on the system theme
