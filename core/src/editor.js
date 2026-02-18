@@ -140,15 +140,15 @@ export function setUpMonaco() {
                 column: position.column,
             });
 
-            window.lastHover = hoverResult;
+            if (!hoverResult) return;
 
             // Return the result to Monaco
             return {
                 contents: [
                     {
                         value: hoverResult.markdown,
-                        supportHtml: false,
-                        isTrusted: false
+                        supportHtml: true,
+                        isTrusted: true
                     }
                 ],
                 range: {
