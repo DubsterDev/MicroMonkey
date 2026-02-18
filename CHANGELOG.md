@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Ctrl+` shortcut on Linux
  - Automatic resizing of editor
 
+### Changed
+ - Type checker is now ty instead of pyright
+
 ## [1.3.2] - 2026-02-05
 
 ### Fixed
