@@ -243,7 +243,9 @@ export function updateDiagnostics(uri, diagnostics) {
     };
 
     // A list of diagnostic codes to ingore
-    const ignoreDiagnostics = [];
+    const ignoreDiagnostics = [
+        "unresolved-import"
+    ];
 
     // An array containing the diagnostics for Monaco
     const newDiagnostics = [];
