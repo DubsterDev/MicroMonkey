@@ -20,7 +20,7 @@ Most of the files should be pretty self-explanatory, but here's the basic ideas:
  - [main.js](core/src/main.js) is the entrypoint. It's main job is starting the rest of the files
  - [openFilesManager.js](core/src/openFilesManager.js) is the tab manager and also holds the state of monaco models and calls custom editor render functions
  - [otherUiManager.js](core/src/otherUiManager.js) contains other random functions, like the context menu, launching a rename for folders and files, and has some render functions for the Welcome to MicroMonkey and What's New pages.
- - [pyrightManager.js](core/src/pyrightManager.js) is the layer between Monaco and the [pyright webworker](https://github.com/posit-dev/pyright/blob/pyright-browser/THIS_FORK.md), the built files for pyright are in [public/pyright](core/public/pyright/)
+ - [tyManager.js](core/src/tyManager.js) is the layer between Monaco and the [ty typechecker](https://github.com/astral-sh/ty/), the built files for ty are in the [ty_wasm](core/src/ty_wasm/) directory, and the WASM code itself is in the [public](core/public/ty_wasm_bg.wasm) directory. To build these files, you can follow [these instructions](tutorials/Build%20ty.md).
  - [serial.js](core/src/serial.js) is where all communication with the board happens, and it also controls the serial monitor and requesting a connection with the serial port
  - [settings.js](core/src/settings.js) contains all the logic for settings. This includes rendering the settings page and also has functions such as `getSetting` and `setSetting`
  - [style.css](core/src/style.css) is where all the styling for MicroMonkey is defined
