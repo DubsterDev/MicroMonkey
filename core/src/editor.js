@@ -1,8 +1,9 @@
 // Import dependencies
 import * as monaco from "monaco-editor";
-import { initializePyright, openFile, updateFile, getCompletions, getSignatureHelp, getHover } from "./pyrightManager";
 import { fileChanged } from "./openFilesManager";
 import { getSetting } from "./settings";
+import { getCompletions, getHover, getSignatureHelp, initializeTy, openFile, updateFile } from "./tyManager";
+import { CompletionKind, Severity } from "./ty_wasm/ty_wasm";
 
 // Create editor variable so we can access it later
 let editor;
@@ -12,8 +13,8 @@ let editor;
  * @returns {*} Instance of monaco
  */
 export function setUpMonaco() {
-    // Start pyright
-    initializePyright();
+    // Start ty
+    initializeTy(updateDiagnostics);
 
     // Define MonacoEnviroment so it gets the service worker from the right spot
     self.MonacoEnvironment = {
@@ -29,7 +30,8 @@ export function setUpMonaco() {
         value: ['print("Hello")'].join('\n'),
         language: 'python',
         theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark",
-        automaticLayout: true
+        automaticLayout: true,
+        fixedOverflowWidgets: true
     });
 
     // Dynamically change the theme of the editor based on the system theme
@@ -42,54 +44,48 @@ export function setUpMonaco() {
     // Register python completion provider
     monaco.languages.registerCompletionItemProvider('python', {
         provideCompletionItems: async (model, position) => {
-            // Array mapping from what the Language Server returns and what Monaco expects
-            const lspToMonacoKind = {
-                1: monaco.languages.CompletionItemKind.Text,
-                2: monaco.languages.CompletionItemKind.Method,
-                3: monaco.languages.CompletionItemKind.Function,
-                4: monaco.languages.CompletionItemKind.Constructor,
-                5: monaco.languages.CompletionItemKind.Field,
-                6: monaco.languages.CompletionItemKind.Variable,
-                7: monaco.languages.CompletionItemKind.Class,
-                8: monaco.languages.CompletionItemKind.Interface,
-                9: monaco.languages.CompletionItemKind.Module,
-                10: monaco.languages.CompletionItemKind.Property,
-                11: monaco.languages.CompletionItemKind.Unit,
-                12: monaco.languages.CompletionItemKind.Value,
-                13: monaco.languages.CompletionItemKind.Enum,
-                14: monaco.languages.CompletionItemKind.Keyword,
-                15: monaco.languages.CompletionItemKind.Snippet,
-                16: monaco.languages.CompletionItemKind.Color,
-                17: monaco.languages.CompletionItemKind.File,
-                18: monaco.languages.CompletionItemKind.Reference,
-                19: monaco.languages.CompletionItemKind.Folder,
-                20: monaco.languages.CompletionItemKind.EnumMember,
-                21: monaco.languages.CompletionItemKind.Constant,
-                22: monaco.languages.CompletionItemKind.Struct,
-                23: monaco.languages.CompletionItemKind.Event,
-                24: monaco.languages.CompletionItemKind.Operator,
-                25: monaco.languages.CompletionItemKind.TypeParameter,
+            // Array mapping from what ty returns and what Monaco expects
+            const tyToMonacoKind = {
+                [CompletionKind.Text]: monaco.languages.CompletionItemKind.Text,
+                [CompletionKind.Method]: monaco.languages.CompletionItemKind.Method,
+                [CompletionKind.Function]: monaco.languages.CompletionItemKind.Function,
+                [CompletionKind.Constructor]: monaco.languages.CompletionItemKind.Constructor,
+                [CompletionKind.Field]: monaco.languages.CompletionItemKind.Field,
+                [CompletionKind.Variable]: monaco.languages.CompletionItemKind.Variable,
+                [CompletionKind.Class]: monaco.languages.CompletionItemKind.Class,
+                [CompletionKind.Interface]: monaco.languages.CompletionItemKind.Interface,
+                [CompletionKind.Module]: monaco.languages.CompletionItemKind.Module,
+                [CompletionKind.Property]: monaco.languages.CompletionItemKind.Property,
+                [CompletionKind.Unit]: monaco.languages.CompletionItemKind.Unit,
+                [CompletionKind.Value]: monaco.languages.CompletionItemKind.Value,
+                [CompletionKind.Enum]: monaco.languages.CompletionItemKind.Enum,
+                [CompletionKind.Keyword]: monaco.languages.CompletionItemKind.Keyword,
+                [CompletionKind.Snippet]: monaco.languages.CompletionItemKind.Snippet,
+                [CompletionKind.Color]: monaco.languages.CompletionItemKind.Color,
+                [CompletionKind.File]: monaco.languages.CompletionItemKind.File,
+                [CompletionKind.Reference]: monaco.languages.CompletionItemKind.Reference,
+                [CompletionKind.Folder]: monaco.languages.CompletionItemKind.Folder,
+                [CompletionKind.EnumMember]: monaco.languages.CompletionItemKind.EnumMember,
+                [CompletionKind.Constant]: monaco.languages.CompletionItemKind.Constant,
+                [CompletionKind.Struct]: monaco.languages.CompletionItemKind.Struct,
+                [CompletionKind.Event]: monaco.languages.CompletionItemKind.Event,
+                [CompletionKind.Operator]: monaco.languages.CompletionItemKind.Operator,
+                [CompletionKind.TypeParameter]: monaco.languages.CompletionItemKind.TypeParameter,
             };
 
-            // Get completions from pyright
+            // Get completions from ty
             const completions = await getCompletions(model.uri.toString(), {
-                line: position.lineNumber - 1,
-                character: position.column - 1
+                line: position.lineNumber,
+                column: position.column
             });
 
-            // Make sure result is an array
-            const items = Array.isArray(completions)
-                ? completions
-                : completions.items;
-
             // Map suggestions to a monaco style array
-            const suggestions = items.map((item) => ({
-                label: item.label,
-                kind: lspToMonacoKind[item.kind] ?? monaco.languages.CompletionItemKind.Text,
-                insertText: item.insertText || item.label,
+            const suggestions = completions.map((item) => ({
+                label: item.name,
+                kind: tyToMonacoKind[item.kind] ?? monaco.languages.CompletionItemKind.Text,
+                insertText: item.insert_text || item.name,
                 detail: item.detail,
                 documentation: item.documentation,
-                sortText: item.sortText,
             }));
 
             return { suggestions };
@@ -103,16 +99,17 @@ export function setUpMonaco() {
             // Convert the URI to a string
             const uri = model.uri.toString();
 
-            // Get signature help from pyright
+            // Get signature help from ty
             const result = await getSignatureHelp(uri, {
-                line: position.lineNumber - 1,
-                character: position.column - 1,
+                line: position.lineNumber,
+                column: position.column,
             });
+            window.signatureHelp = result;
 
             // If there are no results, return no results
             if (!result || !result.signatures?.length) return { value: { signatures: [], activeSignature: 0, activeParameter: 0 }, dispose: () => { } };
 
-            // Convert signatures from LSP style to monaco style
+            // Convert signatures from ty style to monaco style
             const signatures = result.signatures.map((sig) => ({
                 label: sig.label,
                 documentation: sig.documentation,
@@ -126,8 +123,8 @@ export function setUpMonaco() {
             return {
                 value: {
                     signatures,
-                    activeSignature: result.activeSignature ?? 0,
-                    activeParameter: result.activeParameter ?? 0
+                    activeSignature: result.active_signature ?? 0,
+                    activeParameter: result.signatures[result.active_signature].active_parameter ?? 0
                 },
                 dispose: () => { }
             };
@@ -139,24 +136,26 @@ export function setUpMonaco() {
         provideHover: async function (model, position, token) {
             // Get the result of hovering
             const hoverResult = await getHover(model.uri.toString(), {
-                line: position.lineNumber - 1,
-                character: position.column - 1,
+                line: position.lineNumber,
+                column: position.column,
             });
-            
+
+            if (!hoverResult) return;
+
             // Return the result to Monaco
             return {
                 contents: [
                     {
-                        value: hoverResult.contents.value,
-                        supportHtml: false,
-                        isTrusted: false
+                        value: hoverResult.markdown,
+                        supportHtml: true,
+                        isTrusted: true
                     }
                 ],
                 range: {
-                    endColumn: hoverResult.range.end.character + 1,
-                    endLineNumber: hoverResult.range.end.line + 1,
-                    startColumn: hoverResult.range.start.character + 1,
-                    startLineNumber: hoverResult.range.start.line + 1
+                    endColumn: hoverResult.range.end.column,
+                    endLineNumber: hoverResult.range.end.line,
+                    startColumn: hoverResult.range.start.column,
+                    startLineNumber: hoverResult.range.start.line
                 }
             };
         }
@@ -201,23 +200,18 @@ export function changeModel(model) {
 
     // Remove any diagnostics that are applied to this editor
     // if syntax checking is disabled
-    if (!getSetting("syntax-checking")) monaco.editor.setModelMarkers(model, "pyright", []);
+    if (!getSetting("syntax-checking")) monaco.editor.setModelMarkers(model, "ty", []);
 
-    // Let pyright know we're using a different file
+    // Let ty know we're using a different file
     openFile(modelUriString, model.getValue());
 
     // Add a listener for when the user types in the code editor
     model.onDidChangeContent((e) => {
-        // Get the changes to the file
-        const changes = [{
-            text: model.getValue()
-        }];
-
         // Let file manager know that the file has changed
         fileChanged(modelPath);
 
-        // Tell pyright the file has changed
-        updateFile(modelUriString, changes);
+        // Tell ty the file has changed
+        updateFile(modelUriString, model.getValue());
     })
 }
 
@@ -226,7 +220,8 @@ export function changeModel(model) {
  * @param {Array} diagnostics An array of Language Server Protocol style diagnostics
  * @param {string} uri The URI the diagnostics are for
  */
-export function updateDiagnostics(diagnostics, uri) {
+export function updateDiagnostics(uri, diagnostics) {
+    window.diags = diagnostics;
     // Don't show diagnostics if they're disabled
     if (!getSetting("syntax-checking")) return;
 
@@ -239,31 +234,17 @@ export function updateDiagnostics(diagnostics, uri) {
     // If the language of the model is not python, don't render the diagnostics
     if (model.getLanguageId() !== "python") return;
 
-    // An array of monaco marker types to convert LSP to Monaco
-    const monacoMarkerType = [
-        undefined,
-        monaco.MarkerSeverity.Error,
-        monaco.MarkerSeverity.Warning,
-        monaco.MarkerSeverity.Info,
-        monaco.MarkerSeverity.Hint
-    ];
+    // An array of monaco marker types to convert ty to Monaco
+    const monacoMarkerType = {
+        [Severity.Fatal]: monaco.MarkerSeverity.Error,
+        [Severity.Error]: monaco.MarkerSeverity.Error,
+        [Severity.Warning]: monaco.MarkerSeverity.Warning,
+        [Severity.Info]: monaco.MarkerSeverity.Info,
+    };
 
     // A list of diagnostic codes to ingore
     const ignoreDiagnostics = [
-        "reportMissingImports",
-        "reportMissingModuleSource",
-        "reportGeneralTypeIssues",
-        "reportReturnType",
-        "reportUnknownParameterType",
-        "reportUnknownArgumentType",
-        "reportUnknownLambdaType",
-        "reportUnknownVariableType",
-        "reportUnknownMemberType",
-        "reportMissingParameterType",
-        "reportMissingTypeArgument",
-        "reportArgumentType",
-        "reportCallIssue",
-        "reportIndexIssue"
+        "unresolved-import"
     ];
 
     // An array containing the diagnostics for Monaco
@@ -272,17 +253,18 @@ export function updateDiagnostics(diagnostics, uri) {
     // Loop through the array of diagnostics
     diagnostics.forEach(diagnostic => {
         // Skip it if it is a missing module source or unknown module
-        if (ignoreDiagnostics.includes(diagnostic.code)) return;
+        if (ignoreDiagnostics.includes(diagnostic.diagnostic.id())) return;
+
         // Create a Monaco style diagnostic
         const newDiagnostic = {
-            endColumn: diagnostic.range.end.character + 1,
-            endLineNumber: diagnostic.range.end.line + 1,
-            message: diagnostic.message,
-            source: diagnostic.source,
-            severity: monacoMarkerType[diagnostic.severity],
-            startColumn: diagnostic.range.start.character + 1,
-            startLineNumber: diagnostic.range.start.line + 1,
-            code: diagnostic.code
+            endColumn: diagnostic.range.end.column,
+            endLineNumber: diagnostic.range.end.line,
+            message: diagnostic.diagnostic.message(),
+            source: "ty",
+            severity: monacoMarkerType[diagnostic.diagnostic.severity()],
+            startColumn: diagnostic.range.start.column,
+            startLineNumber: diagnostic.range.start.line,
+            code: diagnostic.diagnostic.id()
         };
 
         // Push the new diagnostic to the array
@@ -290,5 +272,5 @@ export function updateDiagnostics(diagnostics, uri) {
     });
 
     // Update Monaco with the new diagnostics
-    monaco.editor.setModelMarkers(model, "pyright", newDiagnostics);
+    monaco.editor.setModelMarkers(model, "ty", newDiagnostics);
 }

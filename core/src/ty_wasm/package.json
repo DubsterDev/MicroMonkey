@@ -1,0 +1,25 @@
+{
+  "name": "ty_wasm",
+  "type": "module",
+  "collaborators": [
+    "Charlie Marsh <charlie.r.marsh@gmail.com>"
+  ],
+  "description": "WebAssembly bindings for ty",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/astral-sh/ruff"
+  },
+  "files": [
+    "ty_wasm_bg.wasm",
+    "ty_wasm.js",
+    "ty_wasm.d.ts"
+  ],
+  "main": "ty_wasm.js",
+  "homepage": "https://docs.astral.sh/ruff",
+  "types": "ty_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
