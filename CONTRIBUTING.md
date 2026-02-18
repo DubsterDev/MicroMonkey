@@ -11,17 +11,20 @@ Once all the dependecies are installed, you can start the development server at 
 All new functions should have a JSDoc, and ideally plenty of comments.
 
 Most of the files should be pretty self-explanatory, but here's the basic ideas:
+ - [communicationProtocols/androidSerial.js](core/src/communicationProtocols/androidSerial.js) contains code for communicating with the Android app's serial bridge.
+ - [communicationProtocols/webSerial.js](core/src/communicationProtocols/webSerial.js) contains code for communicating using the Web Serial API.
  - [commandPalette.js](core/src/commandPalette.js) contains the command palette that shows up when the user presses `CTRL+SHIFT+P`
  - [constants.js](core/src/constants.js) contains constants that are used in various places. Right now, this only includes the MicroMonkey version number
  - [customEditorHelperFunctions.js](core/src/customEditorHelperFunctions.js) contains helper functions for the render functions of custom editors
  - [editor.js](core/src/editor.js) has the bulk of the code for managing the Monaco editor, including showing autocompletions.
  - [fileExplorer.js](core/src/fileExplorer.js) is the main logic for rendering the file explorer on the left hand side of the IDE
- - [flasher.js](core/src/flasher.js) contains the code for flashing ESP32 devices. In the future, I would like to expand this to include support for more types of devices
+ - [flasher.js](core/src/flasher.js) contains the code for flashing devices.
+ - [espFlasher.js](core/src/espFlasher.js) contains the code for flashing ESP32 devices.
  - [main.js](core/src/main.js) is the entrypoint. It's main job is starting the rest of the files
  - [openFilesManager.js](core/src/openFilesManager.js) is the tab manager and also holds the state of monaco models and calls custom editor render functions
  - [otherUiManager.js](core/src/otherUiManager.js) contains other random functions, like the context menu, launching a rename for folders and files, and has some render functions for the Welcome to MicroMonkey and What's New pages.
  - [tyManager.js](core/src/tyManager.js) is the layer between Monaco and the [ty typechecker](https://github.com/astral-sh/ty/), the built files for ty are in the [ty_wasm](core/src/ty_wasm/) directory, and the WASM code itself is in the [public](core/public/ty_wasm_bg.wasm) directory. To build these files, you can follow [these instructions](tutorials/Build%20ty.md).
- - [serial.js](core/src/serial.js) is where all communication with the board happens, and it also controls the serial monitor and requesting a connection with the serial port
+ - [serial.js](core/src/serial.js) is where all communication with the board happens.
  - [settings.js](core/src/settings.js) contains all the logic for settings. This includes rendering the settings page and also has functions such as `getSetting` and `setSetting`
  - [style.css](core/src/style.css) is where all the styling for MicroMonkey is defined
  - [index.html](core/index.html) is where the main MicroMonkey interface is, but some things are added programmatically in the previously mentioned JavaScript files
