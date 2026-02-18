@@ -5,14 +5,33 @@ let portCallback;
 
 ipcMain.handle("port_selected", (event, port) => {
     portCallback(port);
+});
+
+ipcMain.handle("minimize", () => {
+    win.minimize();
+});
+
+ipcMain.handle("fullscreen", () => {
+    if (win.isMaximized()) {
+        win.restore();
+    } else {
+        win.maximize();
+    }
 })
+
+ipcMain.handle("close", () => {
+    win.close();
+})
+
+let win;
 const createWindow = () => {
-    const win = new BrowserWindow({
+    win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
-        }
+        },
+        frame: false
     })
 
     if (!app.isPackaged) {

@@ -8,5 +8,14 @@ contextBridge.exposeInMainWorld('electron', {
     },
     portSelected: (portId) => {
         ipcRenderer.invoke("port_selected", portId);
+    },
+    minimize: () => {
+        ipcRenderer.invoke("minimize");
+    },
+    fullscreen: () => {
+        ipcRenderer.invoke("fullscreen");
+    },
+    close: () => {
+        ipcRenderer.invoke("close");
     }
 })

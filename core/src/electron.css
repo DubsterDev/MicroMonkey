@@ -1,0 +1,24 @@
+.topArea {
+    -webkit-app-region: drag;
+}
+
+.tab {
+    -webkit-app-region: no-drag;
+}
+
+.windowControls {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    height: 100%;
+}
+
+.windowControls button {
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    -webkit-app-region: no-drag;
+    user-select: none;
+}
