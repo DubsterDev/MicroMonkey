@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="shortcut icon" href="/assets/monkeyface.svg" type="image/x-icon">
     <meta name="color-scheme" content="dark light">
 </head>
+
 <body>
     <main>
         <div class="mostContent">
@@ -23,7 +25,14 @@
                 <div data-file-explorer-path="/"></div>
             </div>
             <div class="rightPanel" id="rightPanel">
-                <div id="tabs" class="tabs"></div>
+                <div class="topArea">
+                    <div id="tabs" class="tabs"></div>
+                    <div id="windowControls" class="windowControls">
+                        <button class="material-symbols-outlined" id="minimizeWindow">minimize</button>
+                        <button class="material-symbols-outlined" id="fullscreenWindow">select_window</button>
+                        <button class="material-symbols-outlined" id="closeWindow">close</button>
+                    </div>
+                </div>
                 <div id="customEditor"></div>
                 <div id="codeEditor"></div>
                 <div class="serialMonitor" id="serialMonitor">
@@ -72,4 +81,5 @@
     </main>
     <script type="module" src="/src/main.js"></script>
 </body>
+
 </html>

@@ -1,4 +1,5 @@
 // The Web Serial Protocol
+import { getInput } from "../commandPalette";
 
 export class WebSerial {
     port;
@@ -33,7 +34,12 @@ export class WebSerial {
             // Set the ready state to false and call the onDisconnect callback
             this.ready = false;
             if (this.onDisconnect) this.onDisconnect();
-        })
+        });
+
+        // If electron, handle serial port selection
+        if (import.meta.env.MODE === "electron") {
+            electron.registerPortSelectionCallback(this.selectPort.bind(this));
+        }
     }
 
     /**
@@ -152,5 +158,19 @@ export class WebSerial {
                 callback(text, value);
             })
         }
+    }
+
+    /**
+     * ELECTRON ONLY:
+     * Callback to ask the users for port selection.
+     */
+    async selectPort(portList) {
+        const ports = ["Cancel", ...portList.map(port => port.portName)];
+        const port = await getInput("Select a port", "Select a port", "", ports, false);
+        if (port && port !== "Cancel") {
+            console.log(port, portList)
+            const selectedPortId = portList.filter(item => item.portName === port)[0].portId;
+            electron.portSelected(selectedPortId);
+        } else electron.portSelected('');
     }
 }

@@ -1,3 +1,8 @@
+if (import.meta.env.MODE === "electron") {
+    import("./electron.css");
+    import("./electron.js");
+}
+
 // Import the function to start the editor
 import { setUpMonaco } from "./editor";
 
