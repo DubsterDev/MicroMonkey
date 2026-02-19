@@ -97,18 +97,15 @@ main {
     width: 75%;
     flex: 1;
     position: relative;
+    overflow: hidden;
 }
 
 .serialMonitor {
     background-color: var(--background-color);
     border-top: 1px solid var(--border-color);
     flex-shrink: 0;
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
     height: 30%;
-    z-index: 99;
 }
 
 .serialMonitor .terminal {
@@ -120,10 +117,13 @@ main {
     display: none;
 }
 
+#codeEditor {
+    overflow: hidden;
+}
+
 #customEditor {
     padding: 12px 0 0 12px;
     overflow: auto;
-    flex: 0 0 auto;
 }
 
 #customEditor:empty {

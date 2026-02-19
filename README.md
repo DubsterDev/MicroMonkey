@@ -16,15 +16,13 @@ You can try it out at [MicroMonkey.web.app](https://micromonkey.web.app)!
  - MicroPython flashing (`CTRL+SHIFT+P` > Flash MicroPython)
 
 > [!NOTE]
-> Android support is in the works. The Android app is currently usable but depending on the speed of your device parts of the Serial data is lost making it unpractical.
+> Android support is in the works. The Android app is currently usable but not thoroughly tested.
 > 
 > Ideally Chrome on Android would support Web Serial so we don't have to make an app.
 
 ## To-do
  - **Best Practices**
    - Tests
- - **Editor**
-   - Make pyright use the passed `pyrightconfig.json` instead of ignoring it
 
 ## Contributing
 

@@ -24,9 +24,6 @@ fileInput.onchange = () => requestReRender(myFilePath);
  * Add event listeners for flasher functionality, such as the button on the bottom right of the IDE and the command in the command palette.
  */
 export function addFlasherEventListeners() {
-    // Add an event listener to the button on the bottom right of the IDE
-    // document.getElementById("flashMicroPython").addEventListener("click", openFlasher)
-
     // Add a command to the command palette
     addCommand("openMicroPythonFlasher", "Flash MicroPython", openFlasher);
 }

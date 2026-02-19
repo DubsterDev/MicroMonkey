@@ -5,13 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.3.2 (2026-02-05)
+## [Unreleased]
+
+## [1.3.3] - 2026-02-18
+
+### Fixed
+ - Ctrl+` shortcut on Linux
+ - Automatic resizing of editor
+
+### Changed
+ - Type checker is now ty instead of pyright (#4)
+ - Android app uses WebView again (#3)
+
+## [1.3.2] - 2026-02-05
 
 ### Fixed
  - Rename action didn't launch rename action
  - Editor going off screen slightly
 
-## 1.3.1 (2026-01-05)
+## [1.3.1] - 2026-01-05
 
 ### Changed
  - Doesn't automatically connect to device if not in focus
@@ -21,20 +33,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Save button and command palette button in bottom bar
  - Expiremental support for running on Android via Android app
 
-## 1.3.1-beta (2025-11-28)
+## [1.3.1-beta] - 2025-11-28
 
 ### Changed
  - Doesn't automatically connect to device if not shown
  - Use Android Custom Tab instead of WebView for Android app
 
-## 1.3.0-beta (2025-11-24)
+## [1.3.0-beta] - 2025-11-24
 
 ### Added
  - Mobile layout
  - Save button and command palette button in bottom bar
  - Expiremental support for running on Android via Android app
 
-## 1.2.1 (2025-11-21)
+## [1.2.1] - 2025-11-21
 
 ### Added
  - Monkey image when no tabs are opened
@@ -48,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
  - Exception when trying to access the language ID on a undefined Monaco Model
 
-## 1.2.0 (2025-10-23)
+## [1.2.0] - 2025-10-23
 
 ### Added
  - Keyboard shortcut CTRL+` for toggling serial monitor visibility
@@ -64,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Command palette can no longer hide behind the editor
  - Tab strip shrinking when serial monitor is toggled
 
-## 1.1.3 (2025-10-10)
+## [1.1.3] - 2025-10-10
 
 ### Added
  - Beta download as ZIP functionality
@@ -73,7 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Improved MicroPython flasher UI
  - Seperated logic for espressif devices in flasher to a seperate file
 
-## 1.1.2 (2025-10-01)
+## [1.1.2] - 2025-10-01
 
 ### Added
  - Ability to use arrow keys to select command shown in command palette (`CTRL+SHIFT+P`)
@@ -83,7 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Requests confirmation when closing an unsaved file
 
-## 1.1.1 (2025-10-01)
+## [1.1.1] - 2025-10-01
 
 ### Added
  - Options to close tabs in context menu when right-clicking on a tab
@@ -93,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Made tabs change the locations they reference when they are renamed or they're parent directories are renamed so that it always references an existing file
  - Made custom editors (Welcome to MicroMonkey, Settings, etc), stay inside the right area
 
-## 1.1.0 (2025-09-30)
+## [1.1.0] - 2025-09-30
 
 ### Added
  - What's New page
@@ -103,3 +115,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Made file actions always visible on root folder
  - Various internal modifications
+
+[unreleased]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1...v1.3.3
+[1.3.2]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1-beta...v1.3.1
+[1.3.1-beta]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.0-beta...v1.3.1-beta
+[1.3.0-beta]: https://github.com/FXZFun/MicroMonkey/compare/v1.2.1...v1.3.0-beta
+[1.2.1]: https://github.com/FXZFun/MicroMonkey/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.3...v1.2.0
+[1.1.3]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.2...v1.1.3
+[1.1.2]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.0...v1.1.1

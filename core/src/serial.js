@@ -757,13 +757,6 @@ export function toggleTerminal(editor) {
         serialMonitor.style.display = "none";
     }
 
-    // Update the sizing of the editor based on the height left after removing all the other elements
-    editor.layout({
-        width: rightPanel.offsetWidth - 1,
-        height: rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight
-    });
-    customEditorElement.style.height = (rightPanel.offsetHeight - serialMonitor.offsetHeight - document.getElementById("tabs").offsetHeight) + "px";
-
     // Use the fit addon to fit the terminal
     fitAddon.fit();
 }
@@ -817,7 +810,7 @@ export function startSerial(editor, upandrunningCallback = () => { }) {
 
     // Toggle the serial monitor's visibility with the keyboard shortcut CTRL+`
     document.addEventListener("keydown", (event) => {
-        if (event.ctrlKey && event.key === "`") {
+        if (event.ctrlKey && event.code === "Backquote") {
             toggleTerminal(editor);
         }
     });
