@@ -8,9 +8,9 @@ webPackageJson["version"] = version;
 writeFileSync("core/package.json", JSON.stringify(webPackageJson, null, 2));
 
 // Electron package.json
-const webPackageJson = JSON.parse(readFileSync("electron/package.json").toString());
-webPackageJson["version"] = version;
-writeFileSync("electron/package.json", JSON.stringify(webPackageJson, null, 2));
+const electronPackageJson = JSON.parse(readFileSync("electron/package.json").toString());
+electronPackageJson["version"] = version;
+writeFileSync("electron/package.json", JSON.stringify(electronPackageJson, null, 2));
 
 // Constants.js
 const constantsJs = readFileSync("core/src/constants.js").toString();
