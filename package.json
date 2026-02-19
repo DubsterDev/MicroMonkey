@@ -5,6 +5,8 @@
         "build-web": "cd core && npm run build && cd ..",
         "build-android": "cd core && npm run build -- --mode android && cd .. && node copyBuildToAndroid.js",
         "build-android-apk": "npm run build-android && cd android && gradlew.bat assembleRelease && apksigner sign --ks key.keystore --ks-key-alias micromonkey --out app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-release-unsigned.apk && cd ..",
+        "build-electron": "cd core && npm run build -- --mode electron && cd .. && node copyBuildToElectron.js",
+        "build-electron-packages": "npm run build-electron && cd electron && npm run make && cd ..",
         "deploy-web": "cd core && npm run deploy && cd ..",
         "deploy-beta-web": "cd core && npm run deploy-beta && cd .."
     }
