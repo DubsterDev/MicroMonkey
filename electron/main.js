@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
+
 const path = require("path");
 
 let portCallback;
@@ -39,8 +40,6 @@ const createWindow = () => {
     } else {
         win.loadFile(path.resolve(
             __dirname,
-            '..',
-            'core',
             'dist',
             'index.html'
         ))
