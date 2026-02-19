@@ -16,7 +16,7 @@ export async function initializeTy(diagnosticsCallback) {
     onDiagnosticsChanged = diagnosticsCallback;
 
     // Initialize ty
-    await init({module_or_path: "/ty_wasm_bg.wasm"});
+    await init({module_or_path: "ty_wasm_bg.wasm"});
 
     // Set the log level
     initLogging(LogLevel.Warn);
