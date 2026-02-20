@@ -5,12 +5,10 @@ import '@xterm/xterm/css/xterm.css';
 import { getSetting } from "./settings";
 import { newFolderStructure } from "./fileExplorer";
 import JSZip from "jszip";
-import { addCommand } from "./commandPalette";
+import { addCommand, removeCommand } from "./commandPalette";
 
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");
-const rightPanel = document.getElementById("rightPanel");
-const customEditorElement = document.getElementById("customEditor");
 
 // Create the terminal
 const terminalFontSize = 18;
@@ -81,9 +79,6 @@ export async function writeFile(code, filename, allowSoftReboot = true) {
     // Execute the code
     await runCode(fileWriteCode)
 
-    // Interrupt any scripts
-    await interruptScript();
-
     // Reboot the board if that setting is checked
     if (getSetting("reboot-on-save") && allowSoftReboot) await softReboot();
 }
@@ -110,8 +105,6 @@ export async function getFile(filename) {
 file = open("${filename.replaceAll("\"", "\\\"")}", "r")
 print(file.read())
 file.close()`);
-    // Interrupt the script
-    await interruptScript();
 
     return result;
 }
@@ -145,9 +138,6 @@ def get_contents_of_dir(dir_name="/"):
     return result
 print(get_contents_of_dir())`);
 
-    // Interrupt the script one last time
-    await interruptScript();
-
     return JSON.parse(result.replaceAll("'", "\""));
 
 }
@@ -172,9 +162,6 @@ export async function createFile(filePath) {
     await runCode(`import os
 f = open("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "w")
 f.close()`)
-
-    // Interrupt any running scripts
-    await interruptScript();
 }
 
 /**
@@ -196,9 +183,6 @@ export async function createDirectory(filePath) {
     // Create a folder on the board
     await runCode(`import os
 os.mkdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
-
-    // Interrupt any running scripts
-    await interruptScript();
 }
 
 
@@ -222,9 +206,6 @@ export async function renameFile(oldFilePath, newFilePath) {
     // Rename the file on the board
     await runCode(`import os
 os.rename("${oldFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "${newFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
-
-    // And interrupt any scripts
-    await interruptScript();
 }
 
 /**
@@ -246,9 +227,6 @@ export async function removeFile(filePath) {
     // Delete the file from the board
     await runCode(`import os
 os.remove("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`)
-
-    // Interrupt the script
-    await interruptScript();
 }
 
 /**
@@ -273,9 +251,6 @@ export async function removeDirectory(filePath) {
     // Delete a folder off the board
     await runCode(`import os
 os.rmdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
-
-    // Interrupt any running scripts
-    await interruptScript();
 }
 
 /**
@@ -307,9 +282,6 @@ def recursively_delete_dir(dir_name="/"):
             os.remove(dir_name + file[0])
     os.rmdir(dir_name)
 recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
-
-    // Interrupt any running scripts
-    await interruptScript();
 }
 
 /**
