@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+ - Retrieving files from the connected board is now more reliable
+
 ## [1.3.3] - 2026-02-18
 
 ### Fixed
