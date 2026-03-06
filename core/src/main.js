@@ -13,7 +13,7 @@ import { getFiles, startSerial } from "./serial";
 import { addNewFileEventListeners, newFolderStructure } from "./fileExplorer";
 
 // For managing the open tabs
-import { initializeOpenFilesManager, openTab, saveActiveFile } from "./openFilesManager";
+import { closeActiveTab, initializeOpenFilesManager, openTab, saveActiveFile } from "./openFilesManager";
 
 // Mainly just for the context menu, but there are also some render functions here
 import { renderWelcomeScreen, renderWhatsNewScreen, setupUiManager, startWhatsNewScreenIfVersionChanged } from "./otherUiManager";
@@ -52,11 +52,20 @@ startSerial(editor, async () => {
     newFolderStructure(await getFiles());
 });
 
-// When CTRL+S is pressed, save the active file
 document.addEventListener("keydown", (ev) => {
     if (ev.ctrlKey && ev.key.toLowerCase() === "s") {
+        // When CTRL+S is pressed, save the active file
         ev.preventDefault();
         saveActiveFile();
+        return true;
+    } else if (ev.ctrlKey && ev.key.toLowerCase() === "w") {
+        // When CTRL+W is pressed, close the active file
+        ev.preventDefault();
+        closeActiveTab();
+        return true;
+    } else if (ev.ctrlKey && ev.key.toLowerCase() === "r") {
+        // When CTRL+R is pressed, don't refresh to prevent accidents
+        ev.preventDefault();
         return true;
     }
 });

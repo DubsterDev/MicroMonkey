@@ -166,13 +166,20 @@ export function renameTabsInDirectory(oldPath, newPath) {
 /**
  * Remove a tab from the tab strip if it's open
  * @param {string} path The file path
+ * @param {boolean} force Forces the tab to close even if unsaved. Default is false
  */
-export function closeTab(path) {
+export async function closeTab(path, force=false) {
     // Get the tab object
     const tab = tabs[path];
 
     // Return if the tab isn't open
     if (tab === undefined || tab === null) return;
+
+    // If the tab is unsaved, confirm with the user
+    if (!tab.saved && !force) {
+        const result = await getInput(`${tab.title} isn't saved. Are you sure you want to close it?`, "Pick an option", "", ["No", "Yes"], false);
+        if (result !== "Yes") return;
+    }
 
     // Dispose of the model, if it is monaco
     if (tab.type === "monaco") tab.model.dispose();
@@ -201,6 +208,19 @@ export function closeTabsInDirectory(path) {
         // And close a tab if the path starts with the provided path
         if (tabPath.startsWith(path)) closeTab(tabPath);
     });
+}
+
+/**
+ * Closes the active tab
+ * @param {boolean} force Forces the tab to close even if unsaved. Default is false
+ */
+export function closeActiveTab(force=false) {
+    Object.keys(tabs).forEach(path => {
+        const tab = tabs[path];
+        if (tab.active) {
+            closeTab(path, force);            
+        }
+    })
 }
 
 /**
@@ -286,12 +306,6 @@ function renderTabs(activateActiveTab=true) {
         closeBtn.addEventListener("click", async (ev) => {
             // Prevent the tab container's click event from being triggered
             ev.stopPropagation();
-
-            // If the tab is unsaved, confirm with the user
-            if (!tab.saved) {
-                const result = await getInput(`${tab.title} isn't saved. Are you sure you want to close it?`, "Pick an option", "", ["No", "Yes"], false);
-                if (result !== "Yes") return;
-            }
 
             // Close the tab
             closeTab(path);
