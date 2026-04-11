@@ -28,6 +28,9 @@ export default defineConfig({
         ]
       }
     ],
+    notFound: {
+      quote: "Sorry, this page could not be found."
+    },
     // socialLinks: [
     //   { icon: 'github', link: 'https://github.com/FXZFun/micromonkey' }
     // ]
