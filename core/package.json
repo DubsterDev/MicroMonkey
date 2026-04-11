@@ -15,9 +15,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "deploy": "npm run build && node copy-firebase-json.mjs prod && firebase deploy",
-    "deploy-beta": "npm run build && node copy-firebase-json.mjs beta && firebase deploy"
+    "preview": "vite preview"
   },
   "keywords": [],
   "author": "Dubster Web",

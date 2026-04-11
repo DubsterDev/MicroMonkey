@@ -1,7 +1,8 @@
 {
   "hosting": {
-    "public": "dist",
+    "public": "docs/.vitepress/dist",
     "site": "micromonkey",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",
