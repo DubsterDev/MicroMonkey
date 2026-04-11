@@ -17,7 +17,8 @@ export default defineConfig({
         text: 'Docs',
         items: [
           { text: 'Quick start', link: '/docs/quickstart' },
-          { text: 'Flashing MicroPython', link: '/docs/flash-micropython' }
+          { text: 'Flashing MicroPython', link: '/docs/flash-micropython' },
+          { text: 'Troubleshooting', link: '/docs/troubleshooting' }
         ]
       },
       {
