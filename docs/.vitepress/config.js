@@ -20,6 +20,7 @@ export default defineConfig({
           { text: 'File Management', link: '/docs/file-management' },
           { text: 'Using Intellisense', link: '/docs/intellisense' },
           { text: 'Using the Serial Monitor', link: '/docs/serial-monitor' },
+          { text: 'About the Command Palette', link: '/docs/command-palette' },
           { text: 'Flashing MicroPython', link: '/docs/flash-micropython' },
           { text: 'Troubleshooting', link: '/docs/troubleshooting' },
         ]
