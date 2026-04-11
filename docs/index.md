@@ -11,7 +11,8 @@ hero:
   actions:
     - theme: brand
       text: Go to IDE
-      link: /ide
+      link: /ide/
+      target: _self
     - theme: alt
       text: Quick Start
       link: /docs/quickstart

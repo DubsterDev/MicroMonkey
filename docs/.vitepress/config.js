@@ -8,7 +8,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'IDE', link: '/ide' },
+      { text: 'IDE', link: '/ide/', target: '_self' },
       { text: 'Quick start', link: '/docs/quickstart' }
     ],
     logo: "/logo.svg",
@@ -35,5 +35,6 @@ export default defineConfig({
     //   { icon: 'github', link: 'https://github.com/FXZFun/micromonkey' }
     // ]
   },
-  cleanUrls: true
+  cleanUrls: true,
+  ignoreDeadLinks: true
 })
