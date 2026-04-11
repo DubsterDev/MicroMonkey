@@ -9,7 +9,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'IDE', link: '/ide/', target: '_self' },
-      { text: 'Quick start', link: '/docs/quickstart' }
+      { text: 'Documentation', link: '/docs/quickstart' }
     ],
     logo: "/logo.svg",
     sidebar: [
@@ -19,6 +19,7 @@ export default defineConfig({
           { text: 'Quick start', link: '/docs/quickstart' },
           { text: 'File Management', link: '/docs/file-management' },
           { text: 'Using Intellisense', link: '/docs/intellisense' },
+          { text: 'Using the Serial Monitor', link: '/docs/serial-monitor' },
           { text: 'Flashing MicroPython', link: '/docs/flash-micropython' },
           { text: 'Troubleshooting', link: '/docs/troubleshooting' },
         ]

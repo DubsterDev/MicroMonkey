@@ -14,7 +14,7 @@ hero:
       link: /ide/
       target: _self
     - theme: alt
-      text: Quick Start
+      text: Documentation
       link: /docs/quickstart
 
 features:
