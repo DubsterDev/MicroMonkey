@@ -3,6 +3,7 @@
     "public": "docs/.vitepress/dist",
     "site": "micromonkey",
     "cleanUrls": true,
+    "trailingSlash": true,
     "ignore": [
       "firebase.json",
       "**/.*",
