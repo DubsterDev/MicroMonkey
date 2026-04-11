@@ -127,8 +127,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Made file actions always visible on root folder
  - Various internal modifications
 
-[unreleased]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.3...HEAD
-[1.3.3]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1...v1.3.3
+[unreleased]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.4...HEAD
+[1.3.4]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.3...v1.3.4
+[1.3.3]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1-beta...v1.3.1
 [1.3.1-beta]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.0-beta...v1.3.1-beta

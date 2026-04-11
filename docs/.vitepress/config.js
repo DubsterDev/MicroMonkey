@@ -17,8 +17,16 @@ export default defineConfig({
         text: 'Docs',
         items: [
           { text: 'Quick start', link: '/docs/quickstart' },
+          { text: 'File Management', link: '/docs/file-management' },
+          { text: 'Using Intellisense', link: '/docs/intellisense' },
           { text: 'Flashing MicroPython', link: '/docs/flash-micropython' },
-          { text: 'Troubleshooting', link: '/docs/troubleshooting' }
+          { text: 'Troubleshooting', link: '/docs/troubleshooting' },
+        ]
+      },
+      {
+        text: 'More',
+        items: [
+          { text: 'Changelog', link: '/changelog' },
         ]
       },
       {
