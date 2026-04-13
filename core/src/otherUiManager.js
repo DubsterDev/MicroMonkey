@@ -189,10 +189,11 @@ export async function renderWelcomeScreen(rootElement) {
     addHeading("Welcome to MicroMonkey!", "h2", rootElement);
 
     // Define some welcome text
-    addParagraph("Connect your device with a USB cable, and then you can use the Connect to Board button on the bottom left.", rootElement);
-    addParagraph("If the device does not load, try pressing the 'EN' button on the board or refreshing the page.", rootElement);
-    addParagraph("To soft-reboot device, click into the serial monitor and use the keyboard shortcut CTRL+D.", rootElement);
+    addParagraph("Connect your device with a USB cable, and then you can use the Connect to Board button on the bottom left to connect your board.", rootElement);
+    addParagraph("If the device does not load, try pressing the 'EN' button on the board.", rootElement);
+    addParagraph("To soft-reboot the device, click into the serial monitor and use the keyboard shortcut CTRL+D.", rootElement);
     addParagraph("For more information about controlling your board with the serial monitor, run help()", rootElement);
+    rootElement.innerHTML += "<p>You can also check the <a href='/docs/quickstart' target='_blank'>docs for more information</a>."
 }
 
 /**
