@@ -5,3 +5,4 @@ docs/public/ide
 .firebaserc
 .firebase
 firebase.json
+google*.html
