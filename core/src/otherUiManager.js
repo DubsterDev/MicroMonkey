@@ -208,11 +208,10 @@ export async function renderWhatsNewScreen(rootElement) {
     // Define some what's new text
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
-    addHeading("Fixed", "h3", rootElement);
-    addParagraph("- Retrieving files from the connected board is now more reliable", rootElement);
 
     addHeading("Added", "h3", rootElement);
-    addParagraph("- Electron desktop app", rootElement);
+    addParagraph("- Ctrl+W shortcut to close tabs (doesn't work in browser)", rootElement);
+    addParagraph("- Documentation and landing page", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
