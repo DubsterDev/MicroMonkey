@@ -19,23 +19,23 @@ hero:
 
 features:
   - icon:
-      light: "./icons/terminal-light.svg"
-      dark: "./icons/terminal-dark.svg"
+      light: "/icons/terminal-light.svg"
+      dark: "/icons/terminal-dark.svg"
     title: Integrated REPL
     details: "See the output of your code right in the editor"
   - icon:
-      light: "./icons/desktop-light.svg"
-      dark: "./icons/desktop-dark.svg"
+      light: "/icons/desktop-light.svg"
+      dark: "/icons/desktop-dark.svg"
     title: Clean, easy to use interface
     details: "Finally, a modern design for MicroPython development"
   - icon:
-      light: "./icons/code-light.svg"
-      dark: "./icons/code-dark.svg"
+      light: "/icons/code-light.svg"
+      dark: "/icons/code-dark.svg"
     title: Syntax checking
     details: "Get instant feedback for issues with your code"
   - icon:
-      light: "./icons/board-light.svg"
-      dark: "./icons/board-dark.svg"
+      light: "/icons/board-light.svg"
+      dark: "/icons/board-dark.svg"
     title: Built-in MicroPython flasher
     details: "Flash MicroPython to your ESP32 boards without needing another tool"
 
