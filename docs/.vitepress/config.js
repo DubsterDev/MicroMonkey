@@ -30,12 +30,6 @@ export default defineConfig({
         items: [
           { text: 'Changelog', link: '/changelog' },
         ]
-      },
-      {
-        text: 'Contributing',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' }
-        ]
       }
     ],
     notFound: {
