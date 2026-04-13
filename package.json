@@ -1,8 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "web:dev": "cd core && npm run dev && cd ..",
-    "web:build": "cd core && npm run build && cd ..",
+    "core:dev": "cd core && npm run dev && cd ..",
+    "core:build": "cd core && npm run build && cd ..",
     "android:build": "cd core && npm run build -- --mode android && cd .. && node copyBuildToAndroid.js",
     "android:build-apk": "npm run android:build && cd android && ./gradlew assembleRelease && apksigner sign --ks key.keystore --ks-key-alias micromonkey --out app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/app-release-unsigned.apk && cd ..",
     "electron:build": "cd core && npm run build -- --mode electron && cd .. && node copyBuildToElectron.js",
@@ -10,9 +10,9 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "website:build": "npm run web:build && node copyBuildToDocs.js && npm run docs:build",
-    "website:deploy": "npm run website:build && node copy-firebase-json.mjs prod && firebase deploy",
-    "website:deploy-beta": "npm run website:build && node copy-firebase-json.mjs beta && firebase deploy"
+    "web:build": "npm run core:build && node copyBuildToDocs.js && npm run docs:build",
+    "web:deploy": "npm run web:build && node copy-firebase-json.mjs prod && firebase deploy",
+    "web:deploy-beta": "npm run web:build && node copy-firebase-json.mjs beta && firebase deploy"
   },
   "devDependencies": {
     "vitepress": "^2.0.0-alpha.17"

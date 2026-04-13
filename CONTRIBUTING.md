@@ -29,7 +29,11 @@ Most of the files should be pretty self-explanatory, but here's the basic ideas:
  - [style.css](core/src/style.css) is where all the styling for MicroMonkey is defined
  - [index.html](core/index.html) is where the main MicroMonkey interface is, but some things are added programmatically in the previously mentioned JavaScript files
 
-Under [android](android/), is a small WebView wrapper app to allow running MicroMonkey on Android, due to the fact that the Web Serial API is not supported there yet. In the root of the micromonkey project, you will want to build the website first (with `npm run build-android`), and then running the Android app will work.
+Under [android](android/), is a small WebView wrapper app to allow running MicroMonkey on Android, due to the fact that the Web Serial API is not supported there yet. In the root of the micromonkey project, you will want to build the website first (with `npm run android:build`), and then running the Android app will work.
+
+In [electron](electron/) is a electron wrapper app. Right now this is not very useful, but you can run it by running the core dev server and then going to electron and running `npm install` and then `npm start`.
+
+In [docs](docs/) is the main website/documentation. You can run `npm run docs:dev` to test the docs, but if you want to build it, you'll want to run `npm run web:build` which also builds core and bundles it with the docs.
 
 ## Deploying to Beta
 
