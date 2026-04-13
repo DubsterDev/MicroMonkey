@@ -12,7 +12,7 @@ Your files are grouped by folders. You can expand folders by clicking on the nam
 
 When you click on a file, MicroMonkey will get the contents of the file and open a new tab in the editor with the contents of the file. This is typically pretty fast, but if you have a really big file it can take a little bit of time to load the editor.
 
-In the editor, you'll notice you can type and you'll get code autocompletions. You can read more about how this works at the [intellisense guide](./intellisense).
+In the editor, you'll notice you can type and you'll get code autocompletions. You can read more about how this works at the [intellisense guide](/docs/intellisense).
 
 When you right click a file or folder (or press and hold on mobile), you'll see a context menu containing file management actions, specifically `Delete` and `Rename`.
 

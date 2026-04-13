@@ -17,7 +17,7 @@ If no board is connected, nothing will happen.
 
 ## Flash MicroPython
 
-This command opens the MicroPython Flasher after asking you what type of board is connected. You will then be presented with a step-by-step flash process. See the documentation on [Flashing MicroPython](./flash-micropython.md) for more information.
+This command opens the MicroPython Flasher after asking you what type of board is connected. You will then be presented with a step-by-step flash process. See the documentation on [Flashing MicroPython](/docs/flash-micropython) for more information.
 
 ## Reboot connected device
 
@@ -29,7 +29,7 @@ This command opens the settings page, same as pressing the settings button in th
 
 ## Show/Hide Serial Monitor
 
-Toggles the visibility of the [Serial Monitor](./serial-monitor), same as pressing the button in the bottom or pressing `` Ctrl+Shift+` ``
+Toggles the visibility of the [Serial Monitor](/docs/serial-monitor), same as pressing the button in the bottom or pressing `` Ctrl+Shift+` ``
 
 ## Upload All Files from a ZIP
 
