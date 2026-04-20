@@ -70,6 +70,8 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
             model = createModel(content, "file://micromonkey" + path, language);
         }
 
+        console.log(path, tabs)
+
         // Add the tab to the list of tabs
         tabs[path] = {
             "title": title === "" ? path.split("/").at(-1) : title,
@@ -79,6 +81,7 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
             "active": true,
             "saved": true
         };
+        console.log(tabs)
     }
 
     // Render the tabs
@@ -90,6 +93,9 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
  * @param {string} path The path of the file that was changed
  */
 export function fileChanged(path) {
+    // Decode the path
+    path = decodeURIComponent(path);
+
     // If it already is unsaved, don't do anything
     if (!tabs[path].saved) return;
 
