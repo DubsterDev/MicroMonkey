@@ -316,6 +316,7 @@ function rawMode(enable = true) {
  * Run and retrieve the result of running code in the raw-paste REPL.
  * @param {string} code The code to run
  * @returns {Promise<Object>} The result. Format `{"result": "", "exceptions": ""}`.
+ * @todo Replace streaming text decoding to one decode of the whole thing.
  */
 export function runCode(code) {
     console.log(code)
@@ -441,6 +442,8 @@ export function runCode(code) {
                     rawMode(false);
 
                     // Resolve the result, removing the last \r\n
+                    executionResult += textDecoder.decode();
+                    exceptions += textDecoder.decode();
                     resolve({ "result": executionResult.replace(/\r\n$/, ""), "exceptions": exceptions.replace(/\r\n$/, "") });
                     alreadyReadBytes++;
                 } else if (byte === 0x04 && !doneWriting) {
@@ -450,12 +453,12 @@ export function runCode(code) {
                 } else if (executing) {
                     // If it's not a special byte, and we are currently
                     // receiving execution results, add to the execution variable
-                    executionResult += textDecoder.decode(new Uint8Array([byte]));
+                    executionResult += textDecoder.decode(new Uint8Array([byte]), { stream: true });
                     alreadyReadBytes++;
                 } else if (printingExceptions) {
                     // If printing exceptions, add the exception to the
                     // exceptions variable
-                    exceptions += textDecoder.decode(new Uint8Array([byte]));
+                    exceptions += textDecoder.decode(new Uint8Array([byte]), { stream: true });
                     alreadyReadBytes++;
                 }
             }
