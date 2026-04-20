@@ -204,12 +204,13 @@ export async function closeTab(path, force=false) {
 /**
  * Remove all tabs that are in a directory from the tab strip
  * @param {string} path The file path to remove everything under, should end with a /
+ * @param force Forces tabs to close even if unsaved. Default is false
  */
-export function closeTabsInDirectory(path) {
+export function closeTabsInDirectory(path, force=false) {
     // Loop through all the tabs
     Object.keys(tabs).forEach(tabPath => {
         // And close a tab if the path starts with the provided path
-        if (tabPath.startsWith(path)) closeTab(tabPath);
+        if (tabPath.startsWith(path)) closeTab(tabPath, force);
     });
 }
 
@@ -242,17 +243,6 @@ export function requestReRender(path) {
         customEditorElement.innerText = "";
         tab.renderFunction(customEditorElement);
     }
-}
-
-/**
- * Closes all saved tabs
- */
-export function closeSavedTabs() {
-    Object.keys(tabs).forEach(path => {
-        // If the tab is saved, close it
-        const tab = tabs[path];
-        if (tab.saved) closeTab(path);
-    });
 }
 
 /**

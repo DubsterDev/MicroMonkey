@@ -5,7 +5,7 @@ import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
 import { newFolderStructure } from "./fileExplorer";
-import { closeSavedTabs, closeTab, closeTabsInDirectory, openTab, renameTab, renameTabsInDirectory } from "./openFilesManager";
+import { closeTab, closeTabsInDirectory, openTab, renameTab, renameTabsInDirectory } from "./openFilesManager";
 
 // Helper functions for interacting with the board
 import { getAllFilesAsZip, getFiles, removeDirectoryRecursively, removeFile, renameFile, uploadAllFilesFromZip } from "./serial";
@@ -79,10 +79,10 @@ export function setupUiManager() {
                 closeTab(path);
             }]);
             menuOptions.push(["Close Saved Tabs", () => {
-                closeSavedTabs();
+                closeTabsInDirectory("/", false);
             }]);
             menuOptions.push(["Close All Tabs", () => {
-                closeTabsInDirectory("/");
+                closeTabsInDirectory("/", true);
             }]);
         } else {
             // Add a item that does nothing if no other branch matches
