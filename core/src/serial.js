@@ -127,6 +127,7 @@ export async function getFiles() {
 
     // Read the folders from the board
     const { result } = await runCode(`import os
+import json
 def get_contents_of_dir(dir_name="/"):
     files = os.ilistdir(dir_name)
     result = {}
@@ -136,9 +137,9 @@ def get_contents_of_dir(dir_name="/"):
         else:
             result[file[0]] = file[0]
     return result
-print(get_contents_of_dir())`);
+print(json.dumps(get_contents_of_dir()))`);
 
-    return JSON.parse(result.replaceAll("'", "\""));
+    return JSON.parse(result);
 
 }
 
