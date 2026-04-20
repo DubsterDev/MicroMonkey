@@ -319,7 +319,6 @@ function rawMode(enable = true) {
  * @todo Replace streaming text decoding to one decode of the whole thing.
  */
 export function runCode(code) {
-    console.log(code)
     return new Promise(async (resolve) => {
         // Create a new text decoder to use later
         const textDecoder = new TextDecoder();

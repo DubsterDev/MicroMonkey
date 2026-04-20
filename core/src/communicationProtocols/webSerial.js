@@ -168,7 +168,6 @@ export class WebSerial {
         const ports = ["Cancel", ...portList.map(port => port.portName)];
         const port = await getInput("Select a port", "Select a port", "", ports, false);
         if (port && port !== "Cancel") {
-            console.log(port, portList)
             const selectedPortId = portList.filter(item => item.portName === port)[0].portId;
             electron.portSelected(selectedPortId);
         } else electron.portSelected('');
