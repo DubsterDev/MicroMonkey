@@ -317,6 +317,7 @@ function rawMode(enable = true) {
  * @returns {Promise<Object>} The result. Format `{"result": "", "exceptions": ""}`.
  */
 export function runCode(code) {
+    console.log(code)
     return new Promise(async (resolve) => {
         // Create a new text decoder to use later
         const textDecoder = new TextDecoder();
@@ -617,13 +618,18 @@ export async function uploadAllFilesFromZip(zip, deleteCurrentFiles) {
 
     // Sort the files so we loop through the directories and create them first
     files.sort((a, b) => {
-        if (a.dir) {
-            return -1;
-        } else if (b.dir) {
-            return 1;
-        } else {
-            return b.name.length - a.name.length;
+        if (a.dir !== b.dir) {
+            return a.dir ? -1 : 1;
         }
+
+        if (a.dir && b.dir) {
+            const slashesA = a.name.split("/").length - 1;
+            const slashesB = b.name.split("/").length - 1;
+
+            return slashesA - slashesB;
+        }
+
+        return b.name.length - a.name.length;
     })
 
     // Loop through the zip
