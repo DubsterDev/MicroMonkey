@@ -73,7 +73,7 @@ MicroMonkey is a browser-based MicroPython IDE for ESP32 development, with no in
 
 Built-in MicroPython flashing eliminates the need for multiple tools, and best of all: works on any device with Chrome or a Chromium-based browser, including Chromebooks!
 
-## Everything you need for ESP32 MicroPython—REPL, flashing, and editing in one place
+## Everything you need for ESP32 MicroPython development: REPL, flashing, and editing in one place
 
 Tired of switching to the terminal to run `mpremote` just to test your code, flash MicroPython, or use the REPL? Enter MicroMonkey: The MicroPython IDE that keeps it all in one place.
 
