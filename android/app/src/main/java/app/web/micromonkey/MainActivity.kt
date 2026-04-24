@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
@@ -32,6 +33,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import app.web.micromonkey.ui.theme.MicroMonkeyTheme
@@ -149,6 +151,29 @@ class MyWebViewClient(private val assetLoader: WebViewAssetLoader): WebViewClien
         request: WebResourceRequest
     ): WebResourceResponse? {
         return assetLoader.shouldInterceptRequest(request.url)
+    }
+
+    override fun shouldOverrideUrlLoading(
+        view: WebView,
+        request: WebResourceRequest
+    ): Boolean {
+
+        val url = request.url.toString()
+
+        Log.d("TAG", "shouldOverrideUrlLoading: $url")
+
+        val finalUrl = when {
+            url.startsWith("https://appassets.androidplatform.net/") -> {
+                url.replace("https://appassets.androidplatform.net/", "https://micromonkey.web.app/")
+            }
+
+            else -> url
+        }
+
+        val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
+        view.context.startActivity(intent)
+
+        return true
     }
 }
 
