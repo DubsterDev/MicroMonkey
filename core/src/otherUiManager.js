@@ -209,9 +209,10 @@ export async function renderWhatsNewScreen(rootElement) {
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
 
-    addHeading("Added", "h3", rootElement);
-    addParagraph("- Ctrl+W shortcut to close tabs (doesn't work in browser)", rootElement);
-    addParagraph("- Documentation and landing page", rootElement);
+    addHeading("Fixed", "h3", rootElement);
+    addParagraph("- Opening files with unicode characters in names", rootElement);
+    addParagraph("- Close all tabs closes all tabs, including unsaved ones again", rootElement);
+    addParagraph("- Uploading ZIP files with nested folders", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
