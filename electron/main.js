@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, shell } = require('electron')
 
 const path = require("path");
 
@@ -62,6 +62,12 @@ const createWindow = () => {
         win.webContents.send("port_callback", portList);
         portCallback = callback;
     })
+
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url.startsWith("file://") ? url.replace("file://", "https://micromonkey.web.app") : url);
+        
+        return { action: 'deny' };
+    });
 
 }
 
