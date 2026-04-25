@@ -1,13 +1,14 @@
 :root {
-    --border-color: #313131;
-    --background-color: #181818;
-    --background-color-variant: #222121;
-    --lighter-text-color: #d4d4d4;
-    --text-color: #fafafa;
-    --success-color: #2e7030;
-    --warning-color: #c07504;
-    --error-color: #bd0000;
+    --border-color: light-dark(#b6b4b4, #313131);
+    --background-color: light-dark(#ebebeb, #181818);
+    --background-color-variant: light-dark(#dddcdc, #222121);
+    --lighter-text-color: light-dark(#3d3d3d, #d4d4d4);
+    --text-color: light-dark(#212121, #fafafa);
+    --success-color: light-dark(#4caf50, #2e7030);
+    --warning-color: light-dark(#f0af4e, #c07504);
+    --error-color: light-dark(#ff4d4d, #bd0000);
     --hover-background-color: #78787825;
+    accent-color: #91553d;
 }
 
 * {
@@ -27,7 +28,7 @@ main {
     height: 100%;
     padding: 0;
     margin: 0;
-    color-scheme: dark;
+    color-scheme: dark light;
 }
 
 main {
@@ -422,25 +423,6 @@ main {
 
 .messagebox.error {
     background-color: var(--error-color);
-}
-
-@media screen and (prefers-color-scheme: light) {
-    :root {
-        --border-color: #b6b4b4;
-        --background-color: #ebebeb;
-        --background-color-variant: #dddcdc;
-        --text-color: #212121;
-        --lighter-text-color: #3d3d3d;
-        --success-color: #4caf50;
-        --warning-color: #f0af4e;
-        --error-color: #ff4d4d;
-    }
-
-    html,
-    body,
-    main {
-        color-scheme: light;
-    }
 }
 
 @media screen and (max-width: 700px) {
