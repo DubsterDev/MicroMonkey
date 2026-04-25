@@ -14,11 +14,15 @@
     box-sizing: border-box;
 }
 
-body, main, button {
+body,
+main,
+button {
     font-family: "Open Sans";
 }
 
-html, body, main {
+html,
+body,
+main {
     width: 100%;
     height: 100%;
     padding: 0;
@@ -83,7 +87,8 @@ main {
     cursor: pointer;
 }
 
-.fileExplorerHeader:hover .newActions button, .folder-name:hover .newActions button {
+.fileExplorerHeader:hover .newActions button,
+.folder-name:hover .newActions button {
     opacity: 0.6;
 }
 
@@ -114,7 +119,8 @@ main {
     height: 100%;
 }
 
-#codeEditor, #customEditor {
+#codeEditor,
+#customEditor {
     flex: 0 1 100%;
     display: none;
 }
@@ -150,7 +156,8 @@ main {
     color: var(--lighter-text-color);
 }
 
-.bottomBar .left, .bottomBar .right {
+.bottomBar .left,
+.bottomBar .right {
     display: flex;
     flex-direction: row;
     justify-content: left;
@@ -182,7 +189,8 @@ main {
     display: none;
 }
 
-.leftSidebar .file, .folder-container {
+.leftSidebar .file,
+.folder-container {
     margin-left: 20px;
     vertical-align: middle;
     user-select: none;
@@ -200,22 +208,25 @@ main {
     display: none;
 }
 
-.leftSidebar .folder-name, .leftSidebar .file {
+.leftSidebar .folder-name,
+.leftSidebar .file {
     padding: 6px;
     border-radius: 6px;
     cursor: pointer;
 }
 
-.leftSidebar .file {    
+.leftSidebar .file {
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.leftSidebar .folder-name:hover, .leftSidebar .file:hover {
+.leftSidebar .folder-name:hover,
+.leftSidebar .file:hover {
     background-color: var(--hover-background-color);
 }
 
-.leftSidebar .folder-name::before, .leftSidebar .file::before {
+.leftSidebar .folder-name::before,
+.leftSidebar .file::before {
     font-family: 'Material Symbols Outlined';
     vertical-align: middle;
     font-size: 20px;
@@ -300,7 +311,8 @@ main {
     cursor: pointer;
 }
 
-.tabs .tab.active button, .tabs .tab:hover button {
+.tabs .tab.active button,
+.tabs .tab:hover button {
     opacity: 1;
 }
 
@@ -310,26 +322,26 @@ main {
 }
 
 .tabs::-webkit-scrollbar {
-  height: 5px;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
+    height: 5px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
 }
 
 .tabs::-webkit-scrollbar-track {
-  background: var(--background-color);
+    background: var(--background-color);
 }
 
 .tabs::-webkit-scrollbar-thumb {
-  background: var(--background-color-variant);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+    background: var(--background-color-variant);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
 }
 
 .tabs::-webkit-scrollbar-thumb:hover {
-  background: var(--border-color);
-  border-radius: 10px;
+    background: var(--border-color);
+    border-radius: 10px;
 }
 
 .rightClickMenu {
@@ -383,7 +395,8 @@ main {
     margin: 0;
 }
 
-.commandPalette .suggestions p:hover, .commandPalette .suggestions p.active {
+.commandPalette .suggestions p:hover,
+.commandPalette .suggestions p.active {
     background-color: var(--background-color);
 }
 
@@ -423,7 +436,9 @@ main {
         --error-color: #ff4d4d;
     }
 
-    html, body, main {
+    html,
+    body,
+    main {
         color-scheme: light;
     }
 }
@@ -450,14 +465,15 @@ main {
     }
 
     .bottomBar .item.onlyOnMobile {
-       display: flex;
+        display: flex;
     }
 
     .commandPalette {
         width: 80%;
     }
 
-    .fileExplorerHeader .newActions button, .folder-name .newActions button {
+    .fileExplorerHeader .newActions button,
+    .folder-name .newActions button {
         opacity: 0.6;
     }
 
@@ -465,35 +481,36 @@ main {
         opacity: 1;
     }
 }
+
 /* Open Sans */
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/assets/fonts/opensans.ttf) format('truetype');
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/fonts/opensans.ttf) format('truetype');
 }
 
 
 /* Material Symbols */
 @font-face {
-  font-family: 'Material Symbols Outlined';
-  font-style: normal;
-  font-weight: 400;
-  src: url(/assets/fonts/material-symbols-outlined.woff2) format('woff2');
+    font-family: 'Material Symbols Outlined';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/fonts/material-symbols-outlined.woff2) format('woff2');
 }
 
 .material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-feature-settings: 'liga';
-  -webkit-font-smoothing: antialiased;
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
 }
