@@ -691,7 +691,7 @@ let readyCallback;
  */
 export async function boardConnected() {
     // Change the board status to Connected
-    document.getElementById("boardStatus").innerText = "Connected";
+    document.getElementById("boardStatus").innerText = "Disconnect";
 
     // Clear the terminal display
     terminal.clear();
@@ -719,7 +719,7 @@ function portDisconnected() {
     terminal.writeln("[Board Disconnected]");
 
     // Change the board status button to say a board needs to be connected
-    document.getElementById("boardStatus").innerText = "Connect to board";
+    document.getElementById("boardStatus").innerText = "Connect";
 
     // Clears the file explorer
     newFolderStructure({});
@@ -784,7 +784,7 @@ export function startSerial(editor, upandrunningCallback = () => { }) {
     document.getElementById("findPorts").addEventListener("click", findPorts);
 
     // Add a command to the command palette to launch the port selector
-    addCommand("findPorts", "Connect to board", findPorts);
+    addCommand("findPorts", "Connect/disconnect board", findPorts);
 
     // Toggle the serial monitor's visiblity with the Serial Monitor button
     document.getElementById("openSerialMonitor").addEventListener("click", () => toggleTerminal(editor));

@@ -45,7 +45,7 @@ openTab("/.default_files/micromonkey/welcome.mm", "Welcome to MicroMonkey", "cus
 // Open the "What's New" screen if the version has changed since last load
 startWhatsNewScreenIfVersionChanged();
 
-// Begin listening for clicks on the Connect to board button
+// Begin listening for clicks on the Connect button
 // and manage communication with it
 startSerial(editor, async () => {
     // When connected to a board, get the files from it and tell file explorer
