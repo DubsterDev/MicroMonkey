@@ -7,6 +7,7 @@
     --success-color: #2e7030;
     --warning-color: #c07504;
     --error-color: #bd0000;
+    --hover-background-color: #78787825;
 }
 
 * {
@@ -79,6 +80,7 @@ main {
     padding: 5px;
     border-radius: 6px;
     color: var(--text-color);
+    cursor: pointer;
 }
 
 .fileExplorerHeader:hover .newActions button, .folder-name:hover .newActions button {
@@ -86,7 +88,7 @@ main {
 }
 
 .newActions button:hover {
-    background-color: #78787825;
+    background-color: var(--hover-background-color);
     opacity: 1 !important;
 }
 
@@ -145,8 +147,6 @@ main {
     background-color: var(--background-color);
     border-top: 1px solid var(--border-color);
     padding: 0px;
-    padding-left: 10px;
-    padding-right: 10px;
     color: var(--lighter-text-color);
 }
 
@@ -155,7 +155,7 @@ main {
     flex-direction: row;
     justify-content: left;
     align-items: center;
-    gap: 20px;
+    height: 100%;
 }
 
 .bottomBar i {
@@ -168,6 +168,14 @@ main {
     justify-content: left;
     align-items: center;
     gap: 5px;
+    cursor: pointer;
+    user-select: none;
+    height: 100%;
+    padding: 0 10px;
+}
+
+.bottomBar .item:hover {
+    background-color: var(--hover-background-color);
 }
 
 .bottomBar .item.onlyOnMobile {
@@ -204,7 +212,7 @@ main {
 }
 
 .leftSidebar .folder-name:hover, .leftSidebar .file:hover {
-    background-color: #78787825;
+    background-color: var(--hover-background-color);
 }
 
 .leftSidebar .folder-name::before, .leftSidebar .file::before {
@@ -261,6 +269,7 @@ main {
     overflow-x: auto;
     overflow-y: clip;
     flex: 1 0 50px;
+    user-select: none;
 }
 
 .tabs .tab {
@@ -271,6 +280,7 @@ main {
     align-items: center;
     justify-content: space-between;
     gap: 5px;
+    cursor: pointer;
 }
 
 .tabs .tab.active {
@@ -287,6 +297,7 @@ main {
     padding: 5px;
     border-radius: 6px;
     color: #787878cb;
+    cursor: pointer;
 }
 
 .tabs .tab.active button, .tabs .tab:hover button {
@@ -294,7 +305,7 @@ main {
 }
 
 .tabs .tab button:hover {
-    background-color: #78787825;
+    background-color: var(--hover-background-color);
     color: var(--text-color);
 }
 
