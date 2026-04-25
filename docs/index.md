@@ -46,9 +46,9 @@ features:
   .hero-video {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(128, 128, 128, 0.47);
-    width: 100%;
-    max-width: 918px;
+    max-width: 100%;
     margin: auto;
+    max-height: 80vh;
   }
 
   .hero-video.dark {
