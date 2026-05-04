@@ -20,10 +20,6 @@ You can try it out at [MicroMonkey.web.app](https://micromonkey.web.app)!
 > 
 > Ideally Chrome on Android would support Web Serial so we don't have to make an app.
 
-## To-do
- - **Best Practices**
-   - Tests
-
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more information about running MicroMonkey locally and the structure of the repository.
