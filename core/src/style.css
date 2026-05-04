@@ -472,6 +472,14 @@ main {
     src: url(/assets/fonts/opensans.ttf) format('truetype');
 }
 
+/* JetBrains Mono */
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/fonts/jetbrainsmono.ttf) format('truetype');
+}
+
 
 /* Material Symbols */
 @font-face {

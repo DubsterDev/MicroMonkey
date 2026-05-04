@@ -16,10 +16,7 @@ const terminal = new Terminal({
     cursorBlink: true,
     disableStdin: false,
     fontSize: terminalFontSize,
-    fontFamily: "Open Sans",
-    letterSpacing: "0px",
-    rows: Math.floor((serialMonitor.clientHeight - (terminalFontSize * 2)) / (terminalFontSize + 2)),
-    cols: Math.floor((serialMonitor.clientWidth) / terminalFontSize)
+    fontFamily: "JetBrains Mono"
 });
 
 terminal.attachCustomKeyEventHandler(async (event) => {
@@ -34,6 +31,14 @@ terminal.attachCustomKeyEventHandler(async (event) => {
 // Fit the terminal
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
+
+setTimeout(() => fitAddon.fit(), 10);
+
+const resizeObserver = new ResizeObserver(() => {
+    fitAddon.fit();
+});
+
+resizeObserver.observe(serialMonitor);
 
 // Start the terminal and forward input to connect board
 terminal.open(serialMonitor);
