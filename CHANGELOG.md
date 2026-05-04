@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Wrong sized serial monitor - serial monitor now uses a monospace font
 
 ### Changed
- - Added a pointer instead of text selecting cursor in more actionable places
+ - Added a pointer instead of text cursor in actionable places
 
 ## [1.3.6] - 2026-04-23
 
