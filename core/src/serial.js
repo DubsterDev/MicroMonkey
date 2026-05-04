@@ -6,6 +6,7 @@ import { getSetting } from "./settings";
 import { newFolderStructure } from "./fileExplorer";
 import JSZip from "jszip";
 import { addCommand, removeCommand } from "./commandPalette";
+import { deleteFileCache } from "./openFilesManager";
 
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");
@@ -725,6 +726,9 @@ function portDisconnected() {
 
     // Change the board status button to say a board needs to be connected
     document.getElementById("boardStatus").innerText = "Connect";
+
+    // Delete file cache
+    deleteFileCache();
 
     // Clears the file explorer
     newFolderStructure({});
