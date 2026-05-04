@@ -3,10 +3,14 @@ import { getInput } from "./commandPalette";
 import { changeModel, createModel } from "./editor";
 
 // Functions to get files from the serial device and write files
-import { getFile, writeFile } from "./serial";
+import { getFile, getFiles, writeFile } from "./serial";
+import { closeFile, openFile } from "./tyManager";
 
-// A object containing the open tabs
+// An object containing the open tabs
 const tabs = {};
+
+// An object containing the contents of open files
+const fileCache = {};
 
 // References to monaco and custom editor in the DOM
 const codeEditorElement = document.getElementById("codeEditor");
@@ -48,7 +52,7 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
         let model;
         if (type === "monaco") {
             // Get the file's content from the board
-            const content = await getFile(path);
+            const content = await getFileWithCache(path);
 
             // A list of file extensions and their corresponding languages in Monaco
             const languages = {
@@ -110,11 +114,17 @@ export function saveActiveFile() {
         // Get the tab object
         const tab = tabs[path];
         if (tab.active && tab.type === "monaco") {
+            // Get the new contents
+            const contents = tab.model.getValue();
+
             // If this is an active tab, and it is a file, write the file to the board
-            await writeFile(tab.model.getValue(), path)
+            await writeFile(contents, path)
 
             // Mark it as saved
             tab.saved = true;
+
+            // Update the cache
+            fileCache[path] = contents;
 
             // And render the tabs
             renderTabs();
@@ -354,6 +364,76 @@ function renderTabs(activateActiveTab=true) {
     if (tabPaths.length === 0) {
         codeEditorElement.style.display = "none";
         customEditorElement.style.display = "block";
+    }
+}
+
+/**
+ * Gets the contents of a file from the cache, or board if it hasn't already been opened.
+ * @param {string} path The path of the file to retrieve
+ * @param {boolean} bustCache Update cache for this file. Defaults to false
+ * @returns {string} The contents of the file
+ */
+export async function getFileWithCache(path, bustCache=false) {
+    // If the contents are cached, return the cached contents
+    if (path in fileCache && !bustCache) return fileCache[path];
+
+    // Otherwise, get the contents from the board, and store it in the cache
+    const fileContents = await getFile(path);
+    fileCache[path] = fileContents;
+
+    // Open it in Ty
+    openFile("file://micromonkey" + path, fileContents);
+
+    // Return the file contents
+    return fileContents;
+}
+
+/**
+ * Loads all the files on the board into the file cache.
+ * @param {boolean} [bustCache=false] Update cache for all files. Defaults to false
+ */
+export async function addAllFilesToCache(bustCache=false) {
+    // Get the list of files from the board
+    const files = await getFiles();
+
+    async function addFolderToCache(folder, path) {
+        for (const key in folder) {
+            if (typeof folder[key] === "string") {
+                // If it's a string, it's a file, so get the file and add it to the cache
+                await getFileWithCache(path + "/" + folder[key], bustCache);
+            } else {
+                // If it's not a string, it's a folder, so call this function again
+                await addFolderToCache(folder[key], path + "/" + key);
+            }
+        }
+    }
+
+    // Start the recursive function to get files
+    await addFolderToCache(files, "")
+}
+
+/**
+ * Remove cache for all files.
+ */
+export async function deleteFileCache() {
+    async function removeFolderFromTy(folder, path) {
+        for (const key in folder) {
+            if (typeof folder[key] === "string") {
+                // If it's a string, it's a file, so close the file
+                const path = path + "/" + folder[key];
+                closeFile("file://micromonkey" + path);
+            } else {
+                // If it's not a string, it's a folder, so call this function again
+                await removeFolderFromTy(folder[key], path + "/" + key);
+            }
+        }
+    }
+
+    // Start the recursive function to close the files
+    await removeFolderFromTy(files, "")
+
+    for (const key in fileCache) {
+        delete fileCache[key];
     }
 }
 

@@ -202,9 +202,6 @@ export function changeModel(model) {
     // if syntax checking is disabled
     if (!getSetting("syntax-checking")) monaco.editor.setModelMarkers(model, "ty", []);
 
-    // Let ty know we're using a different file
-    openFile(modelUriString, model.getValue());
-
     // Add a listener for when the user types in the code editor
     model.onDidChangeContent((e) => {
         // Let file manager know that the file has changed
