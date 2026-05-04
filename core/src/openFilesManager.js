@@ -371,9 +371,10 @@ function renderTabs(activateActiveTab=true) {
  * Gets the contents of a file from the cache, or board if it hasn't already been opened.
  * @param {string} path The path of the file to retrieve
  * @param {boolean} bustCache Update cache for this file. Defaults to false
+ * @todo Bust cache is default to true right now; change it to false later
  * @returns {string} The contents of the file
  */
-export async function getFileWithCache(path, bustCache=false) {
+export async function getFileWithCache(path, bustCache=true) {
     // If the contents are cached, return the cached contents
     if (path in fileCache && !bustCache) return fileCache[path];
 
