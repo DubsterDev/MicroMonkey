@@ -28,7 +28,8 @@ export default defineConfig({
       {
         text: 'More',
         items: [
-          { text: 'Changelog', link: '/changelog' },
+          { text: 'Changelog', link: '/more/changelog' },
+          { text: 'Third-party Software Licenses', link: '/more/licenses' },
         ]
       }
     ],
