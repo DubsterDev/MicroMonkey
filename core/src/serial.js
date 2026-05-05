@@ -33,7 +33,9 @@ terminal.attachCustomKeyEventHandler(async (event) => {
 const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
 
-setTimeout(() => fitAddon.fit(), 10);
+document.fonts.ready.then(() => {
+    setTimeout(() => fitAddon.fit(), 100);
+});
 
 const resizeObserver = new ResizeObserver(() => {
     fitAddon.fit();
