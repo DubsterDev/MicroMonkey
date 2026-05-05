@@ -10,7 +10,7 @@ Nothing to see here.
 
 ## Docs/Landing page
 
- - [ ] Update demo videos
+Nothing to see here.
 
 ## Electron
 
