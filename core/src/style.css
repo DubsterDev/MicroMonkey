@@ -49,7 +49,6 @@ main {
     width: 25%;
     height: 100%;
     background-color: var(--background-color);
-    border-right: 1px solid var(--border-color);
     overflow: auto;
     padding: 12px;
     flex: 0 0 auto;
@@ -57,18 +56,26 @@ main {
     resize: horizontal;
 }
 
-.leftSidebar .fileExplorerHeader {
+.leftSidebar {
+    border-right: 1px solid var(--border-color);
+}
+
+.rightSidebar {
+    border-left: 1px solid var(--border-color);
+}
+
+.sidebar .sidebarHeader {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
 
-.leftSidebar .fileExplorerHeader .newActions button {
+.sidebar .sidebarHeader .headerActions button {
     opacity: 0.6;
 }
 
-.newActions {
+.headerActions {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -76,7 +83,7 @@ main {
     gap: 5px;
 }
 
-.newActions button {
+.headerActions button {
     opacity: 0;
     transition: 0.2s;
     background-color: transparent;
@@ -89,12 +96,12 @@ main {
     cursor: pointer;
 }
 
-.fileExplorerHeader:hover .newActions button,
-.folder-name:hover .newActions button {
+.sidebarHeader:hover .headerActions button,
+.folder-name:hover .headerActions button {
     opacity: 0.6;
 }
 
-.newActions button:hover {
+.headerActions button:hover {
     background-color: var(--hover-background-color);
     opacity: 1 !important;
 }
@@ -465,8 +472,8 @@ main {
         width: 80%;
     }
 
-    .fileExplorerHeader .newActions button,
-    .folder-name .newActions button {
+    .sidebarHeader .headerActions button,
+    .folder-name .headerActions button {
         opacity: 0.6;
     }
 

@@ -139,7 +139,7 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
 
             // Create a div to hold the actions for the create file buttons
             const actionsDiv = document.createElement("div");
-            actionsDiv.classList.add("newActions");
+            actionsDiv.classList.add("headerActions");
 
             // Create the new file button
             const newFileButton = document.createElement("button");
