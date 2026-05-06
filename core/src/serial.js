@@ -34,7 +34,7 @@ const fitAddon = new FitAddon();
 terminal.loadAddon(fitAddon);
 
 document.fonts.ready.then(() => {
-    setTimeout(() => fitAddon.fit(), 100);
+    setTimeout(() => fitAddon.fit(), 1500);
 });
 
 const resizeObserver = new ResizeObserver(() => {
