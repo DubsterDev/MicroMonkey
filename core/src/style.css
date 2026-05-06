@@ -8,7 +8,9 @@
     --warning-color: light-dark(#f0af4e, #c07504);
     --error-color: light-dark(#ff4d4d, #bd0000);
     --hover-background-color: #78787825;
-    accent-color: #91553d;
+    --accent-color: #91553d;
+    --color-on-accent: #fafafa;
+    accent-color: var(--accent-color);
 }
 
 * {
@@ -17,7 +19,8 @@
 
 body,
 main,
-button {
+button,
+input {
     font-family: "Open Sans";
 }
 
@@ -267,6 +270,19 @@ main {
     content: "keyboard_arrow_right";
 }
 
+#gitCommitMessage {
+    display: block;
+    width: 100%;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin: 6px auto;
+}
+
+#gitCommitMessage:focus {
+    outline: 2px solid var(--accent-color);
+}
+
 .topArea {
     display: flex;
     flex-direction: row;
@@ -431,6 +447,23 @@ main {
 
 .messagebox.error {
     background-color: var(--error-color);
+}
+
+button.wide {
+    display: block;
+    border: none;
+    background-color: var(--accent-color);
+    color: var(--color-on-accent);
+    width: 100%;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 6px auto;
+    cursor: pointer;
+    transition: .25s;
+}
+
+button.wide:hover {
+    filter: brightness(0.9);
 }
 
 @media screen and (max-width: 700px) {
