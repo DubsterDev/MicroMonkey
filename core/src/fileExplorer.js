@@ -1,6 +1,7 @@
 // Import the openTab function to allow clicking on tabs
 import { getInput } from "./commandPalette";
 import { openTab } from "./openFilesManager";
+import { toggleSidebar } from "./otherUiManager";
 import { createDirectory, createFile, getFiles } from "./serial";
 
 // A object containing which folders are collapsed,
@@ -221,7 +222,7 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
 
             // When it's clicked tell openFilesManager.js to open the file
             p.addEventListener("click", () => {
-                toggleFileExplorer();
+                toggleSidebar("left");
                 openTab(`${currentDir}${key}`);
             });
 

@@ -316,7 +316,7 @@ async function uploadAllFiles() {
  * Toggles the sidebar on mobile.
  * @param {string} [side="left"] Which sidebar to toggle, left or right.
  */
-function toggleSidebar(side="left") {
+export function toggleSidebar(side="left") {
     document.getElementById(`${side}Sidebar`).classList.toggle("show");
     const icon = document.getElementById(`${side}SidebarOpenDirection`);
     if (icon.innerText === "chevron_right") icon.innerText = "chevron_left";
