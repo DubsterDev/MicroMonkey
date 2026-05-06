@@ -311,3 +311,18 @@ async function uploadAllFiles() {
     input.click();
 
 }
+
+/**
+ * Toggles the sidebar on mobile.
+ * @param {string} [side="left"] Which sidebar to toggle, left or right.
+ */
+function toggleSidebar(side="left") {
+    document.getElementById(`${side}Sidebar`).classList.toggle("show");
+    const icon = document.getElementById(`${side}SidebarOpenDirection`);
+    if (icon.innerText === "chevron_right") icon.innerText = "chevron_left";
+    else icon.innerText = "chevron_right";
+}
+
+// Add event listener for open sidebar buttons
+document.getElementById("openLeftSidebar").addEventListener("click", () => toggleSidebar("left"));
+document.getElementById("openRightSidebar").addEventListener("click", () => toggleSidebar("right"));

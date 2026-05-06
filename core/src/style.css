@@ -45,7 +45,7 @@ main {
     flex-grow: 1;
 }
 
-.leftSidebar {
+.sidebar {
     width: 25%;
     height: 100%;
     background-color: var(--background-color);
@@ -427,7 +427,7 @@ main {
 }
 
 @media screen and (max-width: 700px) {
-    .leftSidebar {
+    .sidebar {
         transition: .25s;
         position: fixed;
         top: 0;
@@ -437,10 +437,20 @@ main {
         height: calc(100% - 36px);
         width: 90%;
         z-index: 100;
+        resize: none;
+    }
+
+    .rightSidebar {
+        left: unset;
+        right: -95%;
     }
 
     .leftSidebar.show {
         left: 0;
+    }
+
+    .rightSidebar.show {
+        right: 0;
     }
 
     .bottomBar .item span {

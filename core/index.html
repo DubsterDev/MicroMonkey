@@ -13,7 +13,7 @@
 <body>
     <main>
         <div class="mostContent">
-            <div class="leftSidebar" id="leftSidebar">
+            <div class="sidebar leftSidebar" id="leftSidebar">
                 <div class="fileExplorerHeader">
                     <h3>Files</h3>
                     <div class="newActions">
@@ -38,12 +38,15 @@
                 <div class="serialMonitor" id="serialMonitor">
                 </div>
             </div>
+            <div class="sidebar rightSidebar" id="rightSidebar">
+                <p>Right sidebar</p>
+            </div>
         </div>
         <div class="bottomBar">
             <div class="left">
-                <div id="openFileExplorer" class="item onlyOnMobile">
-                    <i class="material-symbols-outlined" id="fileExplorerOpenDirection">chevron_right</i>
-                    <span>File Explorer</span>
+                <div id="openLeftSidebar" class="item onlyOnMobile">
+                    <i class="material-symbols-outlined" id="leftSidebarOpenDirection">chevron_right</i>
+                    <span>Left Sidebar</span>
                 </div>
                 <div id="findPorts" class="item">
                     <i class="material-symbols-outlined">developer_board</i>
@@ -66,6 +69,10 @@
                 <div id="openSettings" class="item">
                     <i class="material-symbols-outlined">settings</i>
                     <span>Settings</span>
+                </div>
+                <div id="openRightSidebar" class="item onlyOnMobile">
+                    <i class="material-symbols-outlined" id="rightSidebarOpenDirection">chevron_left</i>
+                    <span>Right Sidebar</span>
                 </div>
             </div>
         </div>

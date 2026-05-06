@@ -230,16 +230,3 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
         }
     })
 }
-
-/**
- * Toggles the file explorer on mobile.
- */
-function toggleFileExplorer() {
-    document.getElementById("leftSidebar").classList.toggle("show");
-    const icon = document.getElementById("fileExplorerOpenDirection");
-    if (icon.innerText === "chevron_right") icon.innerText = "chevron_left";
-    else icon.innerText = "chevron_right";
-}
-
-// Add event listener for open file explorer button
-document.getElementById("openFileExplorer").addEventListener("click", toggleFileExplorer);
