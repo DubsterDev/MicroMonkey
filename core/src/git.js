@@ -202,6 +202,12 @@ export async function fsUnlink(filePath, options) {
     return fsResult;
 }
 
+export async function fsDeleteRecursively(path) {
+    if (!path.startsWith("/")) path = "/" + path;
+    
+    return fsEmptyDir(`/${dir}${path}`)
+}
+
 export async function fsEmptyDir(originalPath) {
     if (!originalPath) originalPath = `/${dir}`;
     const dirContents = await fs.readdir(originalPath);
