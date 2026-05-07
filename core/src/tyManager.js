@@ -49,13 +49,22 @@ export async function closeFile(uri) {
     // Convert the URI to a file path
     uri = uriToPath(uri);
 
+    // Close the file
+    await workspace.closeFile(files[uri]);
+    
     // Remove the handle
     delete files[uri];
-
-    // Close the file
-    await workspace.closeFile(uri);
 }
 
+/**
+ * Closes all files
+ */
+export async function closeAllFiles() {
+    for (const key in files) {
+        await closeFile(key);
+    }
+}
+ 
 /**
  * Update the contents of a file
  * @param {string} uri The URI of the file

@@ -398,7 +398,7 @@ export async function getFileAndSave(path) {
     fsWriteFile(path, fileContents);
 
     // Open it in Ty
-    openFile("file://micromonkey" + path, fileContents);
+    await openFile("file://micromonkey" + path, fileContents);
 
     // Return the file contents
     return fileContents;
@@ -432,31 +432,6 @@ export async function addAllFilesToFS() {
     await fsEmptyDir();
     // Start the recursive function to get files
     await addFolderToFS(files, "");
-}
-
-/**
- * Remove cache for all files.
- */
-export async function deleteFileCache() {
-    async function removeFolderFromTy(folder, path) {
-        for (const key in folder) {
-            if (typeof folder[key] === "string") {
-                // If it's a string, it's a file, so close the file
-                const path = path + "/" + folder[key];
-                closeFile("file://micromonkey" + path);
-            } else {
-                // If it's not a string, it's a folder, so call this function again
-                await removeFolderFromTy(folder[key], path + "/" + key);
-            }
-        }
-    }
-
-    // Start the recursive function to close the files
-    await removeFolderFromTy(files, "");
-
-    // for (const key in fileCache) {
-    //     delete fileCache[key];
-    // }
 }
 
 function isInViewport(element) {
