@@ -80,7 +80,6 @@ export async function renderChanges() {
             stageCheckbox.checked = true;
             stageCheckbox.indeterminate = true;
         }
-        console.log(path);
 
         stageCheckbox.addEventListener("change", () => {
             if (stageCheckbox.checked) {
@@ -198,12 +197,12 @@ export async function fsUnlink(filePath, options) {
 }
 
 export async function fsEmptyDir(originalPath) {
-    if (!originalPath) originalPath = `/${dir}/`;
+    if (!originalPath) originalPath = `/${dir}`;
     const dirContents = await fs.readdir(originalPath);
     for (const path of dirContents) {
         if (path === ".git") continue;
         try {
-            const fullPath = originalPath + path;
+            const fullPath = originalPath + "/" + path;
             const stat = await fs.stat(fullPath);
             if (stat.isDirectory()) {
                 if ((await fs.readdir(fullPath)).length)
