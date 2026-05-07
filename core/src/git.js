@@ -1,5 +1,5 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, branch } from "isomorphic-git";
+import { init, statusMatrix } from "isomorphic-git";
 import { Buffer } from "buffer";
 import * as git from "isomorphic-git";
 
@@ -18,19 +18,75 @@ export async function initializeRepo(name) {
     await init({ fs, defaultBranch: "main", dir: "/" + name })
 }
 
+export async function renderChanges() {
+    const changes = await statusMatrix({ fs, dir: `/${dir}` });
+
+    const changesElement = document.getElementById("gitChangesArea");
+    changesElement.innerHTML = "";
+
+    changes.forEach(([path, headStatus, workDirStatus, stageStatus]) => {
+        if (headStatus === 1 && workDirStatus === 1) return;
+
+        const pathParts = path.split("/");
+        
+        const fileName = pathParts[pathParts.length - 1];
+        const parentDir = pathParts.length > 1 ? pathParts.slice(0, -1).join("/") : "";
+
+        let changeType = "not_known";
+
+        if (headStatus === 0) changeType = "untracked";
+        else if (workDirStatus === 2) changeType = "modified";
+        else if (stageStatus === 2) changeType = "staged";
+        else if (stageStatus === 3) changeType = "staged_modified";
+
+        const changeContainer = document.createElement("div");
+        changeContainer.classList.add("change");
+
+        const nameContainer = document.createElement("div");
+        nameContainer.classList.add("name");
+
+        const fileNameSpan = document.createElement("span");
+        fileNameSpan.classList.add("filename");
+        fileNameSpan.innerText = fileName;
+        nameContainer.appendChild(fileNameSpan);
+
+        const parentDirSpan = document.createElement("span");
+        parentDirSpan.classList.add("parentDir");
+        parentDirSpan.innerText = parentDir;
+        nameContainer.appendChild(parentDirSpan);
+
+        changeContainer.appendChild(nameContainer);
+
+        const changeTypeSpan = document.createElement("span");
+        changeTypeSpan.classList.add(changeType);
+        changeTypeSpan.innerText = changeType.substring(0, 1).toUpperCase();
+        changeContainer.appendChild(changeTypeSpan);
+
+        changesElement.appendChild(changeContainer);
+    });
+}
+
 
 // FS Helper Functions
 
-export function fsMkDir(dirName) {
+export async function fsMkDir(dirName) {
     if (!dirName.startsWith("/")) dirName = "/" + dirName;
 
-    return fs.mkdir(`/${dir}${dirName}`)
+    const fsResult = await fs.mkdir(`/${dir}${dirName}`);
+
+    await renderChanges();
+
+    return fsResult;
 }
 
-export function fsRmDir(dirName, options) {
+export async function fsRmDir(dirName, options) {
     if (!dirName.startsWith("/")) dirName = "/" + dirName;
 
-    return fs.rmdir(`/${dir}${dirName}`, options);
+    const fsResult = await fs.rmdir(`/${dir}${dirName}`, options);
+
+    await renderChanges();
+
+    return fsResult;
 }
 
 export function fsReadDir(dirName, options) {
@@ -39,11 +95,15 @@ export function fsReadDir(dirName, options) {
     return fs.readdir(`/${dir}${dirName}`, options)
 }
 
-export function fsRename(oldFilePath, newFilePath) {
+export async function fsRename(oldFilePath, newFilePath) {
     if (!oldFilePath.startsWith("/")) oldFilePath = "/" + oldFilePath;
     if (!newFilePath.startsWith("/")) newFilePath = "/" + newFilePath;
 
-    return fs.rename(`/${dir}${oldFilePath}`, `/${dir}${newFilePath}`);
+    const fsResult = await fs.rename(`/${dir}${oldFilePath}`, `/${dir}${newFilePath}`);
+
+    await renderChanges();
+
+    return fsResult;
 }
 
 export function fsStat(filePath) {
@@ -52,10 +112,14 @@ export function fsStat(filePath) {
     return fs.stat(`/${dir}${filePath}`, options);
 }
 
-export function fsWriteFile(filePath, data, options) {
+export async function fsWriteFile(filePath, data, options) {
     if (!filePath.startsWith("/")) filePath = "/" + filePath;
 
-    return fs.writeFile(`/${dir}${filePath}`, data, options);
+    const fsResult = await fs.writeFile(`/${dir}${filePath}`, data, options);
+
+    await renderChanges();
+
+    return fsResult;
 }
 
 export function fsReadFile(filePath, options) {
@@ -64,10 +128,14 @@ export function fsReadFile(filePath, options) {
     return fs.readFile(`/${dir}${filePath}`, options);
 }
 
-export function fsUnlink(filePath, options) {
+export async function fsUnlink(filePath, options) {
     if (!filePath.startsWith("/")) filePath = "/" + filePath;
 
-    return fs.unlink(`/${dir}${filePath}`, options)
+    const fsResult = await fs.unlink(`/${dir}${filePath}`, options)
+
+    await renderChanges();
+
+    return fsResult;
 }
 
 export async function fsEmptyDir(originalPath) {
@@ -87,4 +155,6 @@ export async function fsEmptyDir(originalPath) {
             console.error(e);
         }
     }
+
+    await renderChanges();
 }

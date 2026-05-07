@@ -4,6 +4,7 @@
     --background-color-variant: light-dark(#dddcdc, #222121);
     --lighter-text-color: light-dark(#3d3d3d, #d4d4d4);
     --text-color: light-dark(#212121, #fafafa);
+    --less-significant-text-color: #787878;
     --success-color: light-dark(#4caf50, #2e7030);
     --warning-color: light-dark(#f0af4e, #c07504);
     --error-color: light-dark(#ff4d4d, #bd0000);
@@ -281,6 +282,22 @@ main {
 
 #gitCommitMessage:focus {
     outline: 2px solid var(--accent-color);
+}
+
+#gitChangesArea .change {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 6px;
+}
+
+#gitChangesArea .name .filename {
+    margin-right: 6px;
+}
+
+#gitChangesArea .name .parentDir {
+    color: var(--less-significant-text-color);
 }
 
 .topArea {
