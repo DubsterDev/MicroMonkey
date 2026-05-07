@@ -1,5 +1,5 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, statusMatrix, add, remove, commit } from "isomorphic-git";
+import { init, statusMatrix, add, remove, commit, resetIndex } from "isomorphic-git";
 import { Buffer } from "buffer";
 import { getInput } from "./commandPalette";
 
@@ -42,8 +42,10 @@ export async function renderChanges() {
 
         if (stageStatus === 2) changeType = "staged";
         else if (stageStatus === 3) changeType = "staged_modified";
-        else if (workDirStatus === 2) changeType = "modified";
         else if (headStatus === 0) changeType = "untracked";
+        else if (workDirStatus === 2) changeType = "modified";
+        else if (headStatus === 1 && workDirStatus === 0 && stageStatus === 0) changeType = "deleted";
+        else if (headStatus === 1 && workDirStatus === 0 && stageStatus === 1) changeType = "deleted_unstaged";
 
         const changeContainer = document.createElement("div");
         changeContainer.classList.add("change");
@@ -74,18 +76,22 @@ export async function renderChanges() {
         const stageCheckbox = document.createElement("input");
         stageCheckbox.type = "checkbox";
 
-        if (changeType === "staged") {
+        if (changeType === "staged" || changeType === "deleted") {
             stageCheckbox.checked = true;
         } else if (changeType === "staged_modified") {
             stageCheckbox.checked = true;
             stageCheckbox.indeterminate = true;
         }
 
-        stageCheckbox.addEventListener("change", () => {
+        stageCheckbox.addEventListener("change", async () => {
             if (stageCheckbox.checked) {
-                add({ fs, dir: `/${dir}`, filepath: path });
+                if (changeType === "deleted_unstaged") {
+                    await remove({ fs, dir: `/${dir}`, filepath: path });
+                } else {
+                    await add({ fs, dir: `/${dir}`, filepath: path });
+                }
             } else {
-                remove({ fs, dir: `/${dir}`, filepath: path });
+                await resetIndex({ fs, dir: `/${dir}`, filepath: path });
             }
             renderChanges();
         });
