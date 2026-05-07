@@ -1,12 +1,12 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, statusMatrix } from "isomorphic-git";
+import { init, statusMatrix, add, remove } from "isomorphic-git";
 import { Buffer } from "buffer";
 import * as git from "isomorphic-git";
 
 window.Buffer = Buffer;
 
 const dir = "bob";
-const fs = new LightningFS('fs').promises;
+const fs = new LightningFS("fs").promises;
 export function setupGit() {
     window.fs = fs;
     window.init = initializeRepo;
@@ -14,8 +14,8 @@ export function setupGit() {
 }
 
 export async function initializeRepo(name) {
-    await fs.mkdir("/" + name)
-    await init({ fs, defaultBranch: "main", dir: "/" + name })
+    await fs.mkdir("/" + name);
+    await init({ fs, defaultBranch: "main", dir: "/" + name });
 }
 
 export async function renderChanges() {
@@ -28,16 +28,17 @@ export async function renderChanges() {
         if (headStatus === 1 && workDirStatus === 1) return;
 
         const pathParts = path.split("/");
-        
+
         const fileName = pathParts[pathParts.length - 1];
-        const parentDir = pathParts.length > 1 ? pathParts.slice(0, -1).join("/") : "";
+        const parentDir =
+            pathParts.length > 1 ? pathParts.slice(0, -1).join("/") : "";
 
         let changeType = "not_known";
 
-        if (headStatus === 0) changeType = "untracked";
-        else if (workDirStatus === 2) changeType = "modified";
-        else if (stageStatus === 2) changeType = "staged";
+        if (stageStatus === 2) changeType = "staged";
         else if (stageStatus === 3) changeType = "staged_modified";
+        else if (workDirStatus === 2) changeType = "modified";
+        else if (headStatus === 0) changeType = "untracked";
 
         const changeContainer = document.createElement("div");
         changeContainer.classList.add("change");
@@ -57,15 +58,41 @@ export async function renderChanges() {
 
         changeContainer.appendChild(nameContainer);
 
+        const changeTypeAndCheckboxContainer = document.createElement("div");
+        changeTypeAndCheckboxContainer.classList.add("stageArea");
+
         const changeTypeSpan = document.createElement("span");
         changeTypeSpan.classList.add(changeType);
         changeTypeSpan.innerText = changeType.substring(0, 1).toUpperCase();
-        changeContainer.appendChild(changeTypeSpan);
+        changeTypeAndCheckboxContainer.appendChild(changeTypeSpan);
+
+        const stageCheckbox = document.createElement("input");
+        stageCheckbox.type = "checkbox";
+
+        if (changeType === "staged") {
+            stageCheckbox.checked = true;
+        } else if (changeType === "staged_modified") {
+            stageCheckbox.checked = true;
+            stageCheckbox.indeterminate = true;
+        }
+        console.log(path);
+
+        stageCheckbox.addEventListener("change", () => {
+            if (stageCheckbox.checked) {
+                add({ fs, dir: `/${dir}`, filepath: path });
+            } else {
+                remove({ fs, dir: `/${dir}`, filepath: path });
+            }
+            renderChanges();
+        });
+
+        changeTypeAndCheckboxContainer.appendChild(stageCheckbox);
+
+        changeContainer.appendChild(changeTypeAndCheckboxContainer);
 
         changesElement.appendChild(changeContainer);
     });
 }
-
 
 // FS Helper Functions
 
@@ -92,14 +119,17 @@ export async function fsRmDir(dirName, options) {
 export function fsReadDir(dirName, options) {
     if (!dirName.startsWith("/")) dirName = "/" + dirName;
 
-    return fs.readdir(`/${dir}${dirName}`, options)
+    return fs.readdir(`/${dir}${dirName}`, options);
 }
 
 export async function fsRename(oldFilePath, newFilePath) {
     if (!oldFilePath.startsWith("/")) oldFilePath = "/" + oldFilePath;
     if (!newFilePath.startsWith("/")) newFilePath = "/" + newFilePath;
 
-    const fsResult = await fs.rename(`/${dir}${oldFilePath}`, `/${dir}${newFilePath}`);
+    const fsResult = await fs.rename(
+        `/${dir}${oldFilePath}`,
+        `/${dir}${newFilePath}`,
+    );
 
     await renderChanges();
 
@@ -131,7 +161,7 @@ export function fsReadFile(filePath, options) {
 export async function fsUnlink(filePath, options) {
     if (!filePath.startsWith("/")) filePath = "/" + filePath;
 
-    const fsResult = await fs.unlink(`/${dir}${filePath}`, options)
+    const fsResult = await fs.unlink(`/${dir}${filePath}`, options);
 
     await renderChanges();
 
@@ -147,8 +177,9 @@ export async function fsEmptyDir(originalPath) {
             const fullPath = originalPath + path;
             const stat = await fs.stat(fullPath);
             if (stat.isDirectory()) {
-                if ((await fs.readdir(fullPath)).length) await fsEmptyDir(fullPath);
-                
+                if ((await fs.readdir(fullPath)).length)
+                    await fsEmptyDir(fullPath);
+
                 fs.rmdir(fullPath);
             } else fs.unlink(fullPath);
         } catch (e) {
