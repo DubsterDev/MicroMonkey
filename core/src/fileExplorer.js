@@ -1,5 +1,6 @@
 // Import the openTab function to allow clicking on tabs
 import { getInput } from "./commandPalette";
+import { fsMkDir, fsWriteFile } from "./git";
 import { openTab } from "./openFilesManager";
 import { toggleSidebar } from "./otherUiManager";
 import { createDirectory, createFile, getFiles } from "./serial";
@@ -55,8 +56,13 @@ async function newFile(base="/") {
     // If escaped or hit enter with no content, don't create the file
     if (fileName === undefined || fileName.trim() === "") return;
 
+    const fullPath = `${base}${fileName}`;
+
     // Use serial.js to create the file
-    await createFile(`${base}${fileName}`);
+    await createFile(fullPath);
+
+    // Tell git about the new file
+    await fsWriteFile(fullPath, "");
 
     // Reload the file explorer
     newFolderStructure(await getFiles());
@@ -74,8 +80,13 @@ async function newFolder(base="/") {
     // If escaped or hit enter with no content, don't create the folder
     if (folderName === undefined || folderName.trim() === "") return;
 
+    const fullPath = `${base}${folderName}`;
+
     // Use serial.js to create the folder
-    await createDirectory(`${base}${folderName}`);
+    await createDirectory(fullPath);
+
+    // Tell git the new folder was created
+    await fsMkDir(fullPath);
 
     // Reload the file explorer
     newFolderStructure(await getFiles());
