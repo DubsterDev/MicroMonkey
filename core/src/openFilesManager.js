@@ -1,6 +1,7 @@
 // Import functions from editor to change what is showing
 import { getInput } from "./commandPalette";
 import { changeModel, createModel } from "./editor";
+import { fsEmptyDir, fsMkDir, fsWriteFile } from "./git";
 
 // Functions to get files from the serial device and write files
 import { getFile, getFiles, writeFile } from "./serial";
@@ -8,9 +9,6 @@ import { closeFile, openFile } from "./tyManager";
 
 // An object containing the open tabs
 const tabs = {};
-
-// An object containing the contents of open files
-const fileCache = {};
 
 // References to monaco and custom editor in the DOM
 const codeEditorElement = document.getElementById("codeEditor");
@@ -52,7 +50,7 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
         let model;
         if (type === "monaco") {
             // Get the file's content from the board
-            const content = await getFileWithCache(path);
+            const content = await getFileAndSave(path);
 
             // A list of file extensions and their corresponding languages in Monaco
             const languages = {
@@ -124,7 +122,7 @@ export function saveActiveFile() {
             tab.saved = true;
 
             // Update the cache
-            fileCache[path] = contents;
+            await fsWriteFile(path, contents);
 
             // And render the tabs
             renderTabs();
@@ -368,19 +366,16 @@ function renderTabs(activateActiveTab=true) {
 }
 
 /**
- * Gets the contents of a file from the cache, or board if it hasn't already been opened.
+ * Gets the contents of a file from the board and store it in the FS.
  * @param {string} path The path of the file to retrieve
- * @param {boolean} bustCache Update cache for this file. Defaults to false
- * @todo Bust cache is default to true right now; change it to false later
  * @returns {string} The contents of the file
  */
-export async function getFileWithCache(path, bustCache=true) {
-    // If the contents are cached, return the cached contents
-    if (path in fileCache && !bustCache) return fileCache[path];
-
-    // Otherwise, get the contents from the board, and store it in the cache
+export async function getFileAndSave(path) {
+    // Get the contents from the board
     const fileContents = await getFile(path);
-    fileCache[path] = fileContents;
+
+    // Save it to fs
+    fsWriteFile(path, fileContents);
 
     // Open it in Ty
     openFile("file://micromonkey" + path, fileContents);
@@ -390,27 +385,33 @@ export async function getFileWithCache(path, bustCache=true) {
 }
 
 /**
- * Loads all the files on the board into the file cache.
- * @param {boolean} [bustCache=false] Update cache for all files. Defaults to false
+ * Loads all the files on the board into the FS.
  */
-export async function addAllFilesToCache(bustCache=false) {
+export async function addAllFilesToFS() {
     // Get the list of files from the board
     const files = await getFiles();
 
-    async function addFolderToCache(folder, path) {
+    async function addFolderToFS(folder, path) {
+        try {
+            await fsMkDir(path);
+        } catch {
+            // it may already exist
+        }
         for (const key in folder) {
             if (typeof folder[key] === "string") {
                 // If it's a string, it's a file, so get the file and add it to the cache
-                await getFileWithCache(path + "/" + folder[key], bustCache);
+                await getFileAndSave(path + "/" + folder[key], bustCache);
             } else {
                 // If it's not a string, it's a folder, so call this function again
-                await addFolderToCache(folder[key], path + "/" + key);
+                await addFolderToFS(folder[key], path + "/" + key);
             }
         }
     }
 
+    // Delete current cache
+    await fsEmptyDir();
     // Start the recursive function to get files
-    await addFolderToCache(files, "")
+    await addFolderToFS(files, "")
 }
 
 /**
@@ -433,9 +434,9 @@ export async function deleteFileCache() {
     // Start the recursive function to close the files
     await removeFolderFromTy(files, "")
 
-    for (const key in fileCache) {
-        delete fileCache[key];
-    }
+    // for (const key in fileCache) {
+    //     delete fileCache[key];
+    // }
 }
 
 function isInViewport(element) {
