@@ -1,7 +1,7 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, statusMatrix, add, remove } from "isomorphic-git";
+import { init, statusMatrix, add, remove, commit } from "isomorphic-git";
 import { Buffer } from "buffer";
-import * as git from "isomorphic-git";
+import { getInput } from "./commandPalette";
 
 window.Buffer = Buffer;
 
@@ -10,7 +10,12 @@ const fs = new LightningFS("fs").promises;
 export function setupGit() {
     window.fs = fs;
     window.init = initializeRepo;
-    window.git = git;
+    document
+        .getElementById("gitCommitButton")
+        .addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            commitStaged();
+        });
 }
 
 export async function initializeRepo(name) {
@@ -92,6 +97,30 @@ export async function renderChanges() {
 
         changesElement.appendChild(changeContainer);
     });
+}
+
+export async function commitStaged() {
+    const gitCommitMessage = document.getElementById("gitCommitMessage");
+    let message = gitCommitMessage.value;
+    if (message.trim().length === 0) {
+        message = await getInput(
+            "Enter a commit message",
+            "Enter a commit message",
+        );
+        if (message === undefined || message.trim().length === 0) {
+            await getInput(
+                "A commit message is required",
+                "Try committing again",
+                "",
+                ["Okay"],
+                false,
+            );
+            return;
+        }
+    }
+    await commit({ fs, dir: `/${dir}`, message });
+    gitCommitMessage.value = "";
+    renderChanges();
 }
 
 // FS Helper Functions
