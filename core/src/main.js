@@ -46,7 +46,7 @@ window.serialInterface =
     import.meta.env.MODE === "android" ? new AndroidSerial() : new WebSerial();
 
 // Insert the editor into the DOM
-const editor = setUpMonaco();
+const [editor, diffEditor] = setUpMonaco();
 
 // Start open files manager
 initializeOpenFilesManager(editor);

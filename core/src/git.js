@@ -1,12 +1,16 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, statusMatrix, add, remove, commit, resetIndex } from "isomorphic-git";
+import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef } from "isomorphic-git";
 import { Buffer } from "buffer";
 import { getInput } from "./commandPalette";
+import { createModel } from "./editor";
+import { openTab } from "./openFilesManager";
 
 window.Buffer = Buffer;
 
 const dir = "bob";
 const fs = new LightningFS("fs").promises;
+const originalModel = createModel("", `file://micromonkey/fileatgithead.mm`);
+
 export function setupGit() {
     window.fs = fs;
     window.init = initializeRepo;
@@ -49,6 +53,27 @@ export async function renderChanges() {
 
         const changeContainer = document.createElement("div");
         changeContainer.classList.add("change");
+
+        changeContainer.addEventListener("click", async (ev) => {
+            const oid = await resolveRef({
+              fs,
+              dir: `/${dir}`,
+              ref: 'HEAD'
+            });
+            
+            const { blob } = await readBlob({
+              fs,
+              dir: `/${dir}`,
+              oid: oid,
+              filepath: path
+            });
+            
+            const originalContents = Buffer.from(blob).toString("utf8");
+            originalModel.setValue(originalContents);
+
+            await openTab(path);
+            openTab(path, "Uncommitted changes", "monaco-diff", null, originalModel);
+        })
 
         const nameContainer = document.createElement("div");
         nameContainer.classList.add("name");

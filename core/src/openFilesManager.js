@@ -12,6 +12,7 @@ const tabs = {};
 
 // References to monaco and custom editor in the DOM
 const codeEditorElement = document.getElementById("codeEditor");
+const codeDiffEditorElement = document.getElementById("codeDiffEditor");
 const customEditorElement = document.getElementById("customEditor");
 const serialMonitor = document.getElementById("serialMonitor");
 const rightPanel = document.getElementById("rightPanel");
@@ -31,23 +32,32 @@ export function initializeOpenFilesManager() {
  * Opens or focuses a tab
  * @param {string} path The path of the file on the board
  * @param {string} title A name to be shown on the tab. If no name is provided, the last segment of the path is used
- * @param {string} type The type of editor to be shown. Either `monaco` (meaning content is fetched from board and displayed in a Monaco editor) or `custom` (must provide render function)
+ * @param {string} type The type of editor to be shown. Either `monaco` (meaning content is fetched from board and displayed in a Monaco editor), `monaco-diff` (modified content is fetched from board, must provide original model) or `custom` (must provide render function)
  * @param {Function|null} renderFunction If the passed type is `custom`, this parameter must have a function that receives a root element where you can append new elements to. It will be called whenever the tab is clicked
+ * @param {*} [originalModel=null] If the passed type is `monaco-diff`, this parameter must have a model that will be displayed side by side with the modified file.
  */
 export async function openTab(
     path,
     title = "",
     type = "monaco",
     renderFunction = null,
+    originalModel = null
 ) {
+    // Change the path used everywhere else if it's a monaco-diff
+    const boardPath = path;
+    if (type === "monaco-diff") {
+        path = "/fileatgithead.mm";
+    }
+    
     // Check if this tab is opened already, while deactivating the currently active tab
     Object.keys(tabs).forEach((path) => {
         const tab = tabs[path];
+        
         if (tab.active) {
             tab.active = false;
         }
     });
-    if (path in tabs) {
+    if (path in tabs && type !== "monaco-diff") {
         // If the tab is already opened, activate it
         tabs[path].active = true;
     } else {
@@ -55,7 +65,7 @@ export async function openTab(
         let model;
         if (type === "monaco") {
             // Get the file's content from the board
-            const content = await getFileAndSave(path);
+            const content = await getFileAndSave(boardPath);
 
             // A list of file extensions and their corresponding languages in Monaco
             const languages = {
@@ -76,6 +86,8 @@ export async function openTab(
 
             // Create a monaco model for the file
             model = createModel(content, "file://micromonkey" + path, language);
+        } else if (type === "monaco-diff") {
+            model = tabs[boardPath].model;
         }
 
         // Add the tab to the list of tabs
@@ -83,6 +95,7 @@ export async function openTab(
             title: title === "" ? path.split("/").at(-1) : title,
             type: type,
             model: model,
+            originalModel: originalModel,
             renderFunction: renderFunction,
             active: true,
             saved: true,
@@ -351,14 +364,22 @@ function renderTabs(activateActiveTab = true) {
         // change the model or switch to custom editor mode
         if (activateActiveTab && tab.active && tab.type === "monaco") {
             codeEditorElement.style.display = "block";
+            codeDiffEditorElement.style.display = "none";
             customEditorElement.style.display = "none";
 
             // Show the save button
             saveButton.style.display = "flex";
 
             changeModel(tab.model);
+        } else if (activateActiveTab && tab.active && tab.type === "monaco-diff") {
+            codeEditorElement.style.display = "none";
+            codeDiffEditorElement.style.display = "block";
+            customEditorElement.style.display = "none";
+
+            changeModel(tab.model, tab.originalModel);
         } else if (activateActiveTab && tab.active && tab.type === "custom") {
             codeEditorElement.style.display = "none";
+            codeDiffEditorElement.style.display = "none";
             customEditorElement.style.display = "block";
             customEditorElement.innerText = "";
             tab.renderFunction(customEditorElement);

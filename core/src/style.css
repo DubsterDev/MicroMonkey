@@ -132,13 +132,13 @@ main {
     height: 100%;
 }
 
-#codeEditor,
+.monacoEditor,
 #customEditor {
     flex: 0 1 100%;
     display: none;
 }
 
-#codeEditor {
+.monacoEditor {
     overflow: hidden;
 }
 
