@@ -13,13 +13,27 @@ import { getFiles, startSerial } from "./serial";
 import { addNewFileEventListeners, newFolderStructure } from "./fileExplorer";
 
 // For managing the open tabs
-import { closeActiveTab, initializeOpenFilesManager, openTab, saveActiveFile } from "./openFilesManager";
+import {
+    addAllFilesToFS,
+    closeActiveTab,
+    initializeOpenFilesManager,
+    openTab,
+    saveActiveFile,
+} from "./openFilesManager";
 
 // Mainly just for the context menu, but there are also some render functions here
-import { renderWelcomeScreen, renderWhatsNewScreen, setupUiManager, startWhatsNewScreenIfVersionChanged } from "./otherUiManager";
+import {
+    renderWelcomeScreen,
+    renderWhatsNewScreen,
+    setupUiManager,
+    startWhatsNewScreenIfVersionChanged,
+} from "./otherUiManager";
 
 // For starting the flasher
 import { addFlasherEventListeners } from "./flasher";
+
+// For Git
+import { setupGit } from "./git.js";
 
 // Handles CTRL+SHIFT+P and running commands
 import { setupCommandPalette } from "./commandPalette";
@@ -28,7 +42,8 @@ import { WebSerial } from "./communicationProtocols/webSerial";
 import { AndroidSerial } from "./communicationProtocols/androidSerial";
 
 // Get the serial interface
-window.serialInterface = import.meta.env.MODE === "android" ? new AndroidSerial() : new WebSerial();
+window.serialInterface =
+    import.meta.env.MODE === "android" ? new AndroidSerial() : new WebSerial();
 
 // Insert the editor into the DOM
 const editor = setUpMonaco();
@@ -40,7 +55,12 @@ initializeOpenFilesManager(editor);
 setupSettings();
 
 // Create a Welcome to MicroMonkey tab
-openTab("/.default_files/micromonkey/welcome.mm", "Welcome to MicroMonkey", "custom", renderWelcomeScreen);
+openTab(
+    "/.default_files/micromonkey/welcome.mm",
+    "Welcome to MicroMonkey",
+    "custom",
+    renderWelcomeScreen,
+);
 
 // Open the "What's New" screen if the version has changed since last load
 startWhatsNewScreenIfVersionChanged();
@@ -50,6 +70,7 @@ startWhatsNewScreenIfVersionChanged();
 startSerial(editor, async () => {
     // When connected to a board, get the files from it and tell file explorer
     newFolderStructure(await getFiles());
+    addAllFilesToFS();
 });
 
 document.addEventListener("keydown", (ev) => {
@@ -80,5 +101,12 @@ addNewFileEventListeners();
 // Add event listeners for the flasher
 addFlasherEventListeners();
 
+// Setup Git
+setupGit();
+
 // Add a event listener for the reload file explorer button
-document.getElementById("reloadFileExplorer").addEventListener("click", async () => newFolderStructure(await getFiles()));
+document
+    .getElementById("reloadFileExplorer")
+    .addEventListener("click", async () =>
+        newFolderStructure(await getFiles()),
+    );
