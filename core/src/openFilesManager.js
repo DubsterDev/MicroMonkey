@@ -34,9 +34,14 @@ export function initializeOpenFilesManager() {
  * @param {string} type The type of editor to be shown. Either `monaco` (meaning content is fetched from board and displayed in a Monaco editor) or `custom` (must provide render function)
  * @param {Function|null} renderFunction If the passed type is `custom`, this parameter must have a function that receives a root element where you can append new elements to. It will be called whenever the tab is clicked
  */
-export async function openTab(path, title="", type="monaco", renderFunction=null) {
+export async function openTab(
+    path,
+    title = "",
+    type = "monaco",
+    renderFunction = null,
+) {
     // Check if this tab is opened already, while deactivating the currently active tab
-    Object.keys(tabs).forEach(path => {
+    Object.keys(tabs).forEach((path) => {
         const tab = tabs[path];
         if (tab.active) {
             tab.active = false;
@@ -54,19 +59,20 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
 
             // A list of file extensions and their corresponding languages in Monaco
             const languages = {
-                "py": "python",
-                "json": "json",
-                "md": "markdown",
-                "js": "javascript",
-                "html": "html",
-                "css": "css"
-            }
+                py: "python",
+                json: "json",
+                md: "markdown",
+                js: "javascript",
+                html: "html",
+                css: "css",
+            };
 
             // Split the file path by .
             const segments = path.split(".");
 
             // Get the last segment, which is the file extension, and look up the language
-            const language = languages[segments[segments.length - 1]] ?? "plaintext";
+            const language =
+                languages[segments[segments.length - 1]] ?? "plaintext";
 
             // Create a monaco model for the file
             model = createModel(content, "file://micromonkey" + path, language);
@@ -74,12 +80,12 @@ export async function openTab(path, title="", type="monaco", renderFunction=null
 
         // Add the tab to the list of tabs
         tabs[path] = {
-            "title": title === "" ? path.split("/").at(-1) : title,
-            "type": type,
-            "model": model,
-            "renderFunction": renderFunction,
-            "active": true,
-            "saved": true
+            title: title === "" ? path.split("/").at(-1) : title,
+            type: type,
+            model: model,
+            renderFunction: renderFunction,
+            active: true,
+            saved: true,
         };
     }
 
@@ -108,7 +114,7 @@ export function fileChanged(path) {
  */
 export function saveActiveFile() {
     // Loop through the paths of open tabs
-    Object.keys(tabs).forEach(async path => {
+    Object.keys(tabs).forEach(async (path) => {
         // Get the tab object
         const tab = tabs[path];
         if (tab.active && tab.type === "monaco") {
@@ -116,7 +122,7 @@ export function saveActiveFile() {
             const contents = tab.model.getValue();
 
             // If this is an active tab, and it is a file, write the file to the board
-            await writeFile(contents, path)
+            await writeFile(contents, path);
 
             // Mark it as saved
             tab.saved = true;
@@ -136,7 +142,7 @@ export function saveActiveFile() {
  * @param {string} newPath The new path of the file
  * @param {boolean} skipRender Whether or not to skip rendering the tabs again, defaults to false
  */
-export function renameTab(oldPath, newPath, skipRender=false) {
+export async function renameTab(oldPath, newPath, skipRender = false) {
     // Get the tab
     const tab = tabs[oldPath];
 
@@ -162,24 +168,24 @@ export function renameTab(oldPath, newPath, skipRender=false) {
  * @param {string} oldPath The file path to rename everything under, should end with a /
  * @param {string} newPath The file path to rename everything under to, should end with a /
  */
-export function renameTabsInDirectory(oldPath, newPath) {
+export async function renameTabsInDirectory(oldPath, newPath) {
     // Loop through all the tabs
-    Object.keys(tabs).forEach(tabPath => {
+    Object.keys(tabs).forEach(async (tabPath) => {
         // And rename a tab if the path starts with the provided path
-        if (tabPath.startsWith(oldPath)) renameTab(tabPath, tabPath.replace(oldPath, newPath), true);
+        if (tabPath.startsWith(oldPath))
+            await renameTab(tabPath, tabPath.replace(oldPath, newPath), true);
     });
 
     // Render the tabs after all renaming is done
-    renderTabs();
+    await renderTabs();
 }
-
 
 /**
  * Remove a tab from the tab strip if it's open
  * @param {string} path The file path
  * @param {boolean} force Forces the tab to close even if unsaved. Default is false
  */
-export async function closeTab(path, force=false) {
+export async function closeTab(path, force = false) {
     // Get the tab object
     const tab = tabs[path];
 
@@ -188,13 +194,18 @@ export async function closeTab(path, force=false) {
 
     // If the tab is unsaved, confirm with the user
     if (!tab.saved && !force) {
-        const result = await getInput(`${tab.title} isn't saved. Are you sure you want to close it?`, "Pick an option", "", ["No", "Yes"], false);
+        const result = await getInput(
+            `${tab.title} isn't saved. Are you sure you want to close it?`,
+            "Pick an option",
+            "",
+            ["No", "Yes"],
+            false,
+        );
         if (result !== "Yes") return;
     }
 
     // Dispose of the model, if it is monaco
     if (tab.type === "monaco") tab.model.dispose();
-
     // Or, if it's a custom editor, remove content from the custom editor
     else if (tab.type === "custom") customEditorElement.innerText = "";
 
@@ -203,7 +214,8 @@ export async function closeTab(path, force=false) {
 
     // If this was an active tab, activate the last tab if possible
     const tabKeys = Object.keys(tabs);
-    if (tab.active && tabKeys.length > 0) tabs[tabKeys[tabKeys.length - 1]].active = true;
+    if (tab.active && tabKeys.length > 0)
+        tabs[tabKeys[tabKeys.length - 1]].active = true;
 
     // Render the tabs
     renderTabs();
@@ -214,9 +226,9 @@ export async function closeTab(path, force=false) {
  * @param {string} path The file path to remove everything under, should end with a /
  * @param force Forces tabs to close even if unsaved. Default is false
  */
-export function closeTabsInDirectory(path, force=false) {
+export function closeTabsInDirectory(path, force = false) {
     // Loop through all the tabs
-    Object.keys(tabs).forEach(tabPath => {
+    Object.keys(tabs).forEach((tabPath) => {
         // And close a tab if the path starts with the provided path
         if (tabPath.startsWith(path)) closeTab(tabPath, force);
     });
@@ -226,13 +238,13 @@ export function closeTabsInDirectory(path, force=false) {
  * Closes the active tab
  * @param {boolean} force Forces the tab to close even if unsaved. Default is false
  */
-export function closeActiveTab(force=false) {
-    Object.keys(tabs).forEach(path => {
+export function closeActiveTab(force = false) {
+    Object.keys(tabs).forEach((path) => {
         const tab = tabs[path];
         if (tab.active) {
-            closeTab(path, force);            
+            closeTab(path, force);
         }
-    })
+    });
 }
 
 /**
@@ -257,7 +269,7 @@ export function requestReRender(path) {
  * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco or calls the render function
  * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco or show call the custom render function
  */
-function renderTabs(activateActiveTab=true) {
+function renderTabs(activateActiveTab = true) {
     // Get and clear the tabs container
     const tabsContainer = document.getElementById("tabs");
     tabsContainer.innerText = "";
@@ -267,13 +279,13 @@ function renderTabs(activateActiveTab=true) {
 
     // Loop through the paths of the tabs
     const tabPaths = Object.keys(tabs);
-    tabPaths.forEach(path => {
+    tabPaths.forEach((path) => {
         // Get the tab's object
         const tab = tabs[path];
 
         // Create a container for the tab
         const tabContainer = document.createElement("div");
-        
+
         // Add the tab class and set the path data field
         tabContainer.dataset.path = path;
         tabContainer.classList.add("tab");
@@ -310,13 +322,12 @@ function renderTabs(activateActiveTab=true) {
 
             // Close the tab
             closeTab(path);
-
         });
 
         // When the tab is clicked, set it as active
         tabContainer.addEventListener("click", () => {
             // Loop through the tab paths
-            Object.keys(tabs).forEach(aTabPath => {
+            Object.keys(tabs).forEach((aTabPath) => {
                 // Get the tab object
                 const aTab = tabs[aTabPath];
 
@@ -356,7 +367,16 @@ function renderTabs(activateActiveTab=true) {
 
     // Scroll the active tab into view
     const activeTab = document.querySelector(".tabs .tab.active");
-    if (activeTab !== null && activeTab !== undefined && !isInViewport(activeTab)) activeTab?.scrollIntoView({behavior: "instant", block: "nearest", inline: "nearest"});
+    if (
+        activeTab !== null &&
+        activeTab !== undefined &&
+        !isInViewport(activeTab)
+    )
+        activeTab?.scrollIntoView({
+            behavior: "instant",
+            block: "nearest",
+            inline: "nearest",
+        });
 
     // If there are no tabs, set the custom editor to visible to get the monkey to appear
     if (tabPaths.length === 0) {
@@ -411,7 +431,7 @@ export async function addAllFilesToFS() {
     // Delete current cache
     await fsEmptyDir();
     // Start the recursive function to get files
-    await addFolderToFS(files, "")
+    await addFolderToFS(files, "");
 }
 
 /**
@@ -432,7 +452,7 @@ export async function deleteFileCache() {
     }
 
     // Start the recursive function to close the files
-    await removeFolderFromTy(files, "")
+    await removeFolderFromTy(files, "");
 
     // for (const key in fileCache) {
     //     delete fileCache[key];
@@ -440,11 +460,13 @@ export async function deleteFileCache() {
 }
 
 function isInViewport(element) {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
+    const rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <=
+            (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <=
+            (window.innerWidth || document.documentElement.clientWidth)
+    );
 }
