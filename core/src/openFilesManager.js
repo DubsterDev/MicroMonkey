@@ -400,7 +400,7 @@ export async function addAllFilesToFS() {
         for (const key in folder) {
             if (typeof folder[key] === "string") {
                 // If it's a string, it's a file, so get the file and add it to the cache
-                await getFileAndSave(path + "/" + folder[key], bustCache);
+                await getFileAndSave(path + "/" + folder[key]);
             } else {
                 // If it's not a string, it's a folder, so call this function again
                 await addFolderToFS(folder[key], path + "/" + key);
