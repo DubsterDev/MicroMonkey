@@ -72,7 +72,7 @@ export async function renderChanges() {
             originalModel.setValue(originalContents);
 
             await openTab(`/${path}`);
-            openTab(`/${path}`, "Uncommitted changes", "monaco-diff", null, originalModel);
+            openTab(`/${path}`, `Changes to ${fileName}`, "monaco-diff", null, originalModel);
         })
 
         const nameContainer = document.createElement("div");
