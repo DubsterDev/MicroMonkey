@@ -108,6 +108,8 @@ export async function renderChanges() {
             stageCheckbox.indeterminate = true;
         }
 
+        stageCheckbox.addEventListener("click", (ev) => ev.stopPropagation())
+
         stageCheckbox.addEventListener("change", async () => {
             if (stageCheckbox.checked) {
                 if (changeType === "deleted_unstaged") {
