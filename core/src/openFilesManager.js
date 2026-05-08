@@ -99,6 +99,7 @@ export async function openTab(
             renderFunction: renderFunction,
             active: true,
             saved: true,
+            realPath: boardPath
         };
     }
 
@@ -125,28 +126,45 @@ export function fileChanged(path) {
 /**
  * Write the active file's content to the connected device
  */
-export function saveActiveFile() {
-    // Loop through the paths of open tabs
-    Object.keys(tabs).forEach(async (path) => {
-        // Get the tab object
+export async function saveActiveFile() {
+    // Find the active tabs
+    const activeTabPaths = Object.keys(tabs).filter(path => {
         const tab = tabs[path];
-        if (tab.active && tab.type === "monaco") {
-            // Get the new contents
-            const contents = tab.model.getValue();
-
-            // If this is an active tab, and it is a file, write the file to the board
-            await writeFile(contents, path);
-
-            // Mark it as saved
-            tab.saved = true;
-
-            // Update the cache
-            await fsWriteFile(path, contents);
-
-            // And render the tabs
-            renderTabs();
-        }
+        return tab.active;
     });
+
+    // If there are no active tabs, exit
+    if (activeTabPaths.length === 0) return;
+
+    // Find the first active tab
+    const activeTab = tabs[activeTabPaths[0]];
+
+    // If it's a custom editor, exit
+    if (activeTab.type === "custom") return;
+
+    // If it's a monaco-diff, find the real monaco editor
+    const tab = activeTab.type === "monaco" ? activeTab : tabs[activeTab.realPath];
+
+    // If it's a monaco-diff, find the realPath, otherwise, the path of the active tab
+    const path = activeTab.type === "monaco" ? activeTabPaths[0] : activeTab.realPath;
+
+    // This should always be true
+    if (tab.type === "monaco") {
+        // Get the new contents
+        const contents = tab.model.getValue();
+
+        // Write the file to the board
+        await writeFile(contents, path);
+
+        // Mark it as saved
+        tab.saved = true;
+
+        // Update the cache
+        await fsWriteFile(path, contents);
+
+        // And render the tabs
+        renderTabs();
+    }
 }
 
 /**
