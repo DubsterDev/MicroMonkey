@@ -46,12 +46,22 @@
                         <button class="material-symbols-outlined" id="reloadGit">refresh</button>
                     </div>
                 </div>
-                <div id="gitCommitArea">
-                    <input type="text" id="gitCommitMessage" placeholder="Commit message">
-                    <button class="wide" id="gitCommitButton">Commit</button>
+                <div id="gitLoading">
+                    <p>Loading...</p>
+                    <p>Tip: A board has to be connected to use git.</p>
                 </div>
-                <p>Changes</p>
-                <div id="gitChangesArea"></div>
+                <div id="gitNotEnabled">
+                    <p>Looks like you don't have git enabled for this board yet.</p>
+                    <button class="wide" id="enableGit">Setup Git</button>
+                </div>
+                <div id="gitEnabled">
+                    <div id="gitCommitArea">
+                        <input type="text" id="gitCommitMessage" placeholder="Commit message">
+                        <button class="wide" id="gitCommitButton">Commit</button>
+                    </div>
+                    <p>Changes</p>
+                    <div id="gitChangesArea"></div>
+                </div>
             </div>
         </div>
         <div class="bottomBar">

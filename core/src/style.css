@@ -271,6 +271,10 @@ main {
     content: "keyboard_arrow_right";
 }
 
+#gitNotEnabled, #gitEnabled {
+    display: none;
+}
+
 #gitCommitMessage {
     display: block;
     width: 100%;

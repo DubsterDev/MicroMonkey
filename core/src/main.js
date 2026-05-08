@@ -14,7 +14,6 @@ import { addNewFileEventListeners, newFolderStructure } from "./fileExplorer";
 
 // For managing the open tabs
 import {
-    addAllFilesToFS,
     closeActiveTab,
     initializeOpenFilesManager,
     openTab,
@@ -70,7 +69,8 @@ startWhatsNewScreenIfVersionChanged();
 startSerial(editor, async () => {
     // When connected to a board, get the files from it and tell file explorer
     newFolderStructure(await getFiles());
-    addAllFilesToFS();
+    // Setup Git
+    setupGit();
 });
 
 document.addEventListener("keydown", (ev) => {
@@ -100,9 +100,6 @@ addNewFileEventListeners();
 
 // Add event listeners for the flasher
 addFlasherEventListeners();
-
-// Setup Git
-setupGit();
 
 // Add a event listener for the reload file explorer button
 document

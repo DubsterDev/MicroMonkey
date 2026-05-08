@@ -1,25 +1,75 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef } from "isomorphic-git";
+import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef, setConfig } from "isomorphic-git";
 import { Buffer } from "buffer";
 import { getInput } from "./commandPalette";
 import { createModel } from "./editor";
-import { openTab } from "./openFilesManager";
+import { addAllFilesToFS, openTab } from "./openFilesManager";
+import { getFile, writeFile } from "./serial";
 
 window.Buffer = Buffer;
 
-const dir = "bob";
+let dir = "bob";
 const fs = new LightningFS("fs").promises;
 const originalModel = createModel("", `file://micromonkey/fileatgithead.mm`);
 
-export function setupGit() {
-    window.fs = fs;
-    window.init = initializeRepo;
+export async function setupGit() {
+    const repo = await getFile("/.mmgitrepo");
+    if (repo && repo.trim() !== "") {
+        dir = repo;
+        await addAllFilesToFS();
+        gitRepoReady();
+    } else {
+        document.getElementById("gitNotEnabled").style.display = "block";
+    }
+    document.getElementById("gitLoading").style.display = "none";
+    
     document
         .getElementById("gitCommitButton")
         .addEventListener("click", (ev) => {
             ev.stopPropagation();
             commitStaged();
         });
+    document
+        .getElementById("enableGit")
+        .addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            enableGit();
+        });
+}
+
+async function enableGit() {
+    const ready = await getInput("We're going to ask you a few questions to setup your git. Ready?", '', '', ['Yes, continue', 'No, cancel'], false);
+
+    if (!ready || ready === 'No, cancel') return;
+
+    
+    const authorName = await getInput("What name would you like to use?", '');
+    const authorEmail = await getInput("What email would you like to use?", '');
+    const repoName = await getInput("Give a name to your new Git repo", "It needs to be unique");
+
+    if (authorName && authorName.trim() !== "" && authorEmail && authorEmail.trim() !== "" && repoName && repoName.trim() !== "") {
+        getInput("Initializing repo (we'll let you know when it's done)", '', '', ['Okay'], false);
+
+        
+        await initializeRepo(repoName);
+        await writeFile(repoName, "/.mmgitrepo");
+        
+        dir = repoName;
+        
+        await addAllFilesToFS();
+        
+        await setConfig({ fs, dir: `/${dir}`, path: 'user.name', value: authorName });
+        await setConfig({ fs, dir: `/${dir}`, path: 'user.email', value: authorEmail });
+        
+        getInput("All done, your repo is ready for you", '', '', ['Okay'], false);
+        
+        gitRepoReady();
+    }
+}
+
+function gitRepoReady() {
+    document.getElementById("gitNotEnabled").style.display = "none";
+    document.getElementById("gitEnabled").style.display = "block";
 }
 
 export async function initializeRepo(name) {
