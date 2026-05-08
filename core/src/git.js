@@ -14,8 +14,16 @@ const originalModel = createModel("", `file://micromonkey/fileatgithead.mm`);
 
 export async function setupGit() {
     const repo = await getFile("/.mmgitrepo");
-    if (repo && repo.trim() !== "") {
+    let repoExists = true;
+    try {
+        const stats = await fs.stat(`/${repo}`)
+    } catch {
+        repoExists = false;
+    }
+    
+    if (repo && repo.trim() !== "" && repoExists) {
         dir = repo;
+        
         await addAllFilesToFS();
         gitRepoReady();
     } else {
