@@ -71,8 +71,8 @@ export async function renderChanges() {
             const originalContents = Buffer.from(blob).toString("utf8");
             originalModel.setValue(originalContents);
 
-            await openTab(path);
-            openTab(path, "Uncommitted changes", "monaco-diff", null, originalModel);
+            await openTab(`/${path}`);
+            openTab(`/${path}`, "Uncommitted changes", "monaco-diff", null, originalModel);
         })
 
         const nameContainer = document.createElement("div");
