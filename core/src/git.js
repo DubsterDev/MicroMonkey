@@ -40,6 +40,13 @@ export async function setupGit() {
             commitStaged();
         });
     document
+        .getElementById("gitCommitMessage")
+        .addEventListener("keyup", (ev) => {
+            if (ev.ctrlKey && ev.key === "Enter") {
+                commitStaged();
+            }
+        });
+    document
         .getElementById("enableGit")
         .addEventListener("click", (ev) => {
             ev.stopPropagation();
