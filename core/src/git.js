@@ -6,6 +6,7 @@ import { createModel } from "./editor";
 import { addAllFilesToFS, openTab, requestReRender } from "./openFilesManager";
 import { getFile, writeFile } from "./serial";
 import { addHeading } from "./customEditorHelperFunctions";
+import { toggleSidebar } from "./otherUiManager";
 
 window.Buffer = Buffer;
 
@@ -145,6 +146,7 @@ export async function renderChanges() {
             const originalContents = Buffer.from(blob).toString("utf8");
             originalModel.setValue(originalContents);
 
+            toggleSidebar("right");
             await openTab(`/${path}`);
             openTab(`/${path}`, `Changes to ${fileName}`, "monaco-diff", null, originalModel);
         })
@@ -206,6 +208,7 @@ export async function renderChanges() {
 }
 
 async function openCommitHistory() {
+    toggleSidebar("right");
     await openTab("/gitcommithistory.mm", "Commit History", "custom", renderGraph);
 }
 
