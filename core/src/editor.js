@@ -196,8 +196,9 @@ export function createModel(content, uri, language = "python") {
  * Switch what model is displaying in the editor
  * @param {*} model The model to switch to. You can get one of these with {@link createModel}
  * @param {*} [originalModel=null] The original model. Only needed for the diff editor.
+ * @param {boolean} readOnly Sets the diff editor to read only
  */
-export function changeModel(model, originalModel=null) {
+export function changeModel(model, originalModel=null, readOnly=false) {
     // Convert the URI to a string
     const modelUriString = model.uri.toString();
 
@@ -210,6 +211,9 @@ export function changeModel(model, originalModel=null) {
         modified: model
     })
     else editor.setModel(model);
+
+    // Set the diff editor to read only or editable
+    diffEditor.updateOptions({ readOnly: readOnly });
 
     // Remove any diagnostics that are applied to this editor
     // if syntax checking is disabled

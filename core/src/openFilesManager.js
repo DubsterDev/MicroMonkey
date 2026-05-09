@@ -35,14 +35,17 @@ export function initializeOpenFilesManager() {
  * @param {string} type The type of editor to be shown. Either `monaco` (meaning content is fetched from board and displayed in a Monaco editor), `monaco-diff` (modified content is fetched from board, must provide original model) or `custom` (must provide render function)
  * @param {Function|null} renderFunction If the passed type is `custom`, this parameter must have a function that receives a root element where you can append new elements to. It will be called whenever the tab is clicked
  * @param {*} [originalModel=null] If the passed type is `monaco-diff`, this parameter must have a model that will be displayed side by side with the modified file.
+ * @param {*} [model=null] If the passed type is `monaco-diff`, this parameter can have the model that will be used instead of the current file state
  */
 export async function openTab(
     path,
     title = "",
     type = "monaco",
     renderFunction = null,
-    originalModel = null
+    originalModel = null,
+    model = null,
 ) {
+    const isReadOnly = model !== null;
     // Change the path used everywhere else if it's a monaco-diff
     const boardPath = path;
     if (type === "monaco-diff") {
@@ -62,7 +65,6 @@ export async function openTab(
         tabs[path].active = true;
     } else {
         // If the type is monaco, grab the contents from the board and create a model for it
-        let model;
         if (type === "monaco") {
             // Get the file's content from the board
             const content = await getFileAndSave(boardPath);
@@ -86,7 +88,7 @@ export async function openTab(
 
             // Create a monaco model for the file
             model = createModel(content, "file://micromonkey" + path, language);
-        } else if (type === "monaco-diff") {
+        } else if (type === "monaco-diff" && !model) {
             model = tabs[boardPath].model;
         }
 
@@ -99,7 +101,8 @@ export async function openTab(
             renderFunction: renderFunction,
             active: true,
             saved: true,
-            realPath: boardPath
+            realPath: boardPath,
+            readOnly: isReadOnly,
         };
     }
 
@@ -140,7 +143,7 @@ export async function saveActiveFile() {
     const activeTab = tabs[activeTabPaths[0]];
 
     // If it's a custom editor, exit
-    if (activeTab.type === "custom") return;
+    if (activeTab.type === "custom" || activeTab.readOnly) return;
 
     // If it's a monaco-diff, find the real monaco editor
     const tab = activeTab.type === "monaco" ? activeTab : tabs[activeTab.realPath];
@@ -394,7 +397,7 @@ function renderTabs(activateActiveTab = true) {
             codeDiffEditorElement.style.display = "block";
             customEditorElement.style.display = "none";
 
-            changeModel(tab.model, tab.originalModel);
+            changeModel(tab.model, tab.originalModel, tab.readOnly);
         } else if (activateActiveTab && tab.active && tab.type === "custom") {
             codeEditorElement.style.display = "none";
             codeDiffEditorElement.style.display = "none";

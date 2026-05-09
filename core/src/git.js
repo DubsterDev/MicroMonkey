@@ -1,22 +1,24 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef, setConfig } from "isomorphic-git";
+import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef, setConfig, log, listFiles } from "isomorphic-git";
 import { Buffer } from "buffer";
 import { getInput } from "./commandPalette";
 import { createModel } from "./editor";
-import { addAllFilesToFS, openTab } from "./openFilesManager";
+import { addAllFilesToFS, openTab, requestReRender } from "./openFilesManager";
 import { getFile, writeFile } from "./serial";
+import { addHeading } from "./customEditorHelperFunctions";
 
 window.Buffer = Buffer;
 
 let dir = "bob";
 const fs = new LightningFS("fs").promises;
 const originalModel = createModel("", `file://micromonkey/fileatgithead.mm`);
+const modifiedModel = createModel("", `file://micromonkey/fileatgithead2.mm`);
 
 export async function setupGit() {
     const repo = await getFile("/.mmgitrepo");
     let repoExists = true;
     try {
-        const stats = await fs.stat(`/${repo}`)
+        await fs.stat(`/${repo}`)
     } catch {
         repoExists = false;
     }
@@ -42,6 +44,12 @@ export async function setupGit() {
         .addEventListener("click", (ev) => {
             ev.stopPropagation();
             enableGit();
+        });
+    document
+        .getElementById("gitCommitHistoryButton")
+        .addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            openCommitHistory();
         });
 }
 
@@ -78,6 +86,7 @@ async function enableGit() {
 function gitRepoReady() {
     document.getElementById("gitNotEnabled").style.display = "none";
     document.getElementById("gitEnabled").style.display = "block";
+    updateGraph();
 }
 
 export async function initializeRepo(name) {
@@ -189,6 +198,153 @@ export async function renderChanges() {
     });
 }
 
+async function openCommitHistory() {
+    await openTab("/gitcommithistory.mm", "Commit History", "custom", renderGraph);
+}
+
+function updateGraph() {
+    requestReRender("/gitcommithistory.mm");
+}
+
+async function renderGraph(root) {
+    addHeading("Commit History", "h2", root);
+    
+    const gitLog = await log({ fs, dir: `/${dir}`});
+
+    const commitHistoryContainer = document.createElement("div");
+    commitHistoryContainer.classList.add("commitHistory");
+    
+    for (const commit of gitLog) {
+        const oid = commit.oid;
+        const parent = commit.commit.parent[0];
+
+        let changes = [];
+
+        if (!parent) {
+            changes = (await listFiles({
+                fs,
+                dir: `/${dir}`,
+                ref: oid
+            })).map(path => ({
+                path,
+                status: 'added',
+            }));
+        } else {
+            changes = await walk({
+                fs,
+                dir: `/${dir}`, 
+                trees: [TREE({ ref: parent }), TREE({ ref: oid })],
+                map: async function (filepath, [A, B]) {
+                    if (filepath === '.') return
+        
+                    const aType = await A.type();
+                    const bType = await B.type();
+        
+                    if (!aType && bType) {
+                        return { path: filepath, status: 'added' }
+                    }
+        
+                    if (aType && !bType) {
+                        return { path: filepath, status: 'deleted' }
+                    }
+        
+                    if (aType && bType) {
+                        const aOid = await A.oid();
+                        const bOid = await B.oid();
+        
+                        if (aOid !== bOid) {
+                            return { path: filepath, status: "modified" };
+                        }
+                    }
+        
+                    return undefined
+                }
+            });
+        }
+
+        changes = changes.filter(Boolean);
+        
+        const commitContainer = document.createElement("details");
+        commitContainer.classList.add("commit");
+
+        const summary = document.createElement("summary");
+
+        const messageSpan = document.createElement("span");
+        messageSpan.classList.add("message");
+        messageSpan.innerText = commit.commit.message.trim();
+        summary.appendChild(messageSpan);
+
+        const authorSpan = document.createElement("span");
+        authorSpan.classList.add("author");
+        authorSpan.innerText = commit.commit.author.name;
+        summary.appendChild(authorSpan);
+
+        commitContainer.appendChild(summary);
+
+        changes.forEach(change => {
+            const pathParts = change.path.split("/");
+    
+            const fileName = pathParts[pathParts.length - 1];
+            const parentDir =
+                pathParts.length > 1 ? pathParts.slice(0, -1).join("/") : "";
+            
+            const changeContainer = document.createElement("div");
+            changeContainer.classList.add("change");
+            
+            const nameContainer = document.createElement("div");
+            nameContainer.classList.add("name");
+    
+            const fileNameSpan = document.createElement("span");
+            fileNameSpan.classList.add("filename");
+            fileNameSpan.innerText = fileName;
+            nameContainer.appendChild(fileNameSpan);
+    
+            const parentDirSpan = document.createElement("span");
+            parentDirSpan.classList.add("parentDir");
+            parentDirSpan.innerText = parentDir;
+            nameContainer.appendChild(parentDirSpan);
+    
+            changeContainer.appendChild(nameContainer);
+    
+            const changeTypeSpan = document.createElement("span");
+            changeTypeSpan.classList.add(change.status);
+            changeTypeSpan.innerText = change.status.substring(0, 1).toUpperCase();
+    
+            changeContainer.appendChild(changeTypeSpan);
+
+            changeContainer.addEventListener("click", async (ev) => {
+                const { blob } = await readBlob({
+                  fs,
+                  dir: `/${dir}`,
+                  oid: parent,
+                  filepath: change.path
+                });
+
+                const { blob: blob2 } = await readBlob({
+                  fs,
+                  dir: `/${dir}`,
+                  oid: oid,
+                  filepath: change.path
+                });
+                
+                const originalContents = Buffer.from(blob).toString("utf8");
+                originalModel.setValue(originalContents);
+
+                const modifiedContents = Buffer.from(blob2).toString("utf8");
+                modifiedModel.setValue(modifiedContents);
+                
+                openTab(`/${change.path}`, `Changes to ${fileName}`, "monaco-diff", null, originalModel, modifiedModel);
+            })
+
+            commitContainer.appendChild(changeContainer);
+        });
+
+        commitHistoryContainer.appendChild(commitContainer);
+    }
+
+    root.appendChild(commitHistoryContainer);
+}
+
 export async function commitStaged() {
     const gitCommitMessage = document.getElementById("gitCommitMessage");
     let message = gitCommitMessage.value;
@@ -211,6 +367,7 @@ export async function commitStaged() {
     await commit({ fs, dir: `/${dir}`, message });
     gitCommitMessage.value = "";
     renderChanges();
+    updateGraph();
 }
 
 // FS Helper Functions
