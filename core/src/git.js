@@ -61,14 +61,14 @@ export async function setupGit() {
 }
 
 async function enableGit() {
-    const ready = await getInput("We're going to ask you a few questions to setup your git. Ready?", '', '', ['Yes, continue', 'No, cancel'], false);
+    const ready = await getInput("We're going to ask you a few questions to setup your git repo. Ready?", '', '', ['Yes, continue', 'No, cancel'], false);
 
     if (!ready || ready === 'No, cancel') return;
 
     
-    const authorName = await getInput("What name would you like to use?", '');
-    const authorEmail = await getInput("What email would you like to use?", '');
-    const repoName = await getInput("Give a name to your new Git repo", "It needs to be unique");
+    const authorName = await getInput("What name would you like to use when committing?", '');
+    const authorEmail = await getInput("What email would you like to use when commiting?", '');
+    const repoName = await getInput("What would you like to name your git repo?", "It needs to be unique");
 
     if (authorName && authorName.trim() !== "" && authorEmail && authorEmail.trim() !== "" && repoName && repoName.trim() !== "") {
         getInput("Initializing repo (we'll let you know when it's done)", '', '', ['Okay'], false);
