@@ -41,6 +41,10 @@ main {
     color: var(--text-color);
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .mostContent {
     display: flex;
     flex-direction: row;
@@ -300,6 +304,10 @@ main {
 
 #gitCommitMessage:focus {
     outline: 2px solid var(--accent-color);
+}
+
+#changesText:has(+ #gitChangesArea:empty) {
+    display: none;
 }
 
 #gitChangesArea .change, .commitHistory .change {
