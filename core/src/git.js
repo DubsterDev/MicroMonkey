@@ -1,7 +1,7 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
 import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef, setConfig, log, listFiles } from "isomorphic-git";
 import { Buffer } from "buffer";
-import { getInput } from "./commandPalette";
+import { addCommand, getInput, removeCommand } from "./commandPalette";
 import { createModel } from "./editor";
 import { addAllFilesToFS, openTab, requestReRender } from "./openFilesManager";
 import { getFile, writeFile } from "./serial";
@@ -30,6 +30,7 @@ export async function setupGit() {
         await addAllFilesToFS();
         gitRepoReady();
     } else {
+        addCommand("gitInitialize", "[Git] Enable", enableGit);
         document.getElementById("gitNotEnabled").style.display = "block";
     }
     document.getElementById("gitLoading").style.display = "none";
@@ -98,6 +99,10 @@ async function enableGit() {
 }
 
 function gitRepoReady() {
+    removeCommand("gitInitialize");
+    addCommand("gitCommitStaged", "[Git] Commit Staged Changes", commitStaged);
+    addCommand("gitOpenCommitHistory", "[Git] Open Commit History", openCommitHistory);
+    addCommand("gitReload", "[Git] Reload", reloadGit);
     document.getElementById("gitNotEnabled").style.display = "none";
     document.getElementById("gitEnabled").style.display = "block";
     updateGraph();
