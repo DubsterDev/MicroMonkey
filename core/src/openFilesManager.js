@@ -448,6 +448,7 @@ export async function getFileAndSave(path) {
 
 /**
  * Loads all the files on the board into the FS.
+ * @todo Does this make any sense here? Should it be in git.js?
  */
 export async function addAllFilesToFS() {
     // Get the list of files from the board
