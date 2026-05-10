@@ -39,29 +39,31 @@
                 <div class="serialMonitor" id="serialMonitor">
                 </div>
             </div>
-            <div class="sidebar rightSidebar" id="rightSidebar">
+            <div class="sidebar rightSidebar flex" id="rightSidebar">
                 <div class="sidebarHeader">
                     <h3>Git</h3>
                     <div class="headerActions">
                         <button class="material-symbols-outlined" id="reloadGit">refresh</button>
                     </div>
                 </div>
-                <div id="gitLoading">
+                <div id="gitLoading" class="grow">
                     <p>Loading...</p>
                     <p>Tip: A board has to be connected to use git.</p>
                 </div>
-                <div id="gitNotEnabled">
+                <div id="gitNotEnabled" class="grow">
                     <p>Looks like you don't have git enabled for this board yet.</p>
                     <button class="wide" id="enableGit">Setup Git</button>
                 </div>
-                <div id="gitEnabled">
-                    <div id="gitCommitArea">
-                        <input type="text" id="gitCommitMessage" placeholder="Commit message">
-                        <button class="wide" id="gitCommitButton">Commit</button>
+                <div id="gitEnabled" class="grow">
+                    <div class="top">
+                        <div id="gitCommitArea">
+                            <input type="text" id="gitCommitMessage" placeholder="Commit message">
+                            <button class="wide" id="gitCommitButton">Commit</button>
+                        </div>
+                        <p>Changes</p>
+                        <div id="gitChangesArea"></div>
                     </div>
-                    <p>Changes</p>
-                    <div id="gitChangesArea"></div>
-                    <button class="wide" id="gitCommitHistoryButton">Commit History</button>
+                    <button class="wide secondary" id="gitCommitHistoryButton">View Commit History</button>
                 </div>
             </div>
         </div>

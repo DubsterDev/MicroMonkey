@@ -68,6 +68,15 @@ main {
     border-left: 1px solid var(--border-color);
 }
 
+.sidebar.flex {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.flex .grow {
+    flex-grow: 1;
+}
+
 .sidebar .sidebarHeader {
     display: flex;
     flex-direction: row;
@@ -273,6 +282,11 @@ main {
 
 #gitNotEnabled, #gitEnabled {
     display: none;
+}
+
+#gitEnabled {
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 #gitCommitMessage {
@@ -493,6 +507,11 @@ button.wide {
     margin: 6px auto;
     cursor: pointer;
     transition: .25s;
+}
+
+button.wide.secondary {
+    background-color: var(--background-color-variant);
+    color: var(--text-color);
 }
 
 button.wide:hover {

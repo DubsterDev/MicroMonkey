@@ -104,7 +104,7 @@ function gitRepoReady() {
     addCommand("gitOpenCommitHistory", "[Git] Open Commit History", openCommitHistory);
     addCommand("gitReload", "[Git] Reload", reloadGit);
     document.getElementById("gitNotEnabled").style.display = "none";
-    document.getElementById("gitEnabled").style.display = "block";
+    document.getElementById("gitEnabled").style.display = "flex";
     updateGraph();
 }
 
