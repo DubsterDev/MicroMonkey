@@ -59,6 +59,12 @@ export async function setupGit() {
             ev.stopPropagation();
             openCommitHistory();
         });
+    document
+        .getElementById("reloadGit")
+        .addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            reloadGit();
+        });
 }
 
 async function enableGit() {
@@ -95,6 +101,13 @@ function gitRepoReady() {
     document.getElementById("gitNotEnabled").style.display = "none";
     document.getElementById("gitEnabled").style.display = "block";
     updateGraph();
+}
+
+async function reloadGit() {
+    await addAllFilesToFS();
+    gitRepoReady();
+    updateGraph();
+    renderChanges();
 }
 
 export async function initializeRepo(name) {
