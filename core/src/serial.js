@@ -6,7 +6,7 @@ import { getSetting } from "./settings";
 import { newFolderStructure } from "./fileExplorer";
 import JSZip from "jszip";
 import { addCommand, removeCommand } from "./commandPalette";
-import { fsDeleteRecursively, fsEmptyDir, fsUnlink } from "./git";
+import { cleanUpGit, fsDeleteRecursively, fsEmptyDir, fsUnlink } from "./git";
 import { closeAllFiles } from "./tyManager";
 
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
@@ -741,6 +741,9 @@ function portDisconnected() {
 
     // Clears the file explorer
     newFolderStructure({});
+
+    // Clears git
+    cleanUpGit();
 }
 
 /**

@@ -120,6 +120,16 @@ export async function initializeRepo(name) {
     await init({ fs, defaultBranch: "main", dir: "/" + name });
 }
 
+export async function cleanUpGit() {
+    removeCommand("gitInitialize");
+    removeCommand("gitCommitStaged");
+    removeCommand("gitOpenCommitHistory");
+    removeCommand("gitReload");
+    document.getElementById("gitLoading").style.display = "block";
+    document.getElementById("gitNotEnabled").style.display = "none";
+    document.getElementById("gitEnabled").style.display = "none";
+}
+
 export async function renderChanges() {
     const changes = await statusMatrix({ fs, dir: `/${dir}` });
 
