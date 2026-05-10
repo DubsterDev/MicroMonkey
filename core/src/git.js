@@ -260,8 +260,8 @@ async function renderGraph(root) {
                 map: async function (filepath, [A, B]) {
                     if (filepath === '.') return
         
-                    const aType = await A.type();
-                    const bType = await B.type();
+                    const aType = await A?.type();
+                    const bType = await B?.type();
         
                     if (!aType && bType) {
                         return { path: filepath, status: 'added' }
