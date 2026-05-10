@@ -115,7 +115,7 @@ async function reloadGit() {
     renderChanges();
 }
 
-export async function initializeRepo(name) {
+async function initializeRepo(name) {
     await fs.mkdir("/" + name);
     await init({ fs, defaultBranch: "main", dir: "/" + name });
 }
@@ -130,7 +130,7 @@ export async function cleanUpGit() {
     document.getElementById("gitEnabled").style.display = "none";
 }
 
-export async function renderChanges() {
+async function renderChanges() {
     const changes = await statusMatrix({ fs, dir: `/${dir}` });
 
     const changesElement = document.getElementById("gitChangesArea");
@@ -383,7 +383,7 @@ async function renderGraph(root) {
     root.appendChild(commitHistoryContainer);
 }
 
-export async function commitStaged() {
+async function commitStaged() {
     const gitCommitMessage = document.getElementById("gitCommitMessage");
     let message = gitCommitMessage.value;
     if (message.trim().length === 0) {
