@@ -482,12 +482,15 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
 ## esptool-js
 
 **Source**: https://github.com/espressif/esptool-js
 
 **License**: Apache 2.0
+
+```text
 
                                  Apache License
                            Version 2.0, January 2004
@@ -1441,7 +1444,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Monaco Editor
 
-**Source**: https://githu*b.com/microsoft/monaco-editor
+**Source**: https://github.com/microsoft/monaco-editor
 
 **License**: MIT
 
@@ -2111,7 +2114,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-## isomorphic-git*
+## isomorphic-git
 
 **Source**: https://github.com/isomorphic-git/isomorphic-git
 
