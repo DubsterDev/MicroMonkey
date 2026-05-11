@@ -14,6 +14,12 @@ To commit files, you'll just use the commit button on the Git panel. Only staged
 
 If you click the name of a file in the changes section of the Git panel, a split pane editor will open showing you the difference in the current file and what was last committed to Git. Nothing will happen if the file has never been committed before.
 
+## Downloading the .git folder
+
+Currently, MicroMonkey supports download the `.git` folder to your computer as a .zip. Later, we'd like to support uploading it too, but that's not a feature yet.
+
+To download it as a .zip folder, make sure the Git panel is loaded and use the command `[Git] Download .git folder as ZIP` in the command palette.
+
 ## How it works
 
 Git support in MicroMonkey is slightly different than typical IDEs. In MicroMonkey, the `.git` folder is stored in your browser's storage, unlike traditional IDEs, where it's stored alongside the files.

@@ -49,6 +49,10 @@ If a Git repo has not been created for this board, this command will show, allow
 
 Commit changes that have been staged in the Git panel. This command will only show if a Git repo is enabled for the connected board.
 
+## [Git] Download .git folder as ZIP
+
+Downloads the `.git` folder of the active repository as a .zip file.
+
 ## [Git] Open Commit History
 
 Opens the Commit History tab, displaying all of the commits made in the active Git repo.
