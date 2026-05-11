@@ -7,6 +7,7 @@ import { addAllFilesToFS, openTab, requestReRender } from "./openFilesManager";
 import { getFile, writeFile } from "./serial";
 import { addHeading } from "./customEditorHelperFunctions";
 import { toggleSidebar } from "./otherUiManager";
+import JSZip from "jszip";
 
 // Expose Buffer to Buffer for Git
 window.Buffer = Buffer;
@@ -138,6 +139,7 @@ function gitRepoReady() {
     addCommand("gitCommitStaged", "[Git] Commit Staged Changes", commitStaged);
     addCommand("gitOpenCommitHistory", "[Git] Open Commit History", openCommitHistory);
     addCommand("gitReload", "[Git] Reload", reloadGit);
+    addCommand("gitDownloadAsZip", "[Git] Download .git folder as ZIP", downloadGitAsZip);
 
     // Swap the view in the right panel to the enabled state
     document.getElementById("gitNotEnabled").style.display = "none";
@@ -185,6 +187,7 @@ export async function cleanUpGit() {
     removeCommand("gitCommitStaged");
     removeCommand("gitOpenCommitHistory");
     removeCommand("gitReload");
+    removeCommand("gitDownloadAsZip");
 
     // Reset view to loading
     document.getElementById("gitLoading").style.display = "block";
@@ -545,6 +548,48 @@ async function commitStaged() {
     // Render changes and update commit history if open
     renderChanges();
     updateGraph();
+}
+
+/**
+ * Downloads the `.git` folder for the active repo as a `.zip` file
+ */
+async function downloadGitAsZip() {
+    // A JSZip instance
+    const zip = new JSZip();
+
+    // A recursive function that adds files to the zip
+    async function addFilesToZip(path) {
+        const folder = await fs.readdir(path);
+        for (const filename of folder) {
+            const types = await fs.stat(`${path}/${filename}`);
+            const zipPath = path.replace(`/${dir}/.git`, "");
+            if (types.type === "file") {
+                // It's a file, so get the file and add it to the zip
+                const fileContents = await fs.readFile(`${path}/${filename}`);
+                zip.file(`${zipPath}/${filename}`, fileContents);
+            } else {
+                // It's a folder, so create the folder and call this function again
+                zip.folder(`${zipPath}/${filename}`);
+                await addFilesToZip(`${path}/${filename}`);
+            }
+        }
+    }
+
+    // Start the recursive function
+    await addFilesToZip(`/${dir}/.git`);
+
+    // Generate the zip as a blob
+    const blob = await zip.generateAsync({ type: "blob" });
+    
+    // Create a blob:// url
+    const url = URL.createObjectURL(blob);
+
+    // Create a link element to download it and then click it
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = `${dir}-.git.zip`;
+    a.click();
 }
 
 // FS Helper Functions
