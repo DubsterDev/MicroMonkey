@@ -1,6 +1,8 @@
 // Import the openTab function to allow clicking on tabs
 import { getInput } from "./commandPalette";
+import { fsMkDir, fsWriteFile } from "./git";
 import { openTab } from "./openFilesManager";
+import { toggleSidebar } from "./otherUiManager";
 import { createDirectory, createFile, getFiles } from "./serial";
 
 // A object containing which folders are collapsed,
@@ -54,8 +56,13 @@ async function newFile(base="/") {
     // If escaped or hit enter with no content, don't create the file
     if (fileName === undefined || fileName.trim() === "") return;
 
+    const fullPath = `${base}${fileName}`;
+
     // Use serial.js to create the file
-    await createFile(`${base}${fileName}`);
+    await createFile(fullPath);
+
+    // Tell git about the new file
+    await fsWriteFile(fullPath, "");
 
     // Reload the file explorer
     newFolderStructure(await getFiles());
@@ -73,8 +80,13 @@ async function newFolder(base="/") {
     // If escaped or hit enter with no content, don't create the folder
     if (folderName === undefined || folderName.trim() === "") return;
 
+    const fullPath = `${base}${folderName}`;
+
     // Use serial.js to create the folder
-    await createDirectory(`${base}${folderName}`);
+    await createDirectory(fullPath);
+
+    // Tell git the new folder was created
+    await fsMkDir(fullPath);
 
     // Reload the file explorer
     newFolderStructure(await getFiles());
@@ -139,7 +151,7 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
 
             // Create a div to hold the actions for the create file buttons
             const actionsDiv = document.createElement("div");
-            actionsDiv.classList.add("newActions");
+            actionsDiv.classList.add("headerActions");
 
             // Create the new file button
             const newFileButton = document.createElement("button");
@@ -221,7 +233,7 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
 
             // When it's clicked tell openFilesManager.js to open the file
             p.addEventListener("click", () => {
-                toggleFileExplorer();
+                toggleSidebar("left");
                 openTab(`${currentDir}${key}`);
             });
 
@@ -230,16 +242,3 @@ function recursivelyAddItems(folderStructure, currentDir="/") {
         }
     })
 }
-
-/**
- * Toggles the file explorer on mobile.
- */
-function toggleFileExplorer() {
-    document.getElementById("leftSidebar").classList.toggle("show");
-    const icon = document.getElementById("fileExplorerOpenDirection");
-    if (icon.innerText === "chevron_right") icon.innerText = "chevron_left";
-    else icon.innerText = "chevron_right";
-}
-
-// Add event listener for open file explorer button
-document.getElementById("openFileExplorer").addEventListener("click", toggleFileExplorer);

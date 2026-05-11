@@ -13,10 +13,10 @@
 <body>
     <main>
         <div class="mostContent">
-            <div class="leftSidebar" id="leftSidebar">
-                <div class="fileExplorerHeader">
+            <div class="sidebar leftSidebar" id="leftSidebar">
+                <div class="sidebarHeader">
                     <h3>Files</h3>
-                    <div class="newActions">
+                    <div class="headerActions">
                         <button class="material-symbols-outlined" id="reloadFileExplorer">refresh</button>
                         <button class="material-symbols-outlined" id="newFileRoot">note_add</button>
                         <button class="material-symbols-outlined" id="newFolderRoot">create_new_folder</button>
@@ -34,16 +34,44 @@
                     </div>
                 </div>
                 <div id="customEditor" style="display: block;"></div>
-                <div id="codeEditor"></div>
+                <div id="codeEditor" class="monacoEditor"></div>
+                <div id="codeDiffEditor" class="monacoEditor"></div>
                 <div class="serialMonitor" id="serialMonitor">
+                </div>
+            </div>
+            <div class="sidebar rightSidebar flex" id="rightSidebar">
+                <div class="sidebarHeader">
+                    <h3>Git</h3>
+                    <div class="headerActions">
+                        <button class="material-symbols-outlined" id="reloadGit">refresh</button>
+                    </div>
+                </div>
+                <div id="gitLoading" class="grow">
+                    <p>Loading...</p>
+                    <p>Tip: A board has to be connected to use git.</p>
+                </div>
+                <div id="gitNotEnabled" class="grow">
+                    <p>Looks like you don't have git enabled for this board yet.</p>
+                    <button class="wide" id="enableGit">Setup Git</button>
+                </div>
+                <div id="gitEnabled" class="grow">
+                    <div class="top">
+                        <div id="gitCommitArea">
+                            <input type="text" id="gitCommitMessage" placeholder="Commit message">
+                            <button class="wide" id="gitCommitButton">Commit</button>
+                        </div>
+                        <p class="bold" id="changesText">Changes</p>
+                        <div id="gitChangesArea"></div>
+                    </div>
+                    <button class="wide secondary" id="gitCommitHistoryButton">View Commit History</button>
                 </div>
             </div>
         </div>
         <div class="bottomBar">
             <div class="left">
-                <div id="openFileExplorer" class="item onlyOnMobile">
-                    <i class="material-symbols-outlined" id="fileExplorerOpenDirection">chevron_right</i>
-                    <span>File Explorer</span>
+                <div id="openLeftSidebar" class="item onlyOnMobile">
+                    <i class="material-symbols-outlined" id="leftSidebarOpenDirection">chevron_right</i>
+                    <span>Left Sidebar</span>
                 </div>
                 <div id="findPorts" class="item">
                     <i class="material-symbols-outlined">developer_board</i>
@@ -66,6 +94,10 @@
                 <div id="openSettings" class="item">
                     <i class="material-symbols-outlined">settings</i>
                     <span>Settings</span>
+                </div>
+                <div id="openRightSidebar" class="item onlyOnMobile">
+                    <i class="material-symbols-outlined" id="rightSidebarOpenDirection">chevron_left</i>
+                    <span>Right Sidebar</span>
                 </div>
             </div>
         </div>

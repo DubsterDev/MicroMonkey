@@ -4,11 +4,14 @@
     --background-color-variant: light-dark(#dddcdc, #222121);
     --lighter-text-color: light-dark(#3d3d3d, #d4d4d4);
     --text-color: light-dark(#212121, #fafafa);
+    --less-significant-text-color: #787878;
     --success-color: light-dark(#4caf50, #2e7030);
     --warning-color: light-dark(#f0af4e, #c07504);
     --error-color: light-dark(#ff4d4d, #bd0000);
     --hover-background-color: #78787825;
-    accent-color: #91553d;
+    --accent-color: #91553d;
+    --color-on-accent: #fafafa;
+    accent-color: var(--accent-color);
 }
 
 * {
@@ -17,7 +20,8 @@
 
 body,
 main,
-button {
+button,
+input {
     font-family: "Open Sans";
 }
 
@@ -37,6 +41,10 @@ main {
     color: var(--text-color);
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .mostContent {
     display: flex;
     flex-direction: row;
@@ -45,29 +53,46 @@ main {
     flex-grow: 1;
 }
 
-.leftSidebar {
+.sidebar {
     width: 25%;
     height: 100%;
     background-color: var(--background-color);
-    border-right: 1px solid var(--border-color);
     overflow: auto;
     padding: 12px;
     flex: 0 0 auto;
     overflow-x: hidden;
+    resize: horizontal;
 }
 
-.leftSidebar .fileExplorerHeader {
+.leftSidebar {
+    border-right: 1px solid var(--border-color);
+}
+
+.rightSidebar {
+    border-left: 1px solid var(--border-color);
+}
+
+.sidebar.flex {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.flex .grow {
+    flex-grow: 1;
+}
+
+.sidebar .sidebarHeader {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
 
-.leftSidebar .fileExplorerHeader .newActions button {
+.sidebar .sidebarHeader .headerActions button {
     opacity: 0.6;
 }
 
-.newActions {
+.headerActions {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -75,7 +100,7 @@ main {
     gap: 5px;
 }
 
-.newActions button {
+.headerActions button {
     opacity: 0;
     transition: 0.2s;
     background-color: transparent;
@@ -88,12 +113,12 @@ main {
     cursor: pointer;
 }
 
-.fileExplorerHeader:hover .newActions button,
-.folder-name:hover .newActions button {
+.sidebarHeader:hover .headerActions button,
+.folder-name:hover .headerActions button {
     opacity: 0.6;
 }
 
-.newActions button:hover {
+.headerActions button:hover {
     background-color: var(--hover-background-color);
     opacity: 1 !important;
 }
@@ -120,13 +145,13 @@ main {
     height: 100%;
 }
 
-#codeEditor,
+.monacoEditor,
 #customEditor {
     flex: 0 1 100%;
     display: none;
 }
 
-#codeEditor {
+.monacoEditor {
     overflow: hidden;
 }
 
@@ -257,6 +282,60 @@ main {
 
 .leftSidebar .folder-container.collapsed .folder-name::before {
     content: "keyboard_arrow_right";
+}
+
+#gitNotEnabled, #gitEnabled {
+    display: none;
+}
+
+#gitEnabled {
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#gitCommitMessage {
+    display: block;
+    width: 100%;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin: 6px auto;
+}
+
+#gitCommitMessage:focus {
+    outline: 2px solid var(--accent-color);
+}
+
+#changesText:has(+ #gitChangesArea:empty) {
+    display: none;
+}
+
+#gitChangesArea .change, .commitHistory .change {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 6px;
+}
+
+#gitChangesArea .name .filename, .commitHistory .change .name .filename {
+    margin-right: 6px;
+}
+
+#gitChangesArea .name .parentDir, .commitHistory .change .name .parentDir {
+    color: var(--less-significant-text-color);
+}
+
+.commitHistory .commit {
+    user-select: none;
+}
+
+.commitHistory .message {
+    margin-right: 6px;
+}
+
+.commitHistory .author {
+    color: var(--less-significant-text-color);
 }
 
 .topArea {
@@ -425,8 +504,30 @@ main {
     background-color: var(--error-color);
 }
 
+button.wide {
+    display: block;
+    border: none;
+    background-color: var(--accent-color);
+    color: var(--color-on-accent);
+    width: 100%;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 6px auto;
+    cursor: pointer;
+    transition: .25s;
+}
+
+button.wide.secondary {
+    background-color: var(--background-color-variant);
+    color: var(--text-color);
+}
+
+button.wide:hover {
+    filter: brightness(0.9);
+}
+
 @media screen and (max-width: 700px) {
-    .leftSidebar {
+    .sidebar {
         transition: .25s;
         position: fixed;
         top: 0;
@@ -436,10 +537,20 @@ main {
         height: calc(100% - 36px);
         width: 90%;
         z-index: 100;
+        resize: none;
+    }
+
+    .rightSidebar {
+        left: unset;
+        right: -95%;
     }
 
     .leftSidebar.show {
         left: 0;
+    }
+
+    .rightSidebar.show {
+        right: 0;
     }
 
     .bottomBar .item span {
@@ -454,8 +565,8 @@ main {
         width: 80%;
     }
 
-    .fileExplorerHeader .newActions button,
-    .folder-name .newActions button {
+    .sidebarHeader .headerActions button,
+    .folder-name .headerActions button {
         opacity: 0.6;
     }
 

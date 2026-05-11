@@ -7,6 +7,7 @@ import { CompletionKind, Severity } from "./ty_wasm/ty_wasm";
 
 // Create editor variable so we can access it later
 let editor;
+let diffEditor;
 
 /**
  * Sets up the monaco editor instance. Must be called before any other functions here.
@@ -32,6 +33,13 @@ export function setUpMonaco() {
         theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark",
         automaticLayout: true,
         fixedOverflowWidgets: true
+    });
+    diffEditor = monaco.editor.createDiffEditor(document.getElementById('codeDiffEditor'), {
+        value: ['print("Hello")'].join('\n'),
+        language: 'python',
+        theme: 'matchMedia' in window && matchMedia("(prefers-color-scheme: light)").matches ? "vs-light" : "vs-dark",
+        automaticLayout: true,
+        fixedOverflowWidgets: true,
     });
 
     // Dynamically change the theme of the editor based on the system theme
@@ -162,7 +170,7 @@ export function setUpMonaco() {
     })
 
     // Return an editor instance in case it is needed elsewhere
-    return editor;
+    return [editor, diffEditor];
 }
 
 /**
@@ -187,8 +195,10 @@ export function createModel(content, uri, language = "python") {
 /**
  * Switch what model is displaying in the editor
  * @param {*} model The model to switch to. You can get one of these with {@link createModel}
+ * @param {*} [originalModel=null] The original model. Only needed for the diff editor.
+ * @param {boolean} readOnly Sets the diff editor to read only
  */
-export function changeModel(model) {
+export function changeModel(model, originalModel=null, readOnly=false) {
     // Convert the URI to a string
     const modelUriString = model.uri.toString();
 
@@ -196,7 +206,14 @@ export function changeModel(model) {
     const modelPath = modelUriString.replace("file://micromonkey", "");
 
     // Set the model
-    editor.setModel(model);
+    if (originalModel) diffEditor.setModel({
+        original: originalModel,
+        modified: model
+    })
+    else editor.setModel(model);
+
+    // Set the diff editor to read only or editable
+    diffEditor.updateOptions({ readOnly: readOnly });
 
     // Remove any diagnostics that are applied to this editor
     // if syntax checking is disabled

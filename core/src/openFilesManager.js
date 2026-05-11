@@ -1,6 +1,7 @@
 // Import functions from editor to change what is showing
 import { getInput } from "./commandPalette";
 import { changeModel, createModel } from "./editor";
+import { fsEmptyDir, fsMkDir, fsWriteFile } from "./git";
 
 // Functions to get files from the serial device and write files
 import { getFile, getFiles, writeFile } from "./serial";
@@ -9,11 +10,9 @@ import { closeFile, openFile } from "./tyManager";
 // An object containing the open tabs
 const tabs = {};
 
-// An object containing the contents of open files
-const fileCache = {};
-
 // References to monaco and custom editor in the DOM
 const codeEditorElement = document.getElementById("codeEditor");
+const codeDiffEditorElement = document.getElementById("codeDiffEditor");
 const customEditorElement = document.getElementById("customEditor");
 const serialMonitor = document.getElementById("serialMonitor");
 const rightPanel = document.getElementById("rightPanel");
@@ -33,55 +32,77 @@ export function initializeOpenFilesManager() {
  * Opens or focuses a tab
  * @param {string} path The path of the file on the board
  * @param {string} title A name to be shown on the tab. If no name is provided, the last segment of the path is used
- * @param {string} type The type of editor to be shown. Either `monaco` (meaning content is fetched from board and displayed in a Monaco editor) or `custom` (must provide render function)
+ * @param {string} type The type of editor to be shown. Either `monaco` (meaning content is fetched from board and displayed in a Monaco editor), `monaco-diff` (modified content is fetched from board, must provide original model) or `custom` (must provide render function)
  * @param {Function|null} renderFunction If the passed type is `custom`, this parameter must have a function that receives a root element where you can append new elements to. It will be called whenever the tab is clicked
+ * @param {*} [originalModel=null] If the passed type is `monaco-diff`, this parameter must have a model that will be displayed side by side with the modified file.
+ * @param {*} [model=null] If the passed type is `monaco-diff`, this parameter can have the model that will be used instead of the current file state
  */
-export async function openTab(path, title="", type="monaco", renderFunction=null) {
+export async function openTab(
+    path,
+    title = "",
+    type = "monaco",
+    renderFunction = null,
+    originalModel = null,
+    model = null,
+) {
+    const isReadOnly = model !== null;
+    // Change the path used everywhere else if it's a monaco-diff
+    const boardPath = path;
+    if (type === "monaco-diff") {
+        path = "/fileatgithead.mm";
+    }
+    
     // Check if this tab is opened already, while deactivating the currently active tab
-    Object.keys(tabs).forEach(path => {
+    Object.keys(tabs).forEach((path) => {
         const tab = tabs[path];
+        
         if (tab.active) {
             tab.active = false;
         }
     });
-    if (path in tabs) {
+    if (path in tabs && type !== "monaco-diff") {
         // If the tab is already opened, activate it
         tabs[path].active = true;
     } else {
         // If the type is monaco, grab the contents from the board and create a model for it
-        let model;
         if (type === "monaco") {
             // Get the file's content from the board
-            const content = await getFileWithCache(path);
+            const content = await getFileAndSave(boardPath);
 
             // A list of file extensions and their corresponding languages in Monaco
             const languages = {
-                "py": "python",
-                "json": "json",
-                "md": "markdown",
-                "js": "javascript",
-                "html": "html",
-                "css": "css"
-            }
+                py: "python",
+                json: "json",
+                md: "markdown",
+                js: "javascript",
+                html: "html",
+                css: "css",
+            };
 
             // Split the file path by .
             const segments = path.split(".");
 
             // Get the last segment, which is the file extension, and look up the language
-            const language = languages[segments[segments.length - 1]] ?? "plaintext";
+            const language =
+                languages[segments[segments.length - 1]] ?? "plaintext";
 
             // Create a monaco model for the file
             model = createModel(content, "file://micromonkey" + path, language);
+        } else if (type === "monaco-diff" && !model) {
+            model = tabs[boardPath].model;
         }
 
         // Add the tab to the list of tabs
         tabs[path] = {
-            "title": title === "" ? path.split("/").at(-1) : title,
-            "type": type,
-            "model": model,
-            "renderFunction": renderFunction,
-            "active": true,
-            "saved": true
+            title: title === "" ? path.split("/").at(-1) : title,
+            type: type,
+            model: model,
+            originalModel: originalModel,
+            renderFunction: renderFunction,
+            active: true,
+            saved: true,
+            realPath: boardPath,
+            readOnly: isReadOnly,
         };
     }
 
@@ -108,28 +129,45 @@ export function fileChanged(path) {
 /**
  * Write the active file's content to the connected device
  */
-export function saveActiveFile() {
-    // Loop through the paths of open tabs
-    Object.keys(tabs).forEach(async path => {
-        // Get the tab object
+export async function saveActiveFile() {
+    // Find the active tabs
+    const activeTabPaths = Object.keys(tabs).filter(path => {
         const tab = tabs[path];
-        if (tab.active && tab.type === "monaco") {
-            // Get the new contents
-            const contents = tab.model.getValue();
-
-            // If this is an active tab, and it is a file, write the file to the board
-            await writeFile(contents, path)
-
-            // Mark it as saved
-            tab.saved = true;
-
-            // Update the cache
-            fileCache[path] = contents;
-
-            // And render the tabs
-            renderTabs();
-        }
+        return tab.active;
     });
+
+    // If there are no active tabs, exit
+    if (activeTabPaths.length === 0) return;
+
+    // Find the first active tab
+    const activeTab = tabs[activeTabPaths[0]];
+
+    // If it's a custom editor, exit
+    if (activeTab.type === "custom" || activeTab.readOnly) return;
+
+    // If it's a monaco-diff, find the real monaco editor
+    const tab = activeTab.type === "monaco" ? activeTab : tabs[activeTab.realPath];
+
+    // If it's a monaco-diff, find the realPath, otherwise, the path of the active tab
+    const path = activeTab.type === "monaco" ? activeTabPaths[0] : activeTab.realPath;
+
+    // This should always be true
+    if (tab.type === "monaco") {
+        // Get the new contents
+        const contents = tab.model.getValue();
+
+        // Write the file to the board
+        await writeFile(contents, path);
+
+        // Mark it as saved
+        tab.saved = true;
+
+        // Update the cache
+        await fsWriteFile(path, contents);
+
+        // And render the tabs
+        renderTabs();
+    }
 }
 
 /**
@@ -138,7 +176,7 @@ export function saveActiveFile() {
  * @param {string} newPath The new path of the file
  * @param {boolean} skipRender Whether or not to skip rendering the tabs again, defaults to false
  */
-export function renameTab(oldPath, newPath, skipRender=false) {
+export async function renameTab(oldPath, newPath, skipRender = false) {
     // Get the tab
     const tab = tabs[oldPath];
 
@@ -164,24 +202,24 @@ export function renameTab(oldPath, newPath, skipRender=false) {
  * @param {string} oldPath The file path to rename everything under, should end with a /
  * @param {string} newPath The file path to rename everything under to, should end with a /
  */
-export function renameTabsInDirectory(oldPath, newPath) {
+export async function renameTabsInDirectory(oldPath, newPath) {
     // Loop through all the tabs
-    Object.keys(tabs).forEach(tabPath => {
+    Object.keys(tabs).forEach(async (tabPath) => {
         // And rename a tab if the path starts with the provided path
-        if (tabPath.startsWith(oldPath)) renameTab(tabPath, tabPath.replace(oldPath, newPath), true);
+        if (tabPath.startsWith(oldPath))
+            await renameTab(tabPath, tabPath.replace(oldPath, newPath), true);
     });
 
     // Render the tabs after all renaming is done
-    renderTabs();
+    await renderTabs();
 }
-
 
 /**
  * Remove a tab from the tab strip if it's open
  * @param {string} path The file path
  * @param {boolean} force Forces the tab to close even if unsaved. Default is false
  */
-export async function closeTab(path, force=false) {
+export async function closeTab(path, force = false) {
     // Get the tab object
     const tab = tabs[path];
 
@@ -190,13 +228,18 @@ export async function closeTab(path, force=false) {
 
     // If the tab is unsaved, confirm with the user
     if (!tab.saved && !force) {
-        const result = await getInput(`${tab.title} isn't saved. Are you sure you want to close it?`, "Pick an option", "", ["No", "Yes"], false);
+        const result = await getInput(
+            `${tab.title} isn't saved. Are you sure you want to close it?`,
+            "Pick an option",
+            "",
+            ["No", "Yes"],
+            false,
+        );
         if (result !== "Yes") return;
     }
 
     // Dispose of the model, if it is monaco
     if (tab.type === "monaco") tab.model.dispose();
-
     // Or, if it's a custom editor, remove content from the custom editor
     else if (tab.type === "custom") customEditorElement.innerText = "";
 
@@ -205,7 +248,8 @@ export async function closeTab(path, force=false) {
 
     // If this was an active tab, activate the last tab if possible
     const tabKeys = Object.keys(tabs);
-    if (tab.active && tabKeys.length > 0) tabs[tabKeys[tabKeys.length - 1]].active = true;
+    if (tab.active && tabKeys.length > 0)
+        tabs[tabKeys[tabKeys.length - 1]].active = true;
 
     // Render the tabs
     renderTabs();
@@ -216,9 +260,9 @@ export async function closeTab(path, force=false) {
  * @param {string} path The file path to remove everything under, should end with a /
  * @param force Forces tabs to close even if unsaved. Default is false
  */
-export function closeTabsInDirectory(path, force=false) {
+export function closeTabsInDirectory(path, force = false) {
     // Loop through all the tabs
-    Object.keys(tabs).forEach(tabPath => {
+    Object.keys(tabs).forEach((tabPath) => {
         // And close a tab if the path starts with the provided path
         if (tabPath.startsWith(path)) closeTab(tabPath, force);
     });
@@ -228,13 +272,13 @@ export function closeTabsInDirectory(path, force=false) {
  * Closes the active tab
  * @param {boolean} force Forces the tab to close even if unsaved. Default is false
  */
-export function closeActiveTab(force=false) {
-    Object.keys(tabs).forEach(path => {
+export function closeActiveTab(force = false) {
+    Object.keys(tabs).forEach((path) => {
         const tab = tabs[path];
         if (tab.active) {
-            closeTab(path, force);            
+            closeTab(path, force);
         }
-    })
+    });
 }
 
 /**
@@ -259,7 +303,7 @@ export function requestReRender(path) {
  * Renders the tabs in the tab strip and optionally activates the active tab's model in Monaco or calls the render function
  * @param {boolean} activateActiveTab Whether or not to change the model open in Monaco or show call the custom render function
  */
-function renderTabs(activateActiveTab=true) {
+function renderTabs(activateActiveTab = true) {
     // Get and clear the tabs container
     const tabsContainer = document.getElementById("tabs");
     tabsContainer.innerText = "";
@@ -269,13 +313,13 @@ function renderTabs(activateActiveTab=true) {
 
     // Loop through the paths of the tabs
     const tabPaths = Object.keys(tabs);
-    tabPaths.forEach(path => {
+    tabPaths.forEach((path) => {
         // Get the tab's object
         const tab = tabs[path];
 
         // Create a container for the tab
         const tabContainer = document.createElement("div");
-        
+
         // Add the tab class and set the path data field
         tabContainer.dataset.path = path;
         tabContainer.classList.add("tab");
@@ -312,13 +356,12 @@ function renderTabs(activateActiveTab=true) {
 
             // Close the tab
             closeTab(path);
-
         });
 
         // When the tab is clicked, set it as active
         tabContainer.addEventListener("click", () => {
             // Loop through the tab paths
-            Object.keys(tabs).forEach(aTabPath => {
+            Object.keys(tabs).forEach((aTabPath) => {
                 // Get the tab object
                 const aTab = tabs[aTabPath];
 
@@ -342,14 +385,22 @@ function renderTabs(activateActiveTab=true) {
         // change the model or switch to custom editor mode
         if (activateActiveTab && tab.active && tab.type === "monaco") {
             codeEditorElement.style.display = "block";
+            codeDiffEditorElement.style.display = "none";
             customEditorElement.style.display = "none";
 
             // Show the save button
             saveButton.style.display = "flex";
 
             changeModel(tab.model);
+        } else if (activateActiveTab && tab.active && tab.type === "monaco-diff") {
+            codeEditorElement.style.display = "none";
+            codeDiffEditorElement.style.display = "block";
+            customEditorElement.style.display = "none";
+
+            changeModel(tab.model, tab.originalModel, tab.readOnly);
         } else if (activateActiveTab && tab.active && tab.type === "custom") {
             codeEditorElement.style.display = "none";
+            codeDiffEditorElement.style.display = "none";
             customEditorElement.style.display = "block";
             customEditorElement.innerText = "";
             tab.renderFunction(customEditorElement);
@@ -358,7 +409,16 @@ function renderTabs(activateActiveTab=true) {
 
     // Scroll the active tab into view
     const activeTab = document.querySelector(".tabs .tab.active");
-    if (activeTab !== null && activeTab !== undefined && !isInViewport(activeTab)) activeTab?.scrollIntoView({behavior: "instant", block: "nearest", inline: "nearest"});
+    if (
+        activeTab !== null &&
+        activeTab !== undefined &&
+        !isInViewport(activeTab)
+    )
+        activeTab?.scrollIntoView({
+            behavior: "instant",
+            block: "nearest",
+            inline: "nearest",
+        });
 
     // If there are no tabs, set the custom editor to visible to get the monkey to appear
     if (tabPaths.length === 0) {
@@ -368,82 +428,63 @@ function renderTabs(activateActiveTab=true) {
 }
 
 /**
- * Gets the contents of a file from the cache, or board if it hasn't already been opened.
+ * Gets the contents of a file from the board and store it in the FS.
  * @param {string} path The path of the file to retrieve
- * @param {boolean} bustCache Update cache for this file. Defaults to false
- * @todo Bust cache is default to true right now; change it to false later
  * @returns {string} The contents of the file
  */
-export async function getFileWithCache(path, bustCache=true) {
-    // If the contents are cached, return the cached contents
-    if (path in fileCache && !bustCache) return fileCache[path];
-
-    // Otherwise, get the contents from the board, and store it in the cache
+export async function getFileAndSave(path) {
+    // Get the contents from the board
     const fileContents = await getFile(path);
-    fileCache[path] = fileContents;
+
+    // Save it to fs
+    fsWriteFile(path, fileContents);
 
     // Open it in Ty
-    openFile("file://micromonkey" + path, fileContents);
+    await openFile("file://micromonkey" + path, fileContents);
 
     // Return the file contents
     return fileContents;
 }
 
 /**
- * Loads all the files on the board into the file cache.
- * @param {boolean} [bustCache=false] Update cache for all files. Defaults to false
+ * Loads all the files on the board into the FS.
+ * @todo Does this make any sense here? Should it be in git.js?
  */
-export async function addAllFilesToCache(bustCache=false) {
+export async function addAllFilesToFS() {
     // Get the list of files from the board
     const files = await getFiles();
 
-    async function addFolderToCache(folder, path) {
+    async function addFolderToFS(folder, path) {
+        try {
+            await fsMkDir(path);
+        } catch {
+            // it may already exist
+        }
         for (const key in folder) {
             if (typeof folder[key] === "string") {
                 // If it's a string, it's a file, so get the file and add it to the cache
-                await getFileWithCache(path + "/" + folder[key], bustCache);
+                await getFileAndSave(path + "/" + folder[key]);
             } else {
                 // If it's not a string, it's a folder, so call this function again
-                await addFolderToCache(folder[key], path + "/" + key);
+                await addFolderToFS(folder[key], path + "/" + key);
             }
         }
     }
 
+    // Delete current cache
+    await fsEmptyDir();
     // Start the recursive function to get files
-    await addFolderToCache(files, "")
-}
-
-/**
- * Remove cache for all files.
- */
-export async function deleteFileCache() {
-    async function removeFolderFromTy(folder, path) {
-        for (const key in folder) {
-            if (typeof folder[key] === "string") {
-                // If it's a string, it's a file, so close the file
-                const path = path + "/" + folder[key];
-                closeFile("file://micromonkey" + path);
-            } else {
-                // If it's not a string, it's a folder, so call this function again
-                await removeFolderFromTy(folder[key], path + "/" + key);
-            }
-        }
-    }
-
-    // Start the recursive function to close the files
-    await removeFolderFromTy(files, "")
-
-    for (const key in fileCache) {
-        delete fileCache[key];
-    }
+    await addFolderToFS(files, "");
 }
 
 function isInViewport(element) {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
+    const rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <=
+            (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <=
+            (window.innerWidth || document.documentElement.clientWidth)
+    );
 }

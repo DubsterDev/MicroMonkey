@@ -6,7 +6,8 @@ import { getSetting } from "./settings";
 import { newFolderStructure } from "./fileExplorer";
 import JSZip from "jszip";
 import { addCommand, removeCommand } from "./commandPalette";
-import { deleteFileCache } from "./openFilesManager";
+import { cleanUpGit, fsDeleteRecursively, fsEmptyDir, fsUnlink } from "./git";
+import { closeAllFiles } from "./tyManager";
 
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");
@@ -236,6 +237,9 @@ export async function removeFile(filePath) {
     // Delete the file from the board
     await runCode(`import os
 os.remove("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`)
+
+    // Delete the file from git
+    await fsUnlink(filePath);
 }
 
 /**
@@ -291,6 +295,9 @@ def recursively_delete_dir(dir_name="/"):
             os.remove(dir_name + file[0])
     os.rmdir(dir_name)
 recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+
+    // Delete directory from git
+    await fsDeleteRecursively(filePath);
 }
 
 /**
@@ -729,11 +736,14 @@ function portDisconnected() {
     // Change the board status button to say a board needs to be connected
     document.getElementById("boardStatus").innerText = "Connect";
 
-    // Delete file cache
-    deleteFileCache();
+    // Close the ty files
+    closeAllFiles();
 
     // Clears the file explorer
     newFolderStructure({});
+
+    // Clears git
+    cleanUpGit();
 }
 
 /**

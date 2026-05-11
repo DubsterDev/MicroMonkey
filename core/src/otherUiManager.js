@@ -5,10 +5,26 @@ import { addHeading, addParagraph } from "./customEditorHelperFunctions";
 
 // After renaming, this is used to reload the file explorer
 import { newFolderStructure } from "./fileExplorer";
-import { closeTab, closeTabsInDirectory, openTab, renameTab, renameTabsInDirectory } from "./openFilesManager";
+import {
+    closeTab,
+    closeTabsInDirectory,
+    openTab,
+    renameTab,
+    renameTabsInDirectory,
+} from "./openFilesManager";
 
 // Helper functions for interacting with the board
-import { getAllFilesAsZip, getFiles, removeDirectoryRecursively, removeFile, renameFile, uploadAllFilesFromZip } from "./serial";
+import {
+    getAllFilesAsZip,
+    getFiles,
+    removeDirectoryRecursively,
+    removeFile,
+    renameFile,
+    uploadAllFilesFromZip,
+} from "./serial";
+
+// Git
+import { fsRename } from "./git";
 
 // Get the context menu element
 const menu = document.getElementById("contextMenu");
@@ -25,28 +41,40 @@ export function setupUiManager() {
         // An array of menu options, in format [Name, Click-Listener]
         const menuOptions = [];
 
-        if (ev.target.classList.contains("folder-name") || ev.target.parentElement.classList.contains("folder-name")) {
+        if (
+            ev.target.classList.contains("folder-name") ||
+            ev.target.parentElement.classList.contains("folder-name")
+        ) {
             // If it's a folder that's clicked
             // Get the directory's path
-            const currentDir = ev.target.classList.contains("folder-name") ? ev.target.parentElement.dataset.fileExplorerPath : ev.target.parentElement.parentElement.dataset.fileExplorerPath;
+            const currentDir = ev.target.classList.contains("folder-name")
+                ? ev.target.parentElement.dataset.fileExplorerPath
+                : ev.target.parentElement.parentElement.dataset
+                    .fileExplorerPath;
 
             // Add a rename function that launches a rename
-            menuOptions.push(["Rename", (ev) => {
-                ev.stopPropagation();
-                launchRename(currentDir);
-            }]);
+            menuOptions.push([
+                "Rename",
+                (ev) => {
+                    ev.stopPropagation();
+                    launchRename(currentDir);
+                },
+            ]);
 
             // Add a delete action
-            menuOptions.push(["Delete", async () => {
-                // Tell the device to delete the file
-                await removeDirectoryRecursively(`${currentDir}`);
-                
-                // Close all tabs in this directory
-                closeTabsInDirectory(`${currentDir}`);
-                
-                // And refresh the file explorer
-                newFolderStructure(await getFiles());
-            }]);
+            menuOptions.push([
+                "Delete",
+                async () => {
+                    // Tell the device to delete the file
+                    await removeDirectoryRecursively(`${currentDir}`);
+
+                    // Close all tabs in this directory
+                    closeTabsInDirectory(`${currentDir}`);
+
+                    // And refresh the file explorer
+                    newFolderStructure(await getFiles());
+                },
+            ]);
         } else if (ev.target.classList.contains("file")) {
             // If it's a file that's clicked
             // Get the directory path
@@ -56,44 +84,64 @@ export function setupUiManager() {
             const fileName = ev.target.dataset.fileName;
 
             // Add a rename action that launches a rename
-            menuOptions.push(["Rename", (ev) => {
-                ev.stopPropagation();
-                launchRename(currentDir, fileName);
-            }]);
+            menuOptions.push([
+                "Rename",
+                (ev) => {
+                    ev.stopPropagation();
+                    launchRename(currentDir, fileName);
+                },
+            ]);
 
             // Add a delete action
-            menuOptions.push(["Delete", async () => {
-                // Tell the device to delete the file
-                await removeFile(`${currentDir}${fileName}`);
-                closeTab(`${currentDir}${fileName}`);
+            menuOptions.push([
+                "Delete",
+                async () => {
+                    // Tell the device to delete the file
+                    await removeFile(`${currentDir}${fileName}`);
+                    closeTab(`${currentDir}${fileName}`);
 
-                // Refresh the file explorer
-                newFolderStructure(await getFiles());
-            }]);
-        } else if (ev.target.classList.contains("tab") || ev.target.parentElement.classList.contains("tab")) {
-            menuOptions.push(["Close Tab", () => {
-                // Get the path of the tab
-                const path = ev.target.classList.contains("tab") ? ev.target.dataset.path : ev.target.parentElement.dataset.path;
+                    // Refresh the file explorer
+                    newFolderStructure(await getFiles());
+                },
+            ]);
+        } else if (
+            ev.target.classList.contains("tab") ||
+            ev.target.parentElement.classList.contains("tab")
+        ) {
+            menuOptions.push([
+                "Close Tab",
+                () => {
+                    // Get the path of the tab
+                    const path = ev.target.classList.contains("tab")
+                        ? ev.target.dataset.path
+                        : ev.target.parentElement.dataset.path;
 
-                // Close the tab
-                closeTab(path);
-            }]);
-            menuOptions.push(["Close Saved Tabs", () => {
-                closeTabsInDirectory("/", false);
-            }]);
-            menuOptions.push(["Close All Tabs", () => {
-                closeTabsInDirectory("/", true);
-            }]);
+                    // Close the tab
+                    closeTab(path);
+                },
+            ]);
+            menuOptions.push([
+                "Close Saved Tabs",
+                () => {
+                    closeTabsInDirectory("/", false);
+                },
+            ]);
+            menuOptions.push([
+                "Close All Tabs",
+                () => {
+                    closeTabsInDirectory("/", true);
+                },
+            ]);
         } else {
             // Add a item that does nothing if no other branch matches
-            menuOptions.push(["Nothing to see here", () => {}]);
+            menuOptions.push(["Nothing to see here", () => { }]);
         }
 
         // Clear the menu
         menu.innerText = "";
 
         // Add the options
-        menuOptions.forEach(option => {
+        menuOptions.forEach((option) => {
             // Create an option element and add the class
             const optEl = document.createElement("p");
             optEl.classList.add("option");
@@ -121,10 +169,18 @@ export function setupUiManager() {
     });
 
     // Add an option to the Command Palette to download all files as a ZIP
-    addCommand("downloadAllFiles", "Download All Files as ZIP [BETA]", downloadAllFiles);
+    addCommand(
+        "downloadAllFiles",
+        "Download All Files as ZIP [BETA]",
+        downloadAllFiles,
+    );
 
     // Add an option to the Command Palette to upload and overwrite all files as a ZIP
-    addCommand("uploadAllFiles", "Upload All Files from a ZIP [BETA]", uploadAllFiles);
+    addCommand(
+        "uploadAllFiles",
+        "Upload All Files from a ZIP [BETA]",
+        uploadAllFiles,
+    );
 }
 
 /**
@@ -132,14 +188,15 @@ export function setupUiManager() {
  * @param {string} directory The directory that contains the file
  * @param {string} fileName The filename
  */
-async function launchRename(directory="", fileName="") {
-    // Whether the directory originally ended with a slash
-    const wasDirectory = directory.endsWith("/");
+async function launchRename(directory = "", fileName = "") {
+    // Whether we're renaming a directory
+    const wasDirectory = fileName.trim() === "";
 
     // If no fileName is provided, use the last part
     if (fileName === "") {
         // If the directory ends with /, remove the slash
-        if (directory.endsWith("/")) directory = directory.slice(0, directory.length - 1);
+        if (directory.endsWith("/"))
+            directory = directory.slice(0, directory.length - 1);
 
         // Split the directory into segments
         const directories = directory.split("/");
@@ -152,10 +209,14 @@ async function launchRename(directory="", fileName="") {
     }
 
     // If the directory doesn't end with a slash, add one
-    if (!directory?.endsWith("/")) directory = (directory || "")  + '/';
-    
+    if (!directory?.endsWith("/")) directory = (directory || "") + "/";
+
     // Get a new name for the file or folder from the command palette
-    const newName = await getInput("Enter a new name", "Enter a new name", fileName);
+    const newName = await getInput(
+        "Enter a new name",
+        "Enter a new name",
+        fileName,
+    );
 
     // If no input was received, don't rename the file
     if (newName === undefined || newName.trim() === "") return;
@@ -169,10 +230,13 @@ async function launchRename(directory="", fileName="") {
 
     // Rename any open tabs
     if (wasDirectory) {
-        renameTabsInDirectory(`${oldPath}/`, `${newPath}/`);
+        await renameTabsInDirectory(`${oldPath}/`, `${newPath}/`);
     } else {
-        renameTab(oldPath, newPath);
+        await renameTab(oldPath, newPath);
     }
+
+    // Rename in Git
+    await fsRename(oldPath, newPath);
 
     // Refresh the file explorer
     newFolderStructure(await getFiles());
@@ -189,11 +253,24 @@ export async function renderWelcomeScreen(rootElement) {
     addHeading("Welcome to MicroMonkey!", "h2", rootElement);
 
     // Define some welcome text
-    addParagraph("Connect your device with a USB cable, and then you can use the Connect button on the bottom left to connect your board.", rootElement);
-    addParagraph("If the device does not load, try pressing the 'EN' button on the board.", rootElement);
-    addParagraph("To soft-reboot the device, click into the serial monitor and use the keyboard shortcut CTRL+D.", rootElement);
-    addParagraph("For more information about controlling your board with the serial monitor, run help()", rootElement);
-    rootElement.innerHTML += "<p>You can also check the <a href='/docs/quickstart' target='_blank'>docs for more information</a>."
+    addParagraph(
+        "Connect your device with a USB cable, and then you can use the Connect button on the bottom left to connect your board.",
+        rootElement,
+    );
+    addParagraph(
+        "If the device does not load, try pressing the 'EN' button on the board.",
+        rootElement,
+    );
+    addParagraph(
+        "To soft-reboot the device, click into the serial monitor and use the keyboard shortcut CTRL+D.",
+        rootElement,
+    );
+    addParagraph(
+        "For more information about controlling your board with the serial monitor, run help()",
+        rootElement,
+    );
+    rootElement.innerHTML +=
+        "<p>You can also check the <a href='/docs/quickstart' target='_blank'>docs for more information</a>.";
 }
 
 /**
@@ -203,15 +280,25 @@ export async function renderWelcomeScreen(rootElement) {
  */
 export async function renderWhatsNewScreen(rootElement) {
     // Header
-    addHeading(`What's New in MicroMonkey ${MICROMONKEY_VERSION}`, "h2", rootElement);
+    addHeading(
+        `What's New in MicroMonkey ${MICROMONKEY_VERSION}`,
+        "h2",
+        rootElement,
+    );
 
     // Define some what's new text
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
 
     addHeading("Fixed", "h3", rootElement);
-    addParagraph("- Opening files with unicode characters in names", rootElement);
-    addParagraph("- Close all tabs closes all tabs, including unsaved ones again", rootElement);
+    addParagraph(
+        "- Opening files with unicode characters in names",
+        rootElement,
+    );
+    addParagraph(
+        "- Close all tabs closes all tabs, including unsaved ones again",
+        rootElement,
+    );
     addParagraph("- Uploading ZIP files with nested folders", rootElement);
 }
 
@@ -220,7 +307,11 @@ export function startWhatsNewScreenIfVersionChanged() {
     const lastVersion = localStorage.getItem("micromonkey-version");
 
     // If the version has changed, open the What's New tab
-    if (lastVersion !== null && lastVersion !== undefined && lastVersion !== MICROMONKEY_VERSION) {
+    if (
+        lastVersion !== null &&
+        lastVersion !== undefined &&
+        lastVersion !== MICROMONKEY_VERSION
+    ) {
         openWhatsNewTab();
     }
 
@@ -235,7 +326,12 @@ export function startWhatsNewScreenIfVersionChanged() {
  * Opens the What's New tab
  */
 function openWhatsNewTab() {
-    openTab("/.default_files/micromonkey/whats_new.mm", "What's New", "custom", renderWhatsNewScreen);
+    openTab(
+        "/.default_files/micromonkey/whats_new.mm",
+        "What's New",
+        "custom",
+        renderWhatsNewScreen,
+    );
 }
 
 /**
@@ -271,11 +367,18 @@ async function downloadAllFiles() {
 async function uploadAllFiles() {
     // Options the user can pick
     const DELETE = "Delete all files from the board and write the new ones";
-    const OVERWRITE = "Overwrite any files with the same names as those in the ZIP";
+    const OVERWRITE =
+        "Overwrite any files with the same names as those in the ZIP";
     const CANCEL = "Cancel";
 
     // Ask the user whether they want to proceed
-    const whatToDo = await getInput("What would you like to do?", "", "", [DELETE, OVERWRITE, CANCEL], false);
+    const whatToDo = await getInput(
+        "What would you like to do?",
+        "",
+        "",
+        [DELETE, OVERWRITE, CANCEL],
+        false,
+    );
 
     // If the user said no, break out of the function
     if (whatToDo === CANCEL || whatToDo === undefined) {
@@ -286,7 +389,7 @@ async function uploadAllFiles() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".zip";
-    
+
     // Add a onchange listener
     input.addEventListener("change", () => {
         // Exit early if no file is selected
@@ -301,13 +404,31 @@ async function uploadAllFiles() {
 
             // Reload the file explorer
             newFolderStructure(await getFiles());
-        }
+        };
 
         // Read the zip as an array buffer
-        reader.readAsArrayBuffer(input.files[0])
+        reader.readAsArrayBuffer(input.files[0]);
     });
 
     // Launch the input
     input.click();
-
 }
+
+/**
+ * Toggles the sidebar on mobile.
+ * @param {string} [side="left"] Which sidebar to toggle, left or right.
+ */
+export function toggleSidebar(side = "left") {
+    document.getElementById(`${side}Sidebar`).classList.toggle("show");
+    const icon = document.getElementById(`${side}SidebarOpenDirection`);
+    if (icon.innerText === "chevron_right") icon.innerText = "chevron_left";
+    else icon.innerText = "chevron_right";
+}
+
+// Add event listener for open sidebar buttons
+document
+    .getElementById("openLeftSidebar")
+    .addEventListener("click", () => toggleSidebar("left"));
+document
+    .getElementById("openRightSidebar")
+    .addEventListener("click", () => toggleSidebar("right"));
