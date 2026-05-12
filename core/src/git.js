@@ -417,7 +417,7 @@ s
                 }
             });
         }
-a
+
         // Only get non-undefined, non-null changes
         changes = changes.filter(Boolean);
 
