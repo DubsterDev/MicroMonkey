@@ -1,5 +1,11 @@
 import { defineConfig } from 'vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
-  base: './'
+  base: './',
+  plugins: [
+      nodePolyfills({
+          include: ['crypto', 'buffer', 'stream', 'util']
+      })
+  ]
 })

@@ -1,6 +1,6 @@
 import LightningFS from "@isomorphic-git/lightning-fs";
-import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef, setConfig, log, listFiles } from "isomorphic-git";
-import { Buffer } from "buffer";
+import { init, statusMatrix, add, remove, commit, resetIndex, walk, TREE, readBlob, resolveRef, setConfig, log, listFiles, addRemote, push, fetch, merge, abortMerge, Errors as IsomorphicGitErrors } from "isomorphic-git";
+import http from "isomorphic-git/http/web";
 import { addCommand, getInput, removeCommand } from "./commandPalette";
 import { createModel } from "./editor";
 import { addAllFilesToFS, openTab, requestReRender } from "./openFilesManager";
@@ -8,9 +8,6 @@ import { getFile, writeFile } from "./serial";
 import { addHeading } from "./customEditorHelperFunctions";
 import { toggleSidebar } from "./otherUiManager";
 import JSZip from "jszip";
-
-// Expose Buffer to Buffer for Git
-window.Buffer = Buffer;
 
 // The git repo currently in use
 let dir = "bob";
@@ -21,6 +18,16 @@ const fs = new LightningFS("fs").promises;
 // Create models for the diff editor
 const originalModel = createModel("", `file://micromonkey/fileatgithead.mm`);
 const modifiedModel = createModel("", `file://micromonkey/fileatgithead2.mm`);
+
+// The username and password to connect to git with
+let gitUsername;
+let gitPassword;
+
+// Whether a merge conflict is occurring, false or an array of filepaths
+let resolvingMerge = false;
+
+// Whether or not the working tree is clean
+let workingTreeClean = false;
 
 /**
  * Add event listeners and check if Git is enabled.
@@ -140,7 +147,10 @@ function gitRepoReady() {
     addCommand("gitOpenCommitHistory", "[Git] Open Commit History", openCommitHistory);
     addCommand("gitReload", "[Git] Reload", reloadGit);
     addCommand("gitDownloadAsZip", "[Git] Download .git folder as ZIP", downloadGitAsZip);
-
+    addCommand("gitAddRemote", "[Git] Add/update remote", addRemoteToRepo);
+    addCommand("gitPush", "[Git] Push", pushToRemote);
+    addCommand("gitPull", "[Git] Pull", pullRepo);
+    
     // Swap the view in the right panel to the enabled state
     document.getElementById("gitNotEnabled").style.display = "none";
     document.getElementById("gitEnabled").style.display = "flex";
@@ -188,11 +198,19 @@ export async function cleanUpGit() {
     removeCommand("gitOpenCommitHistory");
     removeCommand("gitReload");
     removeCommand("gitDownloadAsZip");
+    removeCommand("gitAddRemote");
+    removeCommand("gitPush");
+    removeCommand("gitPull");
+    removeCommand("gitAbortMerge");
 
     // Reset view to loading
     document.getElementById("gitLoading").style.display = "block";
     document.getElementById("gitNotEnabled").style.display = "none";
     document.getElementById("gitEnabled").style.display = "none";
+
+    // Delete git credentials
+    gitUsername = undefined;
+    gitPassword = undefined;
 }
 
 /**
@@ -206,10 +224,16 @@ async function renderChanges() {
     const changesElement = document.getElementById("gitChangesArea");
     changesElement.innerHTML = "";
 
+    // Reset the working tree clean flag
+    workingTreeClean = true;
+
     // Loop through the changes
     changes.forEach(([path, headStatus, workDirStatus, stageStatus]) => {
         // If nothing changed, skip it
         if (headStatus === 1 && workDirStatus === 1) return;
+
+        // If we're still here, the working tree is NOT clean
+        workingTreeClean = false;
 
         // Split the path into filename and directory
         const pathParts = path.split("/");
@@ -395,7 +419,7 @@ async function renderGraph(root) {
                     if (!aType && bType) {
                         return { path: filepath, status: 'added' }
                     }
-s
+
                     // If aType is set, but bType is not, then this file must have been deleted in this commit
                     if (aType && !bType) {
                         return { path: filepath, status: 'deleted' }
@@ -540,7 +564,16 @@ async function commitStaged() {
     }
 
     // Tell git to commit
-    await commit({ fs, dir: `/${dir}`, message });
+    await commit({ 
+        fs, 
+        dir: `/${dir}`, 
+        message,
+        parent: resolvingMerge ? ["main", "origin/main"] : undefined
+    });
+
+    // Remove resolvingMerge information
+    resolvingMerge = false;
+    removeCommand("gitAbortMerge");
 
     // Reset the commit message input value
     gitCommitMessage.value = "";
@@ -548,6 +581,147 @@ async function commitStaged() {
     // Render changes and update commit history if open
     renderChanges();
     updateGraph();
+}
+
+/**
+ * Pull changes from the remote and merge them in.
+ */
+async function pullRepo() {
+    // If the working tree is not clean, make sure the user wants to continue
+    if (!workingTreeClean) {
+        const continueOk = await getInput(
+            "The working tree is not clean. All changes will be overwritten.",
+            "Are you sure you want to continue?", "", 
+            ["Yes, overwrite my changes", "No, cancel"],
+            false
+        );
+        if (!continueOk || continueOk === "No, cancel") return;
+    }
+
+    // Get credentials for logging in
+    const credentials = await getGitCredentials();
+    try {
+        // Fetch updated changes
+        await fetch({ fs, dir: `/${dir}`, http, onAuth: () => credentials });
+
+        // Merge in the changes or fast forward
+        await merge({ 
+            fs, 
+            dir: `/${dir}`,
+            http, 
+            ours: "main", 
+            theirs: "origin/main",
+            fastForward: true,
+            abortOnConflict: false,
+            onAuth: () => credentials
+        });
+    } catch (e) {
+        if (e instanceof IsomorphicGitErrors.MergeConflictError) {
+            // If there's a merge conflict let the user know
+            getInput("Merge conflict! Opening files for manual resolving", e.data.filepaths.join(", "), '', ["Okay"]);
+            
+            // Loop through the changed files
+            for (const filepath of e.data.filepaths) {
+                // Read the new content
+                const fileContents = await fs.readFile(`/${dir}/${filepath}`, "utf8");
+
+                // Write the new content to the board
+                await writeFile(fileContents, filepath, false);
+
+                // And open the tab
+                await openTab(`/${filepath}`);
+            }
+
+            // Store the changed filepaths
+            resolvingMerge = e.data.filepaths;
+
+            // Add command to abort merge
+            addCommand("gitAbortMerge", "[Git] Abort Merge", cancelMerge);
+        } else {
+            // Let the user know there's an error
+            console.error(e);
+            getInput(e.message, "", "", ["Okay"]);
+        }
+    }
+
+    // Render changes, update commit history
+    renderChanges();
+    updateGraph();
+}
+
+/**
+ * Push local commits to remote.
+ */
+async function pushToRemote() {
+    // Push changes
+    await push({ 
+        fs, 
+        http, 
+        dir: `/${dir}`,
+        onAuth: getGitCredentials
+    });
+
+    // Render changes, and update commit history
+    renderChanges();
+    updateGraph();
+}
+
+/**
+ * Add or update the remote associated with this repository.
+ */
+async function addRemoteToRepo() {
+    // Get the new remote url
+    const remoteUrl = await getInput("Enter a remote URL", "Enter a remote URL", "");
+
+    // If canceled, exit early
+    if (remoteUrl === undefined || remoteUrl.trim() === "") return;
+
+    // Add the remote to the repo as 'origin'
+    await addRemote({ 
+        fs, 
+        dir: `/${dir}`, 
+        remote: "origin", 
+        url: remoteUrl,
+        force: true
+    });
+}
+
+/**
+ * Ask the user for login credentials or retrieve them from cache.
+ * @returns Object in the form `{ username, password }`
+ */
+async function getGitCredentials() {
+    // If the username and password aren't cached, ask for them
+    if (!gitUsername || !gitPassword) {
+        gitUsername = await getInput("Username", "for connecting to git repo", "");
+        gitPassword = await getInput("Password", "for connecting to git repo", "");
+    }
+
+    // Return the username and password
+    return { username: gitUsername, password: gitPassword };
+}
+
+/**
+ * Aborts a merge
+ */
+async function cancelMerge() {
+    // Abort the merge
+    await abortMerge({ fs, dir: `/${dir}` });
+
+    // If we have a list of file paths
+    if (resolvingMerge instanceof Array) {
+        for (const filepath of resolvingMerge) {
+            // Then read the new contents
+            const fileContents = await fs.readFile(`/${dir}/${filepath}`, "utf8");
+
+            // And write the new contents to the board
+            await writeFile(fileContents, filepath);
+        }
+    }
+
+    // Set resolving merge to false and remove the abort merge command
+    resolvingMerge = false;
+    removeCommand("gitAbortMerge");
 }
 
 /**
