@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "MicroMonkey",
-  description: "A fast, browser-based MicroPython IDE for ESP32 with built-in REPL, syntax checking, and flasher, no installation required!",
+  description: "A fast, browser-based MicroPython IDE for ESP32 with built-in REPL, Git, syntax checking, and flasher, no installation required!",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

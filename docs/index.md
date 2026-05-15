@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: "MicroMonkey"
-  tagline: A fast, browser-based IDE for ESP32 MicroPython development
+  tagline: A fast, browser-based IDE for ESP32 MicroPython development with integrated Git support
   image:
     src: ./logo.svg
     alt: MicroMonkey logo
@@ -19,15 +19,15 @@ hero:
 
 features:
   - icon:
+      light: "/icons/git-light.svg"
+      dark: "/icons/git-dark.svg"
+    title: Git support
+    details: "Built-in version control for faster development"
+  - icon:
       light: "/icons/terminal-light.svg"
       dark: "/icons/terminal-dark.svg"
     title: Integrated REPL
     details: "See the output of your code right in the editor"
-  - icon:
-      light: "/icons/desktop-light.svg"
-      dark: "/icons/desktop-dark.svg"
-    title: Clean, easy to use interface
-    details: "A modern interface for MicroPython development"
   - icon:
       light: "/icons/code-light.svg"
       dark: "/icons/code-dark.svg"
@@ -73,6 +73,12 @@ MicroMonkey is a browser-based MicroPython IDE for ESP32 development, with no in
 
 Built-in MicroPython flashing eliminates the need for multiple tools, and best of all: works on any device with Chrome or a Chromium-based browser, including Chromebooks!
 
+## Built-in Git support makes development faster and easier
+
+Developing for MicroPython boards and using version control used to be hard, but not anymore! MicroMonkey includes built-in Git support, making it faster and easier to use version control with your MicroPython board.
+
+[Read more about Git support in MicroMonkey here](/docs/git)
+
 ## Everything you need for ESP32 MicroPython development: REPL, flashing, and editing in one place
 
 Tired of switching to the terminal to run `mpremote` just to test your code, flash MicroPython, or use the REPL? Enter MicroMonkey: The MicroPython IDE that keeps it all in one place.
@@ -89,9 +95,9 @@ If you were to use VS Code for MicroPython development, you would have to instal
 
 MicroMonkey changes that: no need to install plugins, use the command line, or do complex installation steps. And it also uses the Monaco editor (the same core editor that powers VS Code), providing a rich user experience, and built-in syntax checking and autocompletion for MicroPython.
 
-## What is MicroMonkey?
+## So, what is MicroMonkey?
 
-MicroMonkey is a fast, lightweight ESP32 MicroPython IDE that runs entirely in your browser. It combines a code editor, REPL, file manager, and flashing tools into a single browser-based environment, eliminating the need for setup or local tools.
+MicroMonkey is a fast, lightweight ESP32 MicroPython IDE that runs entirely in your browser. It combines a code editor, REPL, file manager, Git, and flashing tools into a single browser-based environment, eliminating the need for setup or local tools.
 
 ## Start coding in seconds
 
