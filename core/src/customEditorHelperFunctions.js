@@ -70,6 +70,39 @@ export function addCheckbox(content, root, checked=false, callback) {
 }
 
 /**
+ * Create and append a input:text to an element
+ * @param {string} content The content of the new input's label
+ * @param {Element} root The element to append to
+ * @param {boolean} value The input's initial value
+ * @param {Function|undefined} callback A callback for when the input's value changes. Called with one parameter: string value of the input's value
+ */
+export function addInput(content, root, value='', callback) {
+    const label = document.createElement("label");
+
+    const span = document.createElement("span");
+    span.innerText = content;
+    label.appendChild(span);
+    
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = value;
+    if (callback !== undefined) {
+        input.addEventListener("change", () => {
+            callback(input.value);
+        });
+
+        input.addEventListener("keyup", (ev) => {
+            if (ev.code === "Enter") {
+                callback(input.value);
+            }
+        })
+    }
+    label.appendChild(input);
+
+    root.appendChild(label);
+}
+
+/**
  * Create and append a button to an element
  * @param {string} content The content of the new button
  * @param {Element} root The element to append to
