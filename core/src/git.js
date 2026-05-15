@@ -644,8 +644,9 @@ async function pullRepo() {
         }
     }
 
-    // Render changes, update commit history
-    renderChanges();
+    // Update board, render changes, and update commit history
+    await writeChangedFilesToBoard();
+    await renderChanges();
     updateGraph();
 }
 
@@ -764,6 +765,41 @@ async function downloadGitAsZip() {
     a.href = url;
     a.download = `${dir}-.git.zip`;
     a.click();
+}
+
+/**
+ * Writes new files to the board, getting them from the git HEAD
+ */
+async function writeChangedFilesToBoard(path="/") {
+    // Get the changes from Git
+    const changes = await statusMatrix({ fs, dir: `/${dir}` });
+
+    // Loop through the changes
+    for (const [path, headStatus, workDirStatus, stageStatus] of changes) {
+        // If nothing changed, skip it
+        if (headStatus === 1 && workDirStatus === 1) continue;
+
+        // Get the oid
+        const oid = await resolveRef({
+            fs,
+            dir: `/${dir}`,
+            ref: 'HEAD'
+        });
+
+        // Get the blob from Git
+        const { blob } = await readBlob({
+            fs,
+            dir: `/${dir}`,
+            oid: oid,
+            filepath: path
+        });
+
+        // Convert the blob to a string
+        const newContents = Buffer.from(blob).toString("utf8");
+
+        // Write the new contents to the board
+        await writeFile(newContents, path);
+    };
 }
 
 // FS Helper Functions
