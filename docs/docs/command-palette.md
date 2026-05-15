@@ -62,3 +62,21 @@ Opens the Commit History tab, displaying all of the commits made in the active G
 If a change has been made to a file using something other than MicroMonkey, for example, if a Python program on the board has modified a file, this command may need to be executed to bring the Git repo up to date on the most recent changes.
 
 Typically you won't need to use this command as file operations within MicroMonkey will update Git automatically.
+
+## [Git] Add/update remote
+
+Adds or updates the remote associated with the current git repo.
+
+[See documentation on git for more information.](/docs/git).
+
+## [Git] Push
+
+Pushes local commits to the associated git remote. If there are conflicts, you will get an error.
+
+[See documentation on git for more information.](/docs/git).
+
+## [Git] Pull
+
+Pulls changes from the remote. Unlike `[Git] Push`, this command will allow merge conflicts, and will write conflict markers to the board.
+
+[See documentation on git for more information.](/docs/git).

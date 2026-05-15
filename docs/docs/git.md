@@ -20,6 +20,14 @@ Currently, MicroMonkey supports download the `.git` folder to your computer as a
 
 To download it as a .zip folder, make sure the Git panel is loaded and use the command `[Git] Download .git folder as ZIP` in the command palette.
 
+## Remotes
+
+MicroMonkey has basic support for pushing and pulling. To get started, use the command palette to run `[Git] Add/update remote`. It will ask for the URL of the git repo.
+
+After you've added a remote, you can use `[Git] Push` to push your changes to your remote. It will ask for your git credentials and store them in memory until you close or refresh the page. It does not support pushing to a remote if there is merge conflicts and you will get an error message.
+
+You can also use `[Git] Pull`. This *does* allow merge conflicts, and if there are any, it will write the merge markers to your connected board. After you've resolved the conflicts, you can commit the resolved changes and pushing should work as well.
+
 ## How it works
 
 Git support in MicroMonkey is slightly different than typical IDEs. In MicroMonkey, the `.git` folder is stored in your browser's storage, unlike traditional IDEs, where it's stored alongside the files.
