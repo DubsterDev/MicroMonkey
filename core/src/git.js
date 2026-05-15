@@ -573,6 +573,7 @@ async function commitStaged() {
 
     // Remove resolvingMerge information
     resolvingMerge = false;
+    document.getElementById("gitCommitButton").innerText = "Commit";
     removeCommand("gitAbortMerge");
 
     // Reset the commit message input value
@@ -634,6 +635,10 @@ async function pullRepo() {
 
             // Store the changed filepaths
             resolvingMerge = e.data.filepaths;
+
+            // Set commit button to make it clear it's a merge commit and add default commit message
+            document.getElementById("gitCommitMessage").value = "Merge branch 'origin/main' into 'main'";
+            document.getElementById("gitCommitButton").innerText = "Commit resolved merge";
 
             // Add command to abort merge
             addCommand("gitAbortMerge", "[Git] Abort Merge", cancelMerge);
@@ -722,6 +727,7 @@ async function cancelMerge() {
 
     // Set resolving merge to false and remove the abort merge command
     resolvingMerge = false;
+    document.getElementById("gitCommitButton").innerText = "Commit";
     removeCommand("gitAbortMerge");
 }
 
