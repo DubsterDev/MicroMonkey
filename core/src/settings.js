@@ -1,11 +1,12 @@
 import { addCommand } from "./commandPalette";
-import { addCheckbox, addHeading } from "./customEditorHelperFunctions";
+import { addCheckbox, addHeading, addInput } from "./customEditorHelperFunctions";
 import { openTab } from "./openFilesManager";
 
 // A list of default settings, used if no value is set
 const defaults = {
     "syntax-checking": true,
-    "reboot-on-save": true
+    "reboot-on-save": true,
+    "git-cors-proxy": ''
 };
 
 /**
@@ -65,4 +66,13 @@ function renderSettings(root) {
 
     addHeading("Syntax Checking", "h3", root);
     addCheckbox("Show syntax errors such as missing colons and undefined variables.", root, getSetting("syntax-checking"), (bool) => setSetting("syntax-checking", bool));
+
+    addHeading("Git CORS Proxy", "h3", root);
+    addInput(
+        "CORS proxy URL: ",
+        root, 
+        getSetting("git-cors-proxy"), 
+        (value) => setSetting("git-cors-proxy", value)
+    );
+    
 }
