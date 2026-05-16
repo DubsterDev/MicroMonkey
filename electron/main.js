@@ -32,8 +32,7 @@ const createWindow = () => {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             webSecurity: false
-        },
-        frame: false
+        }
     })
 
     if (!app.isPackaged) {
