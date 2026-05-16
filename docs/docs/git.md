@@ -14,12 +14,6 @@ To commit files, you'll just use the commit button on the Git panel. Only staged
 
 If you click the name of a file in the changes section of the Git panel, a split pane editor will open showing you the difference in the current file and what was last committed to Git. Nothing will happen if the file has never been committed before.
 
-## Downloading the .git folder
-
-Currently, MicroMonkey supports download the `.git` folder to your computer as a .zip. Later, we'd like to support uploading it too, but that's not a feature yet.
-
-To download it as a .zip folder, make sure the Git panel is loaded and use the command `[Git] Download .git folder as ZIP` in the command palette.
-
 ## Remotes
 
 MicroMonkey has basic support for pushing and pulling. To get started, use the command palette to run `[Git] Add/update remote`. It will ask for the URL of the git repo.
@@ -61,6 +55,12 @@ INSECURE_HTTP_ORIGINS="localhost:3245,insecuregitserver.com" cors-proxy run
 Git support in MicroMonkey is slightly different than typical IDEs. In MicroMonkey, the `.git` folder is stored in your browser's storage, unlike traditional IDEs, where it's stored alongside the files.
 
 The reason for doing this is it would require a lot of read and write operations to your board, if it were to store the `.git` folder on the board, and it may even use up the storage space.
+
+## Downloading the .git folder
+
+Currently, MicroMonkey supports download the `.git` folder to your computer as a .zip. Later, we'd like to support uploading it too, but that's not a feature yet.
+
+To download it as a .zip folder, make sure the Git panel is loaded and use the command `[Git] Download .git folder as ZIP` in the command palette.
 
 ## Using the same Git repo on multiple boards {#using-same-git-repo}
 
