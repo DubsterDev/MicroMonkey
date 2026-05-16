@@ -28,9 +28,11 @@ After you've added a remote, you can use `[Git] Push` to push your changes to yo
 
 You can also use `[Git] Pull`. This *does* allow merge conflicts, and if there are any, it will write the merge markers to your connected board. After you've resolved the conflicts, you can commit the resolved changes and pushing should work as well.
 
-## Failed to fetch errors {#using-cors-proxy}
+## Using a CORS Proxy
 
-Most remotes have a CORS policy, making it impossible to push or pull from a site that isn't from the same origin. You can get around this error with a CORS Proxy. If you have `npm`, you can install isomorphic-git's CORS Proxy:
+Most remotes have a CORS policy, making it impossible to push or pull from a site that isn't from the same origin. You'll get the error `Failed to fetch` if the repo you're trying to push to has CORS enabled. This error message may also show up if you have no internet connection.
+
+You can get around this error with a CORS Proxy. If you have `npm`, you can install isomorphic-git's CORS Proxy:
 
 ```bash
 npm install -g @isomorphic-git/cors-proxy
@@ -42,7 +44,7 @@ Then, you can run it:
 cors-proxy run
 ```
 
-Then, open the Settings page in MicroMonkey and put `http://localhost:9999` in the input. Pushing and pulling to remotes should work now!
+Finally, open the Settings page in MicroMonkey and put `http://localhost:9999` in the input labeled `CORS Proxy`. Pushing and pulling to remotes should work now!
 
 ### CORS Proxy with insecure git remotes
 
