@@ -670,14 +670,19 @@ async function pullRepo() {
  * Push local commits to remote.
  */
 async function pushToRemote() {
-    // Push changes
-    await push({ 
-        fs, 
-        http, 
-        dir: `/${dir}`,
-        onAuth: getGitCredentials,
-        corsProxy: getSetting("git-cors-proxy")
-    });
+    try {
+        // Push changes
+        await push({ 
+            fs, 
+            http, 
+            dir: `/${dir}`,
+            onAuth: getGitCredentials,
+            corsProxy: getSetting("git-cors-proxy")
+        });
+    } catch (e) {
+        console.error(e);
+        getInput(e.message, "", "", ["Okay"]);
+    }
 
     // Render changes, and update commit history
     renderChanges();
