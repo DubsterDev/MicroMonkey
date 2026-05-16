@@ -2,9 +2,9 @@
 
 MicroMonkey has built-in support for version control using Git. After connecting a board to MicroMonkey, the Git panel will be displayed on the right of the code editor.
 
-If it's your first time using Git in MicroMonkey, you'll see an Setup Git button. If you click this button, it will ask you a few questions, such as what name and email you want to use for committing, and finally, what you want to name your git repo. MicroMonkey stores the git repo under this name so it knows what Git repo to use for the connected board.
+If it's your first time using Git in MicroMonkey, you'll see an Setup Git button. If you click this button, it will ask you a few questions, such as what name and email you want to use for committing, and finally, what you want to name your git repo. MicroMonkey stores the git repo under this name so it knows what Git repo to use for the connected board. This name should be different for every connected board.
 
-This name should be different for every connected board. Later, support might be added to use the same git repo name on multiple boards. <small>(This is technically possible right now. [See the section about it here](#using-same-git-repo))</small>.
+<small>(It is technically possible to use the same repo on multiple boards, but it's not the best idea. [See the section about it here](#using-same-git-repo))</small>.
 
 ## Committing
 
