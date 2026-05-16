@@ -290,16 +290,23 @@ export async function renderWhatsNewScreen(rootElement) {
     // This should be updated with each release, so check the changelog for what to put here.
     // It doesn't have to have everything the CHANGELOG has, just the most important stuff.
 
+    addHeading("Added", "h3", rootElement);
+    addParagraph(
+        "- Git support",
+        rootElement,
+    );
+    
     addHeading("Fixed", "h3", rootElement);
     addParagraph(
-        "- Opening files with unicode characters in names",
+        "- Wrong sized serial monitor - serial monitor now uses a monospace font",
         rootElement,
     );
+
+    addHeading("Changed", "h3", rootElement);
     addParagraph(
-        "- Close all tabs closes all tabs, including unsaved ones again",
+        "- Added a pointer instead of text cursor in actionable places",
         rootElement,
     );
-    addParagraph("- Uploading ZIP files with nested folders", rootElement);
 }
 
 export function startWhatsNewScreenIfVersionChanged() {
