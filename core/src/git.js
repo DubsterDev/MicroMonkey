@@ -8,6 +8,7 @@ import { getFile, writeFile } from "./serial";
 import { addHeading } from "./customEditorHelperFunctions";
 import { toggleSidebar } from "./otherUiManager";
 import JSZip from "jszip";
+import { getSetting } from "./settings";
 
 // The git repo currently in use
 let dir = "bob";
@@ -602,8 +603,16 @@ async function pullRepo() {
     // Get credentials for logging in
     const credentials = await getGitCredentials();
     try {
+        const corsProxy = getSetting("git-cors-proxy");
+        
         // Fetch updated changes
-        await fetch({ fs, dir: `/${dir}`, http, onAuth: () => credentials });
+        await fetch({ 
+            fs, 
+            dir: `/${dir}`, 
+            http, 
+            onAuth: () => credentials,
+            corsProxy
+        });
 
         // Merge in the changes or fast forward
         await merge({ 
@@ -614,7 +623,9 @@ async function pullRepo() {
             theirs: "origin/main",
             fastForward: true,
             abortOnConflict: false,
-            onAuth: () => credentials
+            onAuth: () => credentials,
+            corsProxy,
+            allowUnrelatedHistories: true
         });
     } catch (e) {
         if (e instanceof IsomorphicGitErrors.MergeConflictError) {
@@ -664,7 +675,8 @@ async function pushToRemote() {
         fs, 
         http, 
         dir: `/${dir}`,
-        onAuth: getGitCredentials
+        onAuth: getGitCredentials,
+        corsProxy: getSetting("git-cors-proxy")
     });
 
     // Render changes, and update commit history
