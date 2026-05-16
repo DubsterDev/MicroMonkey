@@ -4,4 +4,4 @@
 [[toc]]
 :::
 
-<!--@include: ../../LICENSES.md{5,} -->
+<!--@include: ../../THIRD_PARTY_LICENSES.md{5,} -->
