@@ -11,7 +11,8 @@ import JSZip from "jszip";
 import { getSetting } from "./settings";
 
 // The git repo currently in use
-let dir = "bob";
+let dir = "no_git_repo_in_use";
+let gitRepoInUse = false;
 
 // Create a new LightningFS fs
 const fs = new LightningFS("fs").promises;
@@ -48,6 +49,7 @@ export async function setupGit() {
     if (repo && repo.trim() !== "" && repoExists) {
         // If the repo exists, set the dir to repo
         dir = repo;
+        gitRepoInUse = true;
 
         // Download all files from the board, and prepare git for use
         await addAllFilesToFS();
@@ -120,6 +122,7 @@ async function enableGit() {
         // Save the name of the board and set the active repo to the new repo
         await writeFile(repoName, "/.mmgitrepo");
         dir = repoName;
+        gitRepoInUse = true;
 
         // Download all files from the board
         await addAllFilesToFS();
@@ -212,6 +215,10 @@ export async function cleanUpGit() {
     // Delete git credentials
     gitUsername = undefined;
     gitPassword = undefined;
+
+    // Reset git repo variables
+    dir = "no_git_repo_in_use";
+    gitRepoInUse = false;
 }
 
 /**
@@ -828,6 +835,9 @@ async function writeChangedFilesToBoard(path="/") {
 // FS Helper Functions
 
 export async function fsMkDir(dirName, options) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!dirName.startsWith("/")) dirName = "/" + dirName;
 
     const fsResult = await fs.mkdir(`/${dir}${dirName}`, options);
@@ -838,6 +848,9 @@ export async function fsMkDir(dirName, options) {
 }
 
 export async function fsRmDir(dirName, options) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!dirName.startsWith("/")) dirName = "/" + dirName;
 
     const fsResult = await fs.rmdir(`/${dir}${dirName}`, options);
@@ -848,12 +861,18 @@ export async function fsRmDir(dirName, options) {
 }
 
 export function fsReadDir(dirName, options) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!dirName.startsWith("/")) dirName = "/" + dirName;
 
     return fs.readdir(`/${dir}${dirName}`, options);
 }
 
 export async function fsRename(oldFilePath, newFilePath) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!oldFilePath.startsWith("/")) oldFilePath = "/" + oldFilePath;
     if (!newFilePath.startsWith("/")) newFilePath = "/" + newFilePath;
 
@@ -868,12 +887,18 @@ export async function fsRename(oldFilePath, newFilePath) {
 }
 
 export function fsStat(filePath) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!filePath.startsWith("/")) filePath = "/" + filePath;
 
     return fs.stat(`/${dir}${filePath}`, options);
 }
 
 export async function fsWriteFile(filePath, data, options) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!filePath.startsWith("/")) filePath = "/" + filePath;
 
     const fsResult = await fs.writeFile(`/${dir}${filePath}`, data, options);
@@ -884,12 +909,18 @@ export async function fsWriteFile(filePath, data, options) {
 }
 
 export function fsReadFile(filePath, options) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!filePath.startsWith("/")) filePath = "/" + filePath;
 
     return fs.readFile(`/${dir}${filePath}`, options);
 }
 
 export async function fsUnlink(filePath, options) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!filePath.startsWith("/")) filePath = "/" + filePath;
 
     const fsResult = await fs.unlink(`/${dir}${filePath}`, options);
@@ -900,6 +931,9 @@ export async function fsUnlink(filePath, options) {
 }
 
 export async function fsDeleteRecursively(path) {
+    // Exit if git isn't being used
+    if (!gitRepoInUse) return;
+    
     if (!path.startsWith("/")) path = "/" + path;
     
     return fsEmptyDir(`/${dir}${path}`)
