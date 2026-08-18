@@ -146,18 +146,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Made file actions always visible on root folder
  - Various internal modifications
 
-[unreleased]: https://github.com/FXZFun/MicroMonkey/compare/v1.4.0...HEAD
-[1.4.0]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.6...v1.4.0
-[1.3.6]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.5...v1.3.6
-[1.3.5]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.4...v1.3.5
-[1.3.4]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.3...v1.3.4
-[1.3.3]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.2...v1.3.3
-[1.3.2]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1...v1.3.2
-[1.3.1]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.1-beta...v1.3.1
-[1.3.1-beta]: https://github.com/FXZFun/MicroMonkey/compare/v1.3.0-beta...v1.3.1-beta
-[1.3.0-beta]: https://github.com/FXZFun/MicroMonkey/compare/v1.2.1...v1.3.0-beta
-[1.2.1]: https://github.com/FXZFun/MicroMonkey/compare/v1.2.0...v1.2.1
-[1.2.0]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.3...v1.2.0
-[1.1.3]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.2...v1.1.3
-[1.1.2]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.1...v1.1.2
-[1.1.1]: https://github.com/FXZFun/MicroMonkey/compare/v1.1.0...v1.1.1
+[unreleased]: https://github.com/DubsterDev/MicroMonkey/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.6...v1.4.0
+[1.3.6]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.5...v1.3.6
+[1.3.5]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.4...v1.3.5
+[1.3.4]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.3...v1.3.4
+[1.3.3]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.2...v1.3.3
+[1.3.2]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.1-beta...v1.3.1
+[1.3.1-beta]: https://github.com/DubsterDev/MicroMonkey/compare/v1.3.0-beta...v1.3.1-beta
+[1.3.0-beta]: https://github.com/DubsterDev/MicroMonkey/compare/v1.2.1...v1.3.0-beta
+[1.2.1]: https://github.com/DubsterDev/MicroMonkey/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/DubsterDev/MicroMonkey/compare/v1.1.3...v1.2.0
+[1.1.3]: https://github.com/DubsterDev/MicroMonkey/compare/v1.1.2...v1.1.3
+[1.1.2]: https://github.com/DubsterDev/MicroMonkey/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/DubsterDev/MicroMonkey/compare/v1.1.0...v1.1.1
