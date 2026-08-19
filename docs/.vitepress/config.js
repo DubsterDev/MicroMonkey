@@ -27,6 +27,14 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Contributing',
+        items: [
+          { text: 'Contributing for the first time', link: '/contributing/' },
+          { text: 'Setting up a development environment', link: '/contributing/setting-up-environment' },
+          { text: 'Building ty, the typechecker', link: '/contributing/build-ty' },
+        ]
+      },
+      {
         text: 'More',
         items: [
           { text: 'Changelog', link: '/more/changelog' },

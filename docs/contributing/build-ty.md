@@ -1,4 +1,6 @@
-# Tutorial: Build ty, the type checker
+# Building ty, the typechecker
+
+A pre-compiled version of `ty` is already in the repo, but if you need to update it, follow these instructions.
 
 Before beginning, make sure you've installed Rust.
 
@@ -6,7 +8,9 @@ Before beginning, make sure you've installed Rust.
 
 The first step is to clone Ruff, which includes the scripts for the WASM version of ty:
 
-`git clone https://github.com/astral-sh/ruff`
+```bash
+git clone https://github.com/astral-sh/ruff
+```
 
 ## 2. Patch typeshed
 
@@ -14,9 +18,13 @@ Delete the typeshed located at `crates/ty_vendored/vendor/typeshed/stdlib`, or r
 
 cd to `crates/ty_vendored/vendor/typeshed/`.
 
-Install the micropython typeshed here instead: `pip install -I micropython-esp32-stubs --target stdlib/`. 
+Install the micropython typeshed here instead: 
 
-Inside the stdlib directory, run this python script:
+```bash
+pip install -I micropython-esp32-stubs --target stdlib/
+```
+
+Inside the stdlib directory, run this python script to get ty to recognize some of the libraries:
 
 ```python
 import os
@@ -38,15 +46,23 @@ Then move the contents of stdlib (the one inside stdlib) up one directory.
 
 cd into the right directory:
 
-`cd ruff/playground/ty`
+```bash
+cd ruff/playground/ty
+```
 
 We'll have to install `wasm-pack`. This can be done with cargo (note: it will take awhile):
-`cargo install wasm-pack`
+
+```bash
+cargo install wasm-pack
+```
 
 ## 4. Build the WASM ty
 
 Now, we'll build the WASM build of ty. This will also take a bit of time:
-`wasm-pack build ../../crates/ty_wasm --target web --out-dir ../../playground/ty/ty_wasm`
+
+```bash
+wasm-pack build ../../crates/ty_wasm --target web --out-dir ../../playground/ty/ty_wasm
+```
 
 ## 5. Copy the files to the right directories
 
