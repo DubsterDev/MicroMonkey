@@ -15,7 +15,7 @@
     "web:deploy-beta": "npm run web:build && node copy-firebase-json.mjs beta && firebase deploy"
   },
   "devDependencies": {
-    "generate-license-file": "^4.1.1",
-    "vitepress": "^2.0.0-alpha.17"
+    "generate-license-file": "^4.2.5",
+    "vitepress": "^2.0.0-alpha.20"
   }
 }
