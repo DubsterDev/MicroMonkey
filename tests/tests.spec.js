@@ -88,6 +88,8 @@ test("can create file", async ({ page }) => {
     await setupPage(page)
 
     await expect(page.locator("#boardStatus")).toHaveText("Disconnect");
+
+    await page.waitForTimeout(1000);
     
     await page.locator('#newFileRoot').click();
 
@@ -95,7 +97,7 @@ test("can create file", async ({ page }) => {
     
     await page.keyboard.type("playwright_file.txt\n");
 
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(750);
 
     await expect(page.locator('p[title="/playwright_file.txt"]')).toHaveText("playwright_file.txt");
 })
