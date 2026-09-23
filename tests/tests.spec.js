@@ -50,6 +50,24 @@ test.afterAll(async () => {
   mpy.kill();
 });
 
+test("shows welcome page", async ({ page }) => {
+    await setupPage(page)
+
+    await expect(page.locator("#boardStatus")).toHaveText("Disconnect");
+
+    await expect(page.locator("#customEditor h2")).toHaveText("Welcome to MicroMonkey!");
+})
+
+test("can open settings", async ({ page }) => {
+    await setupPage(page)
+
+    await expect(page.locator("#boardStatus")).toHaveText("Disconnect");
+
+    await page.keyboard.press("Control+Shift+P");
+    await page.keyboard.type("settings\n");
+
+    await expect(page.locator("#customEditor h2")).toHaveText("Settings");
+})
 
 test("can connect", async ({ page }) => {
     await setupPage(page)
@@ -60,6 +78,22 @@ test("can connect", async ({ page }) => {
         /main.py/,
     );
 });
+
+test("can create file", async ({ page }) => {
+    await setupPage(page)
+
+    await expect(page.locator("#boardStatus")).toHaveText("Disconnect");
+    
+    await page.locator('#newFileRoot').click();
+
+    await expect(page.locator("#commandPaletteTitle")).toHaveText("Enter a name for the file")
+    
+    await page.keyboard.type("playwright_file.txt\n");
+
+    await page.waitForTimeout(500);
+
+    await expect(page.locator('p[title="/playwright_file.txt"]')).toHaveText("playwright_file.txt");
+})
 
 test("does ask for save confirmation", async ({ page }) => {
     await setupPage(page)
