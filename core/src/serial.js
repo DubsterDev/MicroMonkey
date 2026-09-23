@@ -10,7 +10,7 @@ import { cleanUpGit, fsDeleteRecursively, fsEmptyDir, fsUnlink } from "./git";
 import { closeAllFiles } from "./tyManager";
 
 // Root directory, just so we can change it for CI
-const rootDir = import.meta.env.MODE === "ci" ? "/tmp-micromonkey" : ""
+const rootDir = import.meta.env.MODE === "ci" ? "/tmp/micromonkey" : ""
 
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");

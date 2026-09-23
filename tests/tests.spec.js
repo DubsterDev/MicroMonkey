@@ -1,6 +1,11 @@
 // @ts-check
 import { test, expect } from "@playwright/test";
 import { spawn } from "node:child_process";
+import { rm, mkdir, writeFile } from "node:fs/promises";
+
+await rm("/tmp/micromonkey", { recursive: true, force: true });
+await mkdir("/tmp/micromonkey", { recursive: true });
+await writeFile("/tmp/micromonkey/main.py", "print(\"Welcome!\")");
 
 let currentPage;
 
