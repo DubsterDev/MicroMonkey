@@ -68,7 +68,7 @@ export class AndroidSerial {
      * Start disconnecting from the serial port, for compatibility
      */
     async preDisconnect() {
-        ready = false;
+        this.ready = false;
     }
     
     /**
