@@ -25,7 +25,6 @@ export class AndroidSerial {
     async establishConnection() {
         if (serialPolyfill.requestPort()) {
             this.ready = true;
-            console.log("we're ready now")
             if (this.onConnect) this.onConnect();
         }
     }
