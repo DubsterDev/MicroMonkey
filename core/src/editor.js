@@ -20,7 +20,7 @@ export function setUpMonaco() {
     // Define MonacoEnviroment so it gets the service worker from the right spot
     self.MonacoEnvironment = {
         getWorker: function (_moduleId, label) {
-            return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), {
+            return new Worker(new URL('../node_modules/monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), {
                 type: 'module'
             });
         }
