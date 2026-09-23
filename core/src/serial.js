@@ -9,6 +9,9 @@ import { addCommand, removeCommand } from "./commandPalette";
 import { cleanUpGit, fsDeleteRecursively, fsEmptyDir, fsUnlink } from "./git";
 import { closeAllFiles } from "./tyManager";
 
+// Root directory, just so we can change it for CI
+const rootDir = import.meta.env.MODE === "ci" ? "/tmp/micromonkey" : ""
+
 // Get the elements for the serial monitor and the panel that holds the tabs, editor, and serial monitor
 const serialMonitor = document.getElementById("serialMonitor");
 
@@ -74,7 +77,7 @@ export async function writeFile(code, filename, allowSoftReboot = true) {
     await wait(100);
 
     // Create code snippet that opens the file
-    let fileWriteCode = `file = open("${filename.replaceAll("\"", "\\\"")}", "w")`;
+    let fileWriteCode = `file = open("${rootDir + (filename.startsWith("/") ? "" : "/")}${filename.replaceAll("\"", "\\\"")}", "w")`;
 
     // Write the file onto the board in chunks
     for (let i = 0; i < code.length; i += 125) {
@@ -111,7 +114,7 @@ export async function getFile(filename) {
 
     // Get the contents of the file
     const { result } = await runCode(`
-file = open("${filename.replaceAll("\"", "\\\"")}", "r")
+file = open("${rootDir + (filename.startsWith("/") ? "" : "/")}${filename.replaceAll("\"", "\\\"")}", "r")
 print(file.read())
 file.close()`);
 
@@ -137,7 +140,7 @@ export async function getFiles() {
     // Read the folders from the board
     const { result } = await runCode(`import os
 import json
-def get_contents_of_dir(dir_name="/"):
+def get_contents_of_dir(dir_name="${rootDir !== "" ? rootDir : "/"}"):
     files = os.ilistdir(dir_name)
     result = {}
     for file in files:
@@ -170,7 +173,7 @@ export async function createFile(filePath) {
 
     // Run code to create a new file on the board
     await runCode(`import os
-f = open("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "w")
+f = open("${rootDir + (filePath.startsWith("/") ? "" : "/")}${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "w")
 f.close()`)
 }
 
@@ -192,7 +195,7 @@ export async function createDirectory(filePath) {
 
     // Create a folder on the board
     await runCode(`import os
-os.mkdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+os.mkdir("${rootDir + (filePath.startsWith("/") ? "" : "/")}${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
 }
 
 
@@ -215,7 +218,7 @@ export async function renameFile(oldFilePath, newFilePath) {
 
     // Rename the file on the board
     await runCode(`import os
-os.rename("${oldFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "${newFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+os.rename("${rootDir + (oldFilePath.startsWith("/") ? "" : "/")}${oldFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}", "${rootDir + (newFilePath.startsWith("/") ? "" : "/")}${newFilePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
 }
 
 /**
@@ -236,7 +239,7 @@ export async function removeFile(filePath) {
 
     // Delete the file from the board
     await runCode(`import os
-os.remove("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`)
+os.remove("${rootDir + (filePath.startsWith("/") ? "" : "/")}${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`)
 
     // Delete the file from git
     await fsUnlink(filePath);
@@ -263,7 +266,7 @@ export async function removeDirectory(filePath) {
 
     // Delete a folder off the board
     await runCode(`import os
-os.rmdir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+os.rmdir("${rootDir + (filePath.startsWith("/") ? "" : "/")}${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
 }
 
 /**
@@ -294,7 +297,7 @@ def recursively_delete_dir(dir_name="/"):
         else:
             os.remove(dir_name + file[0])
     os.rmdir(dir_name)
-recursively_delete_dir("${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
+recursively_delete_dir("${rootDir + (filePath.startsWith("/") ? "" : "/")}${filePath.replaceAll("\\", "\\\\").replaceAll("\"", "\\\"").replaceAll("\n", "\\n").replaceAll("\r", "")}")`);
 
     // Delete directory from git
     await fsDeleteRecursively(filePath);

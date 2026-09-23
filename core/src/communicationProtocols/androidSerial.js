@@ -14,7 +14,9 @@ export class AndroidSerial {
      * Initializes Android Serial and connects immediately.
      */
     constructor() {
-        this.establishConnection();
+        if (import.meta.env.MODE !== "ci") {
+            this.establishConnection();
+        }
     }
 
     /**
@@ -68,7 +70,7 @@ export class AndroidSerial {
      * Start disconnecting from the serial port, for compatibility
      */
     async preDisconnect() {
-        ready = false;
+        this.ready = false;
     }
     
     /**

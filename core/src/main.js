@@ -37,7 +37,7 @@ import { AndroidSerial } from "./communicationProtocols/androidSerial";
 
 // Get the serial interface
 window.serialInterface =
-    import.meta.env.MODE === "android" ? new AndroidSerial() : new WebSerial();
+    (import.meta.env.MODE === "android" || import.meta.env.MODE === "ci") ? new AndroidSerial() : new WebSerial();
 
 // Insert the editor into the DOM
 const [editor, diffEditor] = setUpMonaco();

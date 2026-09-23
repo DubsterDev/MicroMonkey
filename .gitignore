@@ -6,3 +6,10 @@ docs/public/ide
 .firebase
 firebase.json
 google*.html
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
