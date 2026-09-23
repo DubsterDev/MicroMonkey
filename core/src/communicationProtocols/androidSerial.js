@@ -14,7 +14,9 @@ export class AndroidSerial {
      * Initializes Android Serial and connects immediately.
      */
     constructor() {
-        this.establishConnection();
+        if (import.meta.env.MODE !== "ci") {
+            this.establishConnection();
+        }
     }
 
     /**
@@ -23,6 +25,7 @@ export class AndroidSerial {
     async establishConnection() {
         if (serialPolyfill.requestPort()) {
             this.ready = true;
+            console.log("we're ready now")
             if (this.onConnect) this.onConnect();
         }
     }
