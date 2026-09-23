@@ -17,6 +17,14 @@ jobs:
       run: cd core && npm ci && cd .. && npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+    - name: Install MicroPython
+      run: |
+          git clone https://github.com/micropython/micropython.git --depth 1
+          cd micropython
+          cd ports/unix
+          make submodules
+          make
+          cd ..
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4

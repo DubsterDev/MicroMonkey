@@ -10,7 +10,7 @@ await writeFile("/tmp/micromonkey/main.py", "print(\"Welcome!\")");
 let currentPage;
 
 let mpy = spawn(
-    "/home/dubster/source/repos/micropython/ports/unix/build-standard/micropython",
+    "./micropython/ports/unix/build-standard/micropython",
     ["-i"],
     {
         stdio: ["pipe", "pipe", "pipe"],
