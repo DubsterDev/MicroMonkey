@@ -9,10 +9,12 @@
     "electron:build-packages": "npm run electron:build && cd electron && npm run make && cd ..",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
+    "docs:build:nightly": "VITE_IS_NIGHTLY=true vitepress dev docs",
     "docs:preview": "vitepress preview docs",
     "web:build": "npm run core:build && node copyBuildToDocs.js && npm run docs:build",
+    "web:build:nightly": "npm run core:build && node copyBuildToDocs.js && npm run docs:build:nightly",
     "web:deploy": "npm run web:build && node copy-firebase-json.mjs prod && firebase deploy",
-    "web:deploy-beta": "npm run web:build && node copy-firebase-json.mjs beta && firebase deploy"
+    "web:deploy:nightly": "npm run web:build:nightly && node copy-firebase-json.mjs beta && firebase deploy"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

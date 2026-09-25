@@ -1,9 +1,17 @@
 import { defineConfig } from 'vitepress'
 
+const isNightly = process.env.VITE_IS_NIGHTLY === 'true'
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "MicroMonkey",
-  description: "A fast, browser-based MicroPython IDE for ESP32 with built-in REPL, Git, syntax checking, and flasher, no installation required!",
+  transformPageData(pageData) {
+    if (pageData.frontmatter.layout === 'home' && isNightly) {
+      pageData.frontmatter.hero.name = pageData.frontmatter.hero.name +' Nightly'
+      pageData.frontmatter.hero.tagline = "This is the Nightly build of MicroMonkey, built off of the GitHub repo HEAD."
+    }
+  },
+  title: isNightly ? "MicroMonkey Nightly" : "MicroMonkey",
+  description: (isNightly ? "Nightly build of MicroMonkey, a" : "A") + " fast, browser-based MicroPython IDE for ESP32 with built-in REPL, Git, syntax checking, and flasher, no installation required!",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
