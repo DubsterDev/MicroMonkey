@@ -42,12 +42,6 @@ features:
 
 ---
 
-<script setup>
-    const isNightly = import.meta.env.VITE_IS_NIGHTLY;
-</script>
-
-The current environment is: {{ isNightly }}
-
 <style>
   .hero-video {
     border-radius: 12px;
