@@ -7,7 +7,7 @@ export default defineConfig({
   transformPageData(pageData) {
     if (pageData.frontmatter.layout === 'home' && isNightly) {
       pageData.frontmatter.hero.name = pageData.frontmatter.hero.name +' Nightly'
-      pageData.frontmatter.hero.tagline = "This is the Nightly build of MicroMonkey, built off of the GitHub repo HEAD."
+      pageData.frontmatter.hero.tagline = "This is the nightly build of MicroMonkey, built from the latest commit on the GitHub repository."
     }
   },
   title: isNightly ? "MicroMonkey Nightly" : "MicroMonkey",
